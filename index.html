@@ -40,7 +40,7 @@
             }
         };
 
-        // --- IMPRESSÃO UNITÁRIA AJUSTADA ---
+        // --- IMPRESSÃO UNITÁRIA AJUSTADA PARA 58mm ---
         window.imprimirCupom = (dados, tipo = 'OS') => {
             const janela = window.open('', '', 'width=300,height=600');
             const NOME_EMPRESA = "EMANUEL SOLUCOES TECNOLOGICAS";
@@ -49,22 +49,22 @@
                 <html>
                 <head>
                     <style>
-                        @page { size: 58mm 200mm; margin: 0; }
+                        /* Força o tamanho da página para 58mm */
+                        @page { size: 58mm auto; margin: 0; }
+                        html, body { margin: 0; padding: 0; background: #fff; }
                         body { 
                             font-family: 'Courier New', monospace; 
-                            width: 54mm; 
-                            margin: 0; 
+                            width: 52mm; /* Deixando margem de segurança para não cortar */
                             padding: 2mm; 
-                            font-size: 12px; 
-                            line-height: 1.1;
+                            font-size: 13px; 
+                            line-height: 1.2;
                             text-transform: uppercase;
-                            background: white;
                         }
                         .c { text-align: center; } 
                         .b { font-weight: bold; }
-                        .hr { border-bottom: 1px dashed #000; margin: 4px 0; }
-                        .total { font-size: 16px; font-weight: bold; text-align: center; margin: 8px 0; }
-                        .espaco-final { height: 50px; }
+                        .hr { border-bottom: 1px dashed #000; margin: 5px 0; width: 100%; }
+                        .total { font-size: 16px; font-weight: bold; text-align: center; margin: 10px 0; border: 1px solid #000; padding: 5px; }
+                        .espaco-final { height: 60px; }
                     </style>
                 </head>
                 <body onload="window.print(); window.onafterprint = function(){ window.close(); };">
@@ -84,28 +84,22 @@
                         <div class="hr"></div>
                         <div class="b">SERVICO:</div>
                         <div>${dados.servico_principal}</div>
-                        <div class="hr"></div>
                         <div class="total">TOTAL: R$ ${dados.valor_servico.toFixed(2)}</div>
                     ` : `
                         <div class="hr"></div>
-                        <div style="height: 30px; border-bottom: 1px solid #000; margin-top: 20px;"></div>
-                        <div class="c" style="font-size: 9px;">ASSINATURA DO CLIENTE</div>
+                        <div style="height: 40px; border-bottom: 1px solid #000; margin-top: 20px;"></div>
+                        <div class="c" style="font-size: 10px;">ASSINATURA DO CLIENTE</div>
                     `}
-                    ${tipo === 'RECIBO' ? `
-                        <div class="hr"></div>
-                        <div>PAGAMENTO: ${dados.forma_pagamento}</div>
-                        <div>DATA PAG: ${dados.data_pagamento}</div>
-                    ` : ''}
                     <div class="hr"></div>
                     <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                    <div class="c" style="font-size: 9px;">DEUS E FIEL</div>
+                    <div class="c" style="font-size: 10px;">DEUS E FIEL</div>
                     <div class="espaco-final"></div>
                 </body></html>`;
             janela.document.write(layout);
             janela.document.close();
         };
 
-        // --- IMPRESSÃO DE LOTE AJUSTADA ---
+        // --- IMPRESSÃO DE LOTE AJUSTADA PARA 58mm ---
         window.imprimirLote = (lista, cliente, total) => {
             const janela = window.open('', '', 'width=300,height=600');
             const NOME_EMPRESA = "EMANUEL SOLUCOES TECNOLOGICAS";
@@ -118,16 +112,16 @@
                         SERV: ${item.servico || 'PENDENTE'}<br>
                         VALOR: R$ ${item.valor.toFixed(2)}
                     </div>
-                    <div style="border-bottom: 0.5px solid #ccc; margin: 4px 0;"></div>`;
+                    <div style="border-bottom: 1px solid #eee; margin: 4px 0;"></div>`;
             });
 
             const layout = `
                 <html>
                 <head><style>
-                    @page { size: 58mm 300mm; margin: 0; }
-                    body { font-family: 'Courier New', monospace; width: 54mm; margin: 0; padding: 2mm; font-size: 11px; line-height: 1.1; text-transform: uppercase; background: white; }
+                    @page { size: 58mm auto; margin: 0; }
+                    body { font-family: 'Courier New', monospace; width: 52mm; margin: 0; padding: 2mm; font-size: 12px; line-height: 1.2; text-transform: uppercase; background: white; }
                     .c { text-align: center; } .b { font-weight: bold; }
-                    .hr { border-bottom: 1px dashed #000; margin: 4px 0; }
+                    .hr { border-bottom: 1px dashed #000; margin: 5px 0; }
                 </style></head>
                 <body onload="window.print(); window.onafterprint = function(){ window.close(); };">
                     <div class="c b">${NOME_EMPRESA}</div>
@@ -138,10 +132,10 @@
                     <div class="hr"></div>
                     ${itensHTML}
                     <div class="hr"></div>
-                    <div class="c b" style="font-size: 16px;">TOTAL GERAL: R$ ${total.toFixed(2)}</div>
+                    <div class="c b" style="font-size: 16px; border: 1px solid #000; padding: 5px;">TOTAL GERAL: R$ ${total.toFixed(2)}</div>
                     <div class="hr"></div>
                     <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                    <div style="height:60px"></div>
+                    <div style="height:70px"></div>
                 </body></html>`;
             janela.document.write(layout);
             janela.document.close();
