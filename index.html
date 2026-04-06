@@ -3,11 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oficina Emanuel - Arny SP5</title>
+    <title>Oficina Emanuel - Newpass Q2i</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* CSS PARA TELA (NÃO APARECE NO PAPEL) */
+        #areaImpressao { display: none; }
+
+        /* CSS EXCLUSIVO PARA IMPRESSORA 58mm */
+        @media print {
+            body * { visibility: hidden; }
+            #areaImpressao, #areaImpressao * { visibility: visible; }
+            #areaImpressao {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 54mm; /* Largura real da bobina da Newpass */
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            @page { size: 58mm auto; margin: 0; }
+            .cupom-texto {
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 14px;
+                line-height: 1.2;
+                text-transform: uppercase;
+                color: black;
+            }
+            .hr { border-bottom: 1px dashed black; margin: 5px 0; }
+            .c { text-align: center; }
+            .b { font-weight: bold; }
+        }
+    </style>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB9_vQUtyjCx8KQw3k5fPlutOD-ekCaHw8",
@@ -25,6 +57,7 @@
         let itensSelecionados = [];
         let clienteAtualSelecao = null;
 
+        // --- NAVEGAÇÃO ---
         window.mudarAba = (aba) => {
             document.getElementById('telaEntrada').classList.toggle('hidden', aba !== 'entrada');
             document.getElementById('telaPendentes').classList.toggle('hidden', aba !== 'pendentes');
@@ -40,107 +73,78 @@
             }
         };
 
-        // --- IMPRESSÃO UNITÁRIA AJUSTADA PARA 58mm ---
-        window.imprimirCupom = (dados, tipo = 'OS') => {
-            const janela = window.open('', '', 'width=300,height=600');
-            const NOME_EMPRESA = "EMANUEL SOLUCOES TECNOLOGICAS";
-            
-            const layout = `
-                <html>
-                <head>
-                    <style>
-                        /* Força o tamanho da página para 58mm */
-                        @page { size: 58mm auto; margin: 0; }
-                        html, body { margin: 0; padding: 0; background: #fff; }
-                        body { 
-                            font-family: 'Courier New', monospace; 
-                            width: 52mm; /* Deixando margem de segurança para não cortar */
-                            padding: 2mm; 
-                            font-size: 13px; 
-                            line-height: 1.2;
-                            text-transform: uppercase;
-                        }
-                        .c { text-align: center; } 
-                        .b { font-weight: bold; }
-                        .hr { border-bottom: 1px dashed #000; margin: 5px 0; width: 100%; }
-                        .total { font-size: 16px; font-weight: bold; text-align: center; margin: 10px 0; border: 1px solid #000; padding: 5px; }
-                        .espaco-final { height: 60px; }
-                    </style>
-                </head>
-                <body onload="window.print(); window.onafterprint = function(){ window.close(); };">
-                    <div class="c b">${NOME_EMPRESA}</div>
-                    <div class="c">${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}</div>
-                    <div class="hr"></div>
-                    <div class="b">OS NUMERO: ${dados.id}</div>
-                    <div class="b">COD. MAQUINA: ${dados.codigo_maquina}</div>
-                    <div class="hr"></div>
-                    <div>DATA: ${dados.data_entrada}</div>
-                    <div>CLIENTE: ${dados.cliente}</div>
-                    <div>EQUIP.: ${dados.equipamento}</div>
-                    <div class="hr"></div>
-                    <div class="b">DEFEITO:</div>
-                    <div>${dados.defeito}</div>
-                    ${dados.servico_principal ? `
-                        <div class="hr"></div>
-                        <div class="b">SERVICO:</div>
-                        <div>${dados.servico_principal}</div>
-                        <div class="total">TOTAL: R$ ${dados.valor_servico.toFixed(2)}</div>
-                    ` : `
-                        <div class="hr"></div>
-                        <div style="height: 40px; border-bottom: 1px solid #000; margin-top: 20px;"></div>
-                        <div class="c" style="font-size: 10px;">ASSINATURA DO CLIENTE</div>
-                    `}
-                    <div class="hr"></div>
-                    <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                    <div class="c" style="font-size: 10px;">DEUS E FIEL</div>
-                    <div class="espaco-final"></div>
-                </body></html>`;
-            janela.document.write(layout);
-            janela.document.close();
+        // --- FUNÇÃO DE IMPRESSÃO UNIFICADA (CORREÇÃO PARA NEWPASS) ---
+        window.imprimirConteudo = (html) => {
+            const area = document.getElementById('areaImpressao');
+            area.innerHTML = `<div class="cupom-texto">${html}</div>`;
+            setTimeout(() => {
+                window.print();
+            }, 500);
         };
 
-        // --- IMPRESSÃO DE LOTE AJUSTADA PARA 58mm ---
-        window.imprimirLote = (lista, cliente, total) => {
-            const janela = window.open('', '', 'width=300,height=600');
-            const NOME_EMPRESA = "EMANUEL SOLUCOES TECNOLOGICAS";
+        window.imprimirCupom = (dados, tipo = 'OS') => {
+            const NOME = "EMANUEL SOLUCOES TECNOLOGICAS";
+            const layout = `
+                <div class="c b">${NOME}</div>
+                <div class="c">${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO'}</div>
+                <div class="hr"></div>
+                <div class="b">OS: ${dados.id} - COD: ${dados.codigo_maquina}</div>
+                <div class="hr"></div>
+                <div>DATA: ${dados.data_entrada}</div>
+                <div>CLIENTE: ${dados.cliente}</div>
+                <div>EQUIP.: ${dados.equipamento}</div>
+                <div class="hr"></div>
+                <div class="b">DEFEITO:</div>
+                <div>${dados.defeito}</div>
+                ${dados.servico_principal ? `
+                    <div class="hr"></div>
+                    <div class="b">SERVICO:</div>
+                    <div>${dados.servico_principal}</div>
+                    <div class="c b" style="font-size:18px; margin-top:10px">TOTAL: R$ ${parseFloat(dados.valor_servico).toFixed(2)}</div>
+                ` : `
+                    <div class="hr"></div>
+                    <div style="height:40px; border-bottom:1px solid black; margin-top:20px"></div>
+                    <div class="c" style="font-size:10px">ASSINATURA CLIENTE</div>
+                `}
+                <div class="hr"></div>
+                <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
+                <div style="height:60px"></div>`;
+            window.imprimirConteudo(layout);
+        };
+
+        window.imprimirLote = () => {
+            if (itensSelecionados.length < 2) return alert("Selecione 2 ou mais!");
+            let total = 0;
             let itensHTML = "";
-            lista.forEach(item => {
+            itensSelecionados.forEach(i => {
+                total += i.valor;
                 itensHTML += `
-                    <div style="margin-top: 8px;">
-                        <b>ID: ${item.id} - COD: ${item.cod}</b><br>
-                        DEF: ${item.defeito}<br>
-                        SERV: ${item.servico || 'PENDENTE'}<br>
-                        VALOR: R$ ${item.valor.toFixed(2)}
+                    <div style="margin-top:8px">
+                        <b>ID: ${i.id} - COD: ${i.cod}</b><br>
+                        DEF: ${i.defeito}<br>
+                        SERV: ${i.servico}<br>
+                        VALOR: R$ ${i.valor.toFixed(2)}
                     </div>
-                    <div style="border-bottom: 1px solid #eee; margin: 4px 0;"></div>`;
+                    <div style="border-bottom:1px solid #eee; margin:4px 0"></div>`;
             });
 
             const layout = `
-                <html>
-                <head><style>
-                    @page { size: 58mm auto; margin: 0; }
-                    body { font-family: 'Courier New', monospace; width: 52mm; margin: 0; padding: 2mm; font-size: 12px; line-height: 1.2; text-transform: uppercase; background: white; }
-                    .c { text-align: center; } .b { font-weight: bold; }
-                    .hr { border-bottom: 1px dashed #000; margin: 5px 0; }
-                </style></head>
-                <body onload="window.print(); window.onafterprint = function(){ window.close(); };">
-                    <div class="c b">${NOME_EMPRESA}</div>
-                    <div class="c">FECHAMENTO DE LOTE</div>
-                    <div class="hr"></div>
-                    <div class="b">CLIENTE: ${cliente}</div>
-                    <div>DATA: ${new Date().toLocaleDateString('pt-BR')}</div>
-                    <div class="hr"></div>
-                    ${itensHTML}
-                    <div class="hr"></div>
-                    <div class="c b" style="font-size: 16px; border: 1px solid #000; padding: 5px;">TOTAL GERAL: R$ ${total.toFixed(2)}</div>
-                    <div class="hr"></div>
-                    <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                    <div style="height:70px"></div>
-                </body></html>`;
-            janela.document.write(layout);
-            janela.document.close();
+                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
+                <div class="c b">RECIBO DE LOTE</div>
+                <div class="hr"></div>
+                <div>CLIENTE: ${clienteAtualSelecao}</div>
+                <div>DATA: ${new Date().toLocaleDateString('pt-BR')}</div>
+                <div class="hr"></div>
+                ${itensHTML}
+                <div class="hr"></div>
+                <div class="c b" style="font-size:18px">TOTAL: R$ ${total.toFixed(2)}</div>
+                <div class="hr"></div>
+                <div class="c b">DEUS E FIEL!</div>
+                <div style="height:60px"></div>`;
+            window.imprimirConteudo(layout);
         };
 
+        // --- LÓGICA DE SELEÇÃO ---
         window.toggleSelecao = (id, cliente, valor, cod, defeito, servico) => {
             const index = itensSelecionados.findIndex(i => i.id === id);
             if (index > -1) {
@@ -148,7 +152,7 @@
                 if (itensSelecionados.length === 0) clienteAtualSelecao = null;
             } else {
                 if (clienteAtualSelecao && clienteAtualSelecao !== cliente) {
-                    alert("Selecione apenas itens do mesmo cliente!");
+                    alert("Apenas itens do mesmo cliente!");
                     document.getElementById('chk' + id).checked = false;
                     return;
                 }
@@ -162,12 +166,7 @@
             document.getElementById('txtQtdLote').innerText = `${itensSelecionados.length} MÁQUINAS`;
         };
 
-        window.dispararImpressaoLote = () => {
-            if (itensSelecionados.length < 2) return alert("Selecione ao menos 2 itens!");
-            const total = itensSelecionados.reduce((a, b) => a + b.valor, 0);
-            window.imprimirLote(itensSelecionados, clienteAtualSelecao, total);
-        };
-
+        // --- CARREGAR BANCADA ---
         async function carregarPendentes() {
             itensSelecionados = []; clienteAtualSelecao = null;
             document.getElementById('btnLote').classList.add('hidden');
@@ -193,147 +192,83 @@
                                 </div>
                                 <h3 class="text-2xl font-black text-blue-900 uppercase leading-none">${d.equipamento}</h3>
                                 <p class="text-[11px] font-bold text-gray-500 mb-4 uppercase italic">👤 ${d.cliente}</p>
-                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-3">
-                                    <p class="text-[9px] font-black text-slate-300 uppercase mb-1">Defeito:</p>
-                                    <p class="text-sm font-bold text-slate-700 uppercase leading-tight">${d.defeito || 'NÃO DESCRITO'}</p>
-                                </div>
-                                ${d.servico_principal ? `<div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 mb-4 font-black text-blue-800 uppercase italic text-sm">🛠 ${d.servico_principal}</div>` : ''}
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-3 text-sm font-bold text-slate-700 uppercase leading-tight">${d.defeito || 'NÃO DESCRITO'}</div>
+                                ${d.servico_principal ? `<div class="bg-blue-50 p-4 rounded-2xl mb-4 font-black text-blue-800 uppercase italic text-sm">🛠 ${d.servico_principal}</div>` : ''}
                                 <div class="flex gap-2">
-                                    ${status === 'PENDENTE' ? `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-900 text-white py-5 rounded-3xl font-black text-xs uppercase shadow-lg italic">LANÇAR SERVIÇO</button>` : 
-                                    `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-5 rounded-3xl font-black text-xs uppercase shadow-lg italic">RECEBER</button>`}
-                                    <button onclick='window.imprimirCupom({id:"${d.id}", codigo_maquina:"${d.codigo_maquina}", cliente:"${d.cliente}", equipamento:"${d.equipamento}", data_entrada:"${d.data_entrada}", defeito:"${d.defeito}", servico_principal:"${d.servico_principal||''}", valor_servico:${d.valor_servico||0}}, "OS")' class="bg-gray-100 p-5 rounded-3xl text-xl shadow-inner active:bg-gray-200">🖨️</button>
+                                    ${status === 'PENDENTE' ? `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-900 text-white py-5 rounded-3xl font-black text-xs uppercase shadow-lg">LANÇAR</button>` : `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-5 rounded-3xl font-black text-xs uppercase shadow-lg">RECEBER</button>`}
+                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="bg-gray-100 p-5 rounded-3xl text-xl shadow-inner active:bg-gray-200">🖨️</button>
                                 </div>
                             </div>`;
                     }
                 });
                 document.getElementById('resumoGeralBancada').innerText = `R$ ${totalAcumulado.toFixed(2)}`;
-            } catch (e) { alert("Erro ao carregar: " + e.message); }
+            } catch (e) { alert("Erro: " + e.message); }
         }
 
+        // --- LANÇAMENTO E PAGAMENTO (IGUAIS) ---
         window.abrirLancamento = async (id) => {
             idAtual = id;
-            const modal = document.getElementById('modalServicos');
+            document.getElementById('modalServicos').classList.remove('hidden');
             const lista = document.getElementById('listaDeServicos');
-            modal.classList.remove('hidden');
-            lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse uppercase'>Buscando...</p>";
-            try {
-                const snap = await getDocs(collection(db, "servicos_lista"));
-                lista.innerHTML = "";
-                snap.forEach(dDoc => {
-                    const s = dDoc.data();
-                    const nomeDoServico = s.servico_lista || s.servico || dDoc.id;
-                    const valorDoServico = s.valor || s.preco || 0;
-                    lista.innerHTML += `
-                        <button onclick="confirmarServico('${nomeDoServico}', ${valorDoServico})" class="w-full p-6 mb-4 bg-slate-50 rounded-[2rem] border-2 border-transparent active:border-blue-900 text-left shadow-sm">
-                            <div class="font-black text-blue-900 uppercase text-sm italic">${nomeDoServico}</div>
-                            <div class="text-green-600 font-black text-xs mt-1 italic font-mono">
-                                R$ ${valorDoServico.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                            </div>
-                        </button>`;
-                });
-            } catch (e) { alert("Erro ao carregar serviços: " + e.message); }
+            const snap = await getDocs(collection(db, "servicos_lista"));
+            lista.innerHTML = "";
+            snap.forEach(dDoc => {
+                const s = dDoc.data();
+                const n = s.servico_lista || s.servico || dDoc.id;
+                const v = s.valor || s.preco || 0;
+                lista.innerHTML += `<button onclick="confirmarServico('${n}', ${v})" class="w-full p-6 mb-4 bg-slate-50 rounded-[2rem] border-2 text-left font-black uppercase text-blue-900 text-sm italic">${n}<br><span class="text-green-600">R$ ${v.toFixed(2)}</span></button>`;
+            });
         };
 
         window.confirmarServico = async (nome, preco) => {
             if(!confirm(`LANÇAR ${nome}?`)) return;
-            try {
-                await updateDoc(doc(db, "ordens", idAtual.toString()), {
-                    servico_principal: nome.toUpperCase(),
-                    valor_servico: preco,
-                    status: "AGUARDANDO PAGAMENTO"
-                });
-                document.getElementById('modalServicos').classList.add('hidden');
-                carregarPendentes();
-            } catch (e) { alert(e.message); }
+            await updateDoc(doc(db, "ordens", idAtual.toString()), { servico_principal: nome.toUpperCase(), valor_servico: preco, status: "AGUARDANDO PAGAMENTO" });
+            document.getElementById('modalServicos').classList.add('hidden'); carregarPendentes();
         };
 
         window.prepararFinalizacao = async (id) => {
             idAtual = id;
             document.getElementById('modalPagamento').classList.remove('hidden');
-            const display = document.getElementById('displayValor');
-            const listaP = document.getElementById('listaFormasPag');
-            try {
-                const docSnap = await getDoc(doc(db, "ordens", id.toString()));
-                const valor = docSnap.data().valor_servico || 0;
-                display.innerText = "R$ " + valor.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                const snapP = await getDocs(collection(db, "formas_pagamento"));
-                listaP.innerHTML = "";
-                snapP.forEach(dDoc => {
-                    const f = dDoc.data();
-                    listaP.innerHTML += `
-                        <label class="flex items-center p-5 bg-gray-50 rounded-2xl mb-2 border-2 border-transparent has-[:checked]:border-blue-900 transition-all">
-                            <input type="radio" name="pag" value="${f.nome}" class="w-6 h-6 accent-blue-900">
-                            <span class="ml-4 font-black text-blue-900 uppercase text-sm italic">${f.nome}</span>
-                        </label>`;
-                });
-            } catch (e) { alert(e.message); }
+            const docSnap = await getDoc(doc(db, "ordens", id.toString()));
+            document.getElementById('displayValor').innerText = "R$ " + docSnap.data().valor_servico.toFixed(2);
+            const snapP = await getDocs(collection(db, "formas_pagamento"));
+            const listaP = document.getElementById('listaFormasPag'); listaP.innerHTML = "";
+            snapP.forEach(dDoc => { const f = dDoc.data(); listaP.innerHTML += `<label class="flex items-center p-5 bg-gray-50 rounded-2xl mb-2"><input type="radio" name="pag" value="${f.nome}" class="w-6 h-6 accent-blue-900"><span class="ml-4 font-black text-blue-900 uppercase text-sm italic">${f.nome}</span></label>`; });
         };
 
         window.confirmarPagamento = async () => {
-            const radio = document.querySelector('input[name="pag"]:checked');
-            if(!radio) return alert("SELECIONE A FORMA!");
-            try {
-                const docRef = doc(db, "ordens", idAtual.toString());
-                const dSnap = await getDoc(docRef);
-                const dados = dSnap.data();
-                dados.status = "PAGO";
-                dados.forma_pagamento = radio.value.toUpperCase();
-                dados.data_pagamento = new Date().toLocaleDateString('pt-BR');
-                await updateDoc(docRef, dados);
-                if(confirm("PAGO COM SUCESSO! IMPRIMIR RECIBO?")) {
-                    window.imprimirCupom(dados, 'RECIBO');
-                }
-                document.getElementById('modalPagamento').classList.add('hidden');
-                carregarPendentes();
-            } catch (e) { alert(e.message); }
+            const r = document.querySelector('input[name="pag"]:checked'); if(!r) return alert("FORMA?");
+            const docRef = doc(db, "ordens", idAtual.toString()); const dSnap = await getDoc(docRef); const dados = dSnap.data();
+            dados.status = "PAGO"; dados.forma_pagamento = r.value.toUpperCase(); dados.data_pagamento = new Date().toLocaleDateString('pt-BR');
+            await updateDoc(docRef, dados); if(confirm("PAGO! IMPRIMIR?")) window.imprimirCupom(dados, 'RECIBO');
+            document.getElementById('modalPagamento').classList.add('hidden'); carregarPendentes();
         };
 
-        window.abrirSeletor = async (tipo) => {
-            const modal = document.getElementById('modal');
-            const lista = document.getElementById('listaItens');
-            modal.classList.remove('hidden');
-            lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse uppercase'>Buscando...</p>";
-            try {
-                const snap = await getDocs(collection(db, tipo));
-                lista.innerHTML = "";
-                snap.forEach(dDoc => {
-                    const d = dDoc.data();
-                    const nome = tipo === 'clientes' ? (d.nome || d.BETINHO || dDoc.id) : (d.equipamento || d.nome || d.descricao);
-                    lista.innerHTML += `<button onclick="definirItem('${tipo}', '${nome}')" class="w-full p-6 text-left border-b font-black uppercase text-blue-900 active:bg-blue-50 italic">${nome}</button>`;
-                });
-            } catch (e) { alert(e.message); }
+        // --- ENTRADA ---
+        window.abrirSeletor = async (t) => {
+            const m = document.getElementById('modal'); const l = document.getElementById('listaItens'); m.classList.remove('hidden');
+            const s = await getDocs(collection(db, t)); l.innerHTML = "";
+            s.forEach(dDoc => { const d = dDoc.data(); const n = t === 'clientes' ? (d.nome || d.BETINHO || dDoc.id) : (d.equipamento || d.nome || d.descricao);
+            l.innerHTML += `<button onclick="definirItem('${t}', '${n}')" class="w-full p-6 text-left border-b font-black uppercase text-blue-900 italic">${n}</button>`; });
         };
 
-        window.definirItem = (tipo, valor) => {
-            if(tipo === 'clientes') document.getElementById('inputCliente').value = valor;
-            else document.getElementById('inputEquipamento').value = valor;
-            document.getElementById('modal').classList.add('hidden');
-        };
+        window.definirItem = (t, v) => { if(t === 'clientes') document.getElementById('inputCliente').value = v; else document.getElementById('inputEquipamento').value = v; document.getElementById('modal').classList.add('hidden'); };
 
         window.salvarEntrada = async () => {
-            const btn = document.getElementById('btnGravar');
-            const c = document.getElementById('inputCliente').value;
-            const e = document.getElementById('inputEquipamento').value;
-            const d = document.getElementById('defeito').value.toUpperCase();
-            if(!c || !e) return alert("COMPLETE OS DADOS!");
-            btn.disabled = true;
-            try {
-                const snapID = await getDocs(collection(db, "ordens"));
-                let maior = 0;
-                snapID.forEach(docS => { const idN = parseInt(docS.id); if(!isNaN(idN) && idN > maior) maior = idN; });
-                const novoID = (maior + 1).toString();
-                const cod = Math.random().toString(36).substring(2,5).toUpperCase() + Math.floor(100 + Math.random() * 900);
-                const dados = { id: parseInt(novoID), codigo_maquina: cod, cliente: c, equipamento: e, defeito: d, status: "PENDENTE", data_entrada: new Date().toLocaleDateString('pt-BR'), timestamp: Date.now(), servico_principal: "", valor_servico: 0, forma_pagamento: "", data_pagamento: "", observacoes: "" };
-                await setDoc(doc(db, "ordens", novoID), dados);
-                if(confirm("REGISTRADO! IMPRIMIR CANHOTO?")) window.imprimirCupom(dados, 'OS');
-                mudarAba('pendentes');
-            } catch (e) { alert(e.message); btn.disabled = false; }
+            const c = document.getElementById('inputCliente').value; const e = document.getElementById('inputEquipamento').value; const d = document.getElementById('defeito').value.toUpperCase();
+            if(!c || !e) return alert("DADOS!"); document.getElementById('btnGravar').disabled = true;
+            const snapID = await getDocs(collection(db, "ordens")); let m = 0; snapID.forEach(s => { const n = parseInt(s.id); if(!isNaN(n) && n > m) m = n; });
+            const nID = (m + 1).toString(); const cod = Math.random().toString(36).substring(2,5).toUpperCase() + Math.floor(100 + Math.random() * 900);
+            const dados = { id: parseInt(nID), codigo_maquina: cod, cliente: c, equipamento: e, defeito: d, status: "PENDENTE", data_entrada: new Date().toLocaleDateString('pt-BR'), timestamp: Date.now(), servico_principal: "", valor_servico: 0, forma_pagamento: "", data_pagamento: "", observacoes: "" };
+            await setDoc(doc(db, "ordens", nID), dados); if(confirm("IMPRIMIR?")) window.imprimirCupom(dados, 'OS'); mudarAba('pendentes');
         };
 
         window.onload = () => carregarPendentes();
     </script>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans">
+    <div id="areaImpressao"></div>
+
     <nav class="flex bg-white shadow-lg p-2 sticky top-0 z-[50]">
         <button id="btnAbaEntrada" onclick="mudarAba('entrada')" class="flex-1 p-4 rounded-2xl font-black uppercase text-xs text-blue-900">Nova Entrada</button>
         <button id="btnAbaPendentes" onclick="mudarAba('pendentes')" class="flex-1 p-4 rounded-2xl font-black uppercase text-xs bg-blue-900 text-white shadow-md">Na Bancada</button>
@@ -341,46 +276,31 @@
 
     <div id="telaPendentes" class="p-4 max-w-md mx-auto">
         <div class="bg-blue-900 rounded-[2.5rem] p-7 mb-6 text-white shadow-2xl relative overflow-hidden">
-            <div class="relative z-10"><p class="text-[10px] font-black opacity-60 uppercase italic tracking-widest">Total a Receber</p><h1 id="resumoGeralBancada" class="text-4xl font-black italic tracking-tighter">R$ 0,00</h1></div>
-            <div class="absolute -right-4 -bottom-4 opacity-10 text-6xl font-black italic">OFICINA</div>
+            <div class="relative z-10"><p class="text-[10px] font-black opacity-60 uppercase italic">Total a Receber</p><h1 id="resumoGeralBancada" class="text-4xl font-black italic tracking-tighter">R$ 0,00</h1></div>
         </div>
         <div id="btnLote" class="hidden bg-green-600 rounded-[2.5rem] p-6 mb-6 text-white shadow-xl flex justify-between items-center animate-bounce">
             <div><p id="txtQtdLote" class="text-[10px] font-black uppercase opacity-80 italic">0 ITENS</p><p id="txtTotalLote" class="text-2xl font-black italic tracking-tighter">R$ 0,00</p></div>
-            <button onclick="dispararImpressaoLote()" class="bg-white text-green-600 px-6 py-4 rounded-3xl font-black text-[10px] uppercase shadow-md active:scale-95">IMPRIMIR LOTE</button>
+            <button onclick="imprimirLote()" class="bg-white text-green-600 px-6 py-4 rounded-3xl font-black text-[10px] uppercase shadow-md">IMPRIMIR LOTE</button>
         </div>
         <div id="listaPendentes" class="pb-24"></div>
     </div>
 
     <div id="telaEntrada" class="hidden p-4 space-y-5 max-w-md mx-auto">
-        <header class="py-4 text-center"><h1 class="text-4xl font-black text-blue-900 uppercase italic italic tracking-tighter">Nova Entrada</h1></header>
+        <header class="py-4 text-center"><h1 class="text-4xl font-black text-blue-900 uppercase italic">Nova Entrada</h1></header>
         <input id="inputCliente" readonly onclick="abrirSeletor('clientes')" type="text" placeholder="CLIENTE" class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-black text-blue-900 uppercase outline-none">
         <input id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" type="text" placeholder="EQUIPAMENTO" class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-black text-blue-900 uppercase outline-none">
-        <textarea id="defeito" placeholder="DEFEITO RELATADO..." class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-bold text-slate-700 h-44 uppercase outline-none"></textarea>
-        <button id="btnGravar" onclick="salvarEntrada()" class="w-full bg-blue-900 text-white p-8 rounded-[3rem] font-black text-xl shadow-2xl active:scale-95 transition-all">GRAVAR SERVIÇO</button>
+        <textarea id="defeito" placeholder="DEFEITO..." class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-bold text-slate-700 h-44 uppercase outline-none"></textarea>
+        <button id="btnGravar" onclick="salvarEntrada()" class="w-full bg-blue-900 text-white p-8 rounded-[3rem] font-black text-xl shadow-2xl">GRAVAR</button>
     </div>
 
     <div id="modalServicos" class="hidden fixed inset-0 bg-blue-900/95 z-[100] p-4 flex items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 flex flex-col max-h-[85vh] shadow-2xl">
-            <h2 class="text-2xl font-black text-blue-900 uppercase italic mb-6 text-center">Tabela de Preços</h2>
-            <div id="listaDeServicos" class="overflow-y-auto flex-1 pr-2"></div>
-            <button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="mt-6 w-full p-6 bg-slate-100 rounded-3xl font-black text-xs uppercase text-slate-400">Voltar</button>
-        </div>
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 flex flex-col max-h-[85vh] shadow-2xl"><h2 class="text-2xl font-black text-blue-900 uppercase italic mb-6 text-center">Serviços</h2><div id="listaDeServicos" class="overflow-y-auto flex-1"></div><button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="mt-6 w-full p-6 bg-slate-100 rounded-3xl font-black text-xs uppercase text-slate-400">Voltar</button></div>
     </div>
-
     <div id="modalPagamento" class="hidden fixed inset-0 bg-blue-900/95 z-[110] p-4 flex items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl p-8 flex flex-col max-h-[90vh]">
-            <h2 class="text-2xl font-black text-blue-900 uppercase italic text-center mb-6">Finalizar</h2>
-            <div class="text-center mb-8"><p class="text-[10px] font-black text-gray-400 uppercase mb-1">Total a Receber</p><h3 id="displayValor" class="text-5xl font-black text-green-600 italic tracking-tighter">R$ 0,00</h3></div>
-            <div id="listaFormasPag" class="overflow-y-auto flex-1 mb-8"></div>
-            <div class="flex gap-3"><button onclick="document.getElementById('modalPagamento').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-400 p-6 rounded-3xl font-black text-xs uppercase">Sair</button><button onclick="confirmarPagamento()" class="flex-2 bg-green-600 text-white p-6 rounded-3xl font-black text-xs uppercase shadow-lg">Confirmar</button></div>
-        </div>
+        <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl p-8 flex flex-col max-h-[90vh]"><h2 class="text-2xl font-black text-blue-900 uppercase italic text-center mb-6">Receber</h2><div class="text-center mb-8"><h3 id="displayValor" class="text-5xl font-black text-green-600 italic tracking-tighter">R$ 0,00</h3></div><div id="listaFormasPag" class="overflow-y-auto flex-1 mb-8"></div><div class="flex gap-3"><button onclick="document.getElementById('modalPagamento').classList.add('hidden')" class="flex-1 bg-slate-100 p-6 rounded-3xl font-black text-xs uppercase">Sair</button><button onclick="confirmarPagamento()" class="flex-2 bg-green-600 text-white p-6 rounded-3xl font-black text-xs uppercase shadow-lg">Confirmar</button></div></div>
     </div>
-
     <div id="modal" class="hidden fixed inset-0 bg-blue-900/90 z-[100] p-4 flex items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl max-h-[80vh] flex flex-col overflow-hidden">
-            <div class="p-8 border-b flex justify-between items-center bg-slate-50"><h2 class="font-black text-blue-900 text-sm uppercase italic">Selecionar</h2><button onclick="document.getElementById('modal').classList.add('hidden')" class="text-red-500 font-black text-[10px] uppercase bg-red-100 px-6 py-2 rounded-full">Fechar</button></div>
-            <div id="listaItens" class="overflow-y-auto flex-1"></div>
-        </div>
+        <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl max-h-[80vh] flex flex-col overflow-hidden"><div class="p-8 border-b flex justify-between items-center"><h2 class="font-black text-blue-900 text-sm uppercase italic">Selecionar</h2><button onclick="document.getElementById('modal').classList.add('hidden')" class="text-red-500 font-black text-[10px] uppercase bg-red-100 px-6 py-2 rounded-full">Fechar</button></div><div id="listaItens" class="overflow-y-auto flex-1"></div></div>
     </div>
 </body>
 </html>
