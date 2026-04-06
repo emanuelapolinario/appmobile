@@ -3,8 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oficina Emanuel - Copiar Recibo</title>
+    <title>Oficina Emanuel - Newpass Q2i</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ESTILO PARA A TELA DO TABLET */
+        #areaImpressao { display: none; }
+
+        /* ESTILO EXCLUSIVO PARA A IMPRESSORA TÉRMICA 58mm */
+        @media print {
+            body * { visibility: hidden; }
+            #areaImpressao, #areaImpressao * { visibility: visible; }
+            #areaImpressao {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 52mm; /* Ajustado para a largura real da Newpass */
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            @page { size: 58mm auto; margin: 0; }
+            .cupom-texto {
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 13px;
+                line-height: 1.2;
+                text-transform: uppercase;
+                color: black;
+            }
+            .hr { border-bottom: 1px dashed black; margin: 5px 0; width: 100%; }
+            .c { text-align: center; }
+            .b { font-weight: bold; }
+            .espaco-fim { height: 60px; } /* Espaço para conseguir rasgar o papel */
+        }
+    </style>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -25,83 +58,95 @@
         let itensSelecionados = [];
         let clienteAtualSelecao = null;
 
-        // --- FUNÇÃO PARA COPIAR TEXTO ---
-        window.copiarParaImpressora = (texto) => {
-            navigator.clipboard.writeText(texto).then(() => {
-                alert("RECIBO COPIADO! Cole no RawBT para imprimir.");
-            }).catch(err => {
-                // Caso o navegador bloqueie o clipboard, mostra num prompt para copiar manual
-                window.prompt("Cópia automática falhou. Copie o texto abaixo:", texto);
-            });
-        };
-
-        // --- FORMATAR RECIBO UNITÁRIO ---
-        window.gerarTextoCupom = (dados, tipo = 'OS') => {
-            const linha = "--------------------------------\n";
-            let txt = "   EMANUEL SOLUCOES TECNICAS    \n";
-            txt += tipo === 'OS' ? "       ORDEM DE SERVICO         \n" : "      RECIBO DE PAGAMENTO       \n";
-            txt += linha;
-            txt += `OS: ${dados.id}      COD: ${dados.codigo_maquina}\n`;
-            txt += linha;
-            txt += `DATA: ${dados.data_entrada}\n`;
-            txt += `CLIENTE: ${dados.cliente.substring(0,23)}\n`;
-            txt += `EQUIP: ${dados.equipamento.substring(0,25)}\n`;
-            txt += linha;
-            txt += `DEFEITO:\n${dados.defeito}\n`;
-            
-            if (dados.servico_principal) {
-                txt += linha;
-                txt += `SERVICO: ${dados.servico_principal}\n`;
-                txt += linha;
-                txt += `TOTAL: R$ ${parseFloat(dados.valor_servico).toFixed(2)}\n`;
-            } else {
-                txt += "\n\n________________________________\n";
-                txt += "      ASSINATURA CLIENTE        \n";
-            }
-            
-            txt += linha;
-            txt += "    AGRADECEMOS A PREFERENCIA   \n";
-            txt += "          DEUS E FIEL           \n\n\n\n";
-            
-            window.copiarParaImpressora(txt);
-        };
-
-        // --- FORMATAR RECIBO DE LOTE ---
-        window.gerarTextoLote = () => {
-            if (itensSelecionados.length < 2) return alert("Selecione 2 ou mais!");
-            const linha = "--------------------------------\n";
-            let totalLote = 0;
-            let txt = "   EMANUEL SOLUCOES TECNICAS    \n";
-            txt += "       FECHAMENTO DE LOTE       \n";
-            txt += linha;
-            txt += `CLIENTE: ${clienteAtualSelecao}\n`;
-            txt += `DATA: ${new Date().toLocaleDateString('pt-BR')}\n`;
-            txt += linha;
-            
-            itensSelecionados.forEach(i => {
-                totalLote += i.valor;
-                txt += `ID:${i.id} COD:${i.cod}\n`;
-                txt += `DEF:${i.defeito.substring(0,28)}\n`;
-                txt += `SERV:${i.servico.substring(0,27)}\n`;
-                txt += `VALOR: R$ ${i.valor.toFixed(2)}\n`;
-                txt += "- - - - - - - - - - - - - - - - \n";
-            });
-
-            txt += linha;
-            txt += `TOTAL GERAL: R$ ${totalLote.toFixed(2)}\n`;
-            txt += linha;
-            txt += "          DEUS E FIEL           \n\n\n\n";
-            
-            window.copiarParaImpressora(txt);
-        };
-
-        // --- LOGICA DO FIREBASE E NAVEGAÇÃO ---
+        // --- NAVEGAÇÃO ---
         window.mudarAba = (aba) => {
             document.getElementById('telaEntrada').classList.toggle('hidden', aba !== 'entrada');
             document.getElementById('telaPendentes').classList.toggle('hidden', aba !== 'pendentes');
-            if(aba === 'pendentes') carregarPendentes();
+            const bE = document.getElementById('btnAbaEntrada');
+            const bP = document.getElementById('btnAbaPendentes');
+            if(aba === 'entrada') {
+                bE.className = "flex-1 p-4 rounded-2xl font-black uppercase text-xs bg-blue-900 text-white shadow-md";
+                bP.className = "flex-1 p-4 rounded-2xl font-black uppercase text-xs text-blue-900";
+            } else {
+                bP.className = "flex-1 p-4 rounded-2xl font-black uppercase text-xs bg-blue-900 text-white shadow-md";
+                bE.className = "flex-1 p-4 rounded-2xl font-black uppercase text-xs text-blue-900";
+                carregarPendentes();
+            }
         };
 
+        // --- FUNÇÃO DE IMPRESSÃO (ESTRATÉGIA PARA NÃO TRAVAR O ANDROID) ---
+        window.dispararPrint = (html) => {
+            const area = document.getElementById('areaImpressao');
+            area.innerHTML = `<div class="cupom-texto">${html}</div>`;
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        };
+
+        window.imprimirCupom = (dados, tipo = 'OS') => {
+            const layout = `
+                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
+                <div class="c">${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}</div>
+                <div class="hr"></div>
+                <div class="b">OS: ${dados.id} - COD: ${dados.codigo_maquina}</div>
+                <div class="hr"></div>
+                <div>DATA: ${dados.data_entrada}</div>
+                <div>CLIENTE: ${dados.cliente}</div>
+                <div>EQUIP.: ${dados.equipamento}</div>
+                <div class="hr"></div>
+                <div class="b">DEFEITO:</div>
+                <div>${dados.defeito}</div>
+                ${dados.servico_principal ? `
+                    <div class="hr"></div>
+                    <div class="b">SERVICO:</div>
+                    <div>${dados.servico_principal}</div>
+                    <div class="c b" style="font-size:18px; margin-top:10px">TOTAL: R$ ${parseFloat(dados.valor_servico).toFixed(2)}</div>
+                ` : `
+                    <div class="hr"></div>
+                    <div style="height:40px; border-bottom:1px solid black; margin-top:20px"></div>
+                    <div class="c" style="font-size:10px">ASSINATURA DO CLIENTE</div>
+                `}
+                <div class="hr"></div>
+                <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
+                <div class="c" style="font-size:10px">DEUS E FIEL</div>
+                <div class="espaco-fim"></div>`;
+            window.dispararPrint(layout);
+        };
+
+        window.imprimirLote = () => {
+            if (itensSelecionados.length < 2) return alert("Selecione 2 ou mais!");
+            let totalLote = 0;
+            let itensHTML = "";
+            itensSelecionados.forEach(i => {
+                totalLote += i.valor;
+                itensHTML += `
+                    <div style="margin-top:8px">
+                        <b>ID: ${i.id} - COD: ${i.cod}</b><br>
+                        DEF: ${i.defeito}<br>
+                        SERV: ${i.servico}<br>
+                        VALOR: R$ ${i.valor.toFixed(2)}
+                    </div>
+                    <div style="border-bottom:1px solid #eee; margin:4px 0"></div>`;
+            });
+
+            const layout = `
+                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
+                <div class="c b">FECHAMENTO DE LOTE</div>
+                <div class="hr"></div>
+                <div>CLIENTE: ${clienteAtualSelecao}</div>
+                <div>DATA: ${new Date().toLocaleDateString('pt-BR')}</div>
+                <div class="hr"></div>
+                <div class="b">ITENS:</div>
+                ${itensHTML}
+                <div class="hr"></div>
+                <div class="c b" style="font-size:18px">TOTAL: R$ ${totalLote.toFixed(2)}</div>
+                <div class="hr"></div>
+                <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
+                <div class="espaco-fim"></div>`;
+            window.dispararPrint(layout);
+        };
+
+        // --- LÓGICA DE SELEÇÃO ---
         window.toggleSelecao = (id, cliente, valor, cod, defeito, servico) => {
             const index = itensSelecionados.findIndex(i => i.id === id);
             if (index > -1) {
@@ -109,7 +154,7 @@
                 if (itensSelecionados.length === 0) clienteAtualSelecao = null;
             } else {
                 if (clienteAtualSelecao && clienteAtualSelecao !== cliente) {
-                    alert("Apenas itens do mesmo cliente!");
+                    alert("Selecione apenas itens do mesmo cliente!");
                     document.getElementById('chk' + id).checked = false;
                     return;
                 }
@@ -123,11 +168,12 @@
             document.getElementById('txtQtdLote').innerText = `${itensSelecionados.length} MÁQUINAS`;
         };
 
+        // --- LISTAR BANCADA ---
         async function carregarPendentes() {
             itensSelecionados = []; clienteAtualSelecao = null;
             document.getElementById('btnLote').classList.add('hidden');
             const lista = document.getElementById('listaPendentes');
-            lista.innerHTML = "<p class='p-10 text-center animate-pulse'>CARREGANDO...</p>";
+            lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse text-blue-900'>SINCRONIZANDO...</p>";
             try {
                 const snap = await getDocs(collection(db, "ordens"));
                 lista.innerHTML = "";
@@ -140,133 +186,204 @@
                         lista.innerHTML += `
                             <div class="bg-white p-5 rounded-[2.5rem] mb-5 shadow-xl border-l-[14px] ${status === 'PENDENTE' ? 'border-orange-500' : 'border-green-600'} relative">
                                 <div class="absolute right-6 top-6">
-                                    <input type="checkbox" id="chk${d.id}" onchange="toggleSelecao('${d.id}', '${d.cliente}', ${d.valor_servico || 0}, '${d.codigo_maquina}', '${d.defeito}', '${d.servico_principal || 'PENDENTE'}')" class="w-8 h-8 rounded-full accent-blue-900">
+                                    <input type="checkbox" id="chk${d.id}" onchange="toggleSelecao('${d.id}', '${d.cliente}', ${d.valor_servico || 0}, '${d.codigo_maquina}', '${d.defeito}', '${d.servico_principal || 'PENDENTE'}')" class="w-8 h-8 rounded-full accent-blue-900 shadow-sm">
                                 </div>
-                                <div class="mb-2">
+                                <div class="flex justify-between items-center mb-2 pr-12">
                                     <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full ${status === 'PENDENTE' ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'} italic">${status}</span>
-                                    <span class="text-[10px] font-black text-blue-900 bg-blue-50 px-3 py-1 rounded-lg ml-2">#${d.codigo_maquina}</span>
+                                    <span class="text-[10px] font-black text-blue-900 bg-blue-50 px-3 py-1 rounded-lg"># ${d.codigo_maquina}</span>
                                 </div>
-                                <h3 class="text-xl font-black text-blue-900 uppercase">${d.equipamento}</h3>
-                                <p class="text-xs font-bold text-gray-400 mb-3 uppercase">👤 ${d.cliente}</p>
+                                <h3 class="text-2xl font-black text-blue-900 uppercase leading-none">${d.equipamento}</h3>
+                                <p class="text-[11px] font-bold text-gray-500 mb-4 uppercase italic">👤 ${d.cliente}</p>
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-3 text-sm font-bold text-slate-700 uppercase leading-tight">${d.defeito || 'NÃO DESCRITO'}</div>
+                                ${d.servico_principal ? `<div class="bg-blue-50 p-4 rounded-2xl mb-4 font-black text-blue-800 uppercase italic text-sm">🛠 ${d.servico_principal}</div>` : ''}
                                 <div class="flex gap-2">
-                                    ${status === 'PENDENTE' ? `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-900 text-white py-4 rounded-2xl font-black text-xs">LANÇAR</button>` : `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-4 rounded-2xl font-black text-xs">RECEBER</button>`}
-                                    <button onclick='window.gerarTextoCupom(${JSON.stringify(d)}, "OS")' class="bg-gray-100 p-4 rounded-2xl text-lg shadow-inner">📋</button>
+                                    ${status === 'PENDENTE' ? `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-900 text-white py-5 rounded-3xl font-black text-xs uppercase shadow-lg italic">LANÇAR</button>` : `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-5 rounded-3xl font-black text-xs uppercase shadow-lg italic">RECEBER</button>`}
+                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="bg-gray-100 p-5 rounded-3xl text-xl shadow-inner active:bg-gray-200">🖨️</button>
                                 </div>
                             </div>`;
                     }
                 });
                 document.getElementById('resumoGeralBancada').innerText = `R$ ${totalAcumulado.toFixed(2)}`;
-            } catch (e) { alert(e.message); }
+            } catch (e) { alert("Erro ao carregar: " + e.message); }
         }
 
+        // --- LANÇAR SERVIÇO ---
         window.abrirLancamento = async (id) => {
-            idAtual = id; document.getElementById('modalServicos').classList.remove('hidden');
+            idAtual = id;
+            const modal = document.getElementById('modalServicos');
             const lista = document.getElementById('listaDeServicos');
-            const snap = await getDocs(collection(db, "servicos_lista"));
-            lista.innerHTML = "";
-            snap.forEach(dDoc => {
-                const s = dDoc.data(); const n = s.servico_lista || s.servico; const v = s.valor || 0;
-                lista.innerHTML += `<button onclick="confirmarServico('${n}', ${v})" class="w-full p-5 mb-3 bg-slate-50 rounded-2xl text-left font-black text-blue-900 uppercase text-xs border border-slate-100">${n} - R$ ${v.toFixed(2)}</button>`;
-            });
+            modal.classList.remove('hidden');
+            lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse uppercase'>Buscando...</p>";
+            try {
+                const snap = await getDocs(collection(db, "servicos_lista"));
+                lista.innerHTML = "";
+                snap.forEach(dDoc => {
+                    const s = dDoc.data();
+                    const n = s.servico_lista || s.servico || dDoc.id;
+                    const v = s.valor || s.preco || 0;
+                    lista.innerHTML += `<button onclick="confirmarServico('${n}', ${v})" class="w-full p-6 mb-4 bg-slate-50 rounded-[2rem] border-2 border-transparent active:border-blue-900 text-left shadow-sm">
+                        <div class="font-black text-blue-900 uppercase text-sm italic">${n}</div>
+                        <div class="text-green-600 font-black text-xs mt-1 italic">R$ ${v.toFixed(2)}</div>
+                    </button>`;
+                });
+            } catch (e) { alert(e.message); }
         };
 
         window.confirmarServico = async (nome, preco) => {
             if(!confirm(`LANÇAR ${nome}?`)) return;
-            await updateDoc(doc(db, "ordens", idAtual.toString()), { servico_principal: nome.toUpperCase(), valor_servico: preco, status: "AGUARDANDO PAGAMENTO" });
-            document.getElementById('modalServicos').classList.add('hidden'); carregarPendentes();
+            try {
+                await updateDoc(doc(db, "ordens", idAtual.toString()), { servico_principal: nome.toUpperCase(), valor_servico: preco, status: "AGUARDANDO PAGAMENTO" });
+                document.getElementById('modalServicos').classList.add('hidden');
+                carregarPendentes();
+            } catch (e) { alert(e.message); }
         };
 
+        // --- FINALIZAR PAGAMENTO ---
         window.prepararFinalizacao = async (id) => {
-            idAtual = id; document.getElementById('modalPagamento').classList.remove('hidden');
-            const docSnap = await getDoc(doc(db, "ordens", id.toString()));
-            document.getElementById('displayValor').innerText = "R$ " + docSnap.data().valor_servico.toFixed(2);
-            const snapP = await getDocs(collection(db, "formas_pagamento"));
-            const listaP = document.getElementById('listaFormasPag'); listaP.innerHTML = "";
-            snapP.forEach(dDoc => { const f = dDoc.data(); listaP.innerHTML += `<label class="flex items-center p-4 bg-gray-50 rounded-xl mb-2"><input type="radio" name="pag" value="${f.nome}" class="w-5 h-5 accent-blue-900"><span class="ml-3 font-black text-blue-900 uppercase text-xs italic">${f.nome}</span></label>`; });
+            idAtual = id;
+            document.getElementById('modalPagamento').classList.remove('hidden');
+            const display = document.getElementById('displayValor');
+            const listaP = document.getElementById('listaFormasPag');
+            try {
+                const docSnap = await getDoc(doc(db, "ordens", id.toString()));
+                display.innerText = "R$ " + docSnap.data().valor_servico.toFixed(2);
+                const snapP = await getDocs(collection(db, "formas_pagamento"));
+                listaP.innerHTML = "";
+                snapP.forEach(dDoc => {
+                    const f = dDoc.data();
+                    listaP.innerHTML += `<label class="flex items-center p-5 bg-gray-50 rounded-2xl mb-2 border-2 border-transparent has-[:checked]:border-blue-900 transition-all">
+                        <input type="radio" name="pag" value="${f.nome}" class="w-6 h-6 accent-blue-900">
+                        <span class="ml-4 font-black text-blue-900 uppercase text-sm italic">${f.nome}</span>
+                    </label>`;
+                });
+            } catch (e) { alert(e.message); }
         };
 
         window.confirmarPagamento = async () => {
-            const r = document.querySelector('input[name="pag"]:checked'); if(!r) return alert("FORMA?");
-            const docRef = doc(db, "ordens", idAtual.toString()); const dSnap = await getDoc(docRef); const dados = dSnap.data();
-            dados.status = "PAGO"; dados.forma_pagamento = r.value.toUpperCase(); dados.data_pagamento = new Date().toLocaleDateString('pt-BR');
-            await updateDoc(docRef, dados); if(confirm("PAGO! COPIAR RECIBO?")) window.gerarTextoCupom(dados, 'RECIBO');
-            document.getElementById('modalPagamento').classList.add('hidden'); carregarPendentes();
+            const radio = document.querySelector('input[name="pag"]:checked');
+            if(!radio) return alert("SELECIONE A FORMA!");
+            try {
+                const docRef = doc(db, "ordens", idAtual.toString());
+                const dSnap = await getDoc(docRef);
+                const dados = dSnap.data();
+                dados.status = "PAGO";
+                dados.forma_pagamento = radio.value.toUpperCase();
+                dados.data_pagamento = new Date().toLocaleDateString('pt-BR');
+                await updateDoc(docRef, dados);
+                if(confirm("PAGO! IMPRIMIR RECIBO?")) {
+                    window.imprimirCupom(dados, 'RECIBO');
+                }
+                document.getElementById('modalPagamento').classList.add('hidden');
+                carregarPendentes();
+            } catch (e) { alert(e.message); }
         };
 
-        window.abrirSeletor = async (t) => {
-            const m = document.getElementById('modal'); const l = document.getElementById('listaItens'); m.classList.remove('hidden');
-            const s = await getDocs(collection(db, t)); l.innerHTML = "";
-            s.forEach(dDoc => { const d = dDoc.data(); const n = t === 'clientes' ? (d.nome || d.BETINHO || dDoc.id) : (d.equipamento || d.nome);
-            l.innerHTML += `<button onclick="definirItem('${t}', '${n}')" class="w-full p-5 text-left border-b font-black uppercase text-blue-900 italic text-sm">${n}</button>`; });
+        // --- ENTRADA DE SERVIÇO ---
+        window.abrirSeletor = async (tipo) => {
+            const modal = document.getElementById('modal');
+            const lista = document.getElementById('listaItens');
+            modal.classList.remove('hidden');
+            lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse uppercase'>Buscando...</p>";
+            try {
+                const snap = await getDocs(collection(db, tipo));
+                lista.innerHTML = "";
+                snap.forEach(dDoc => {
+                    const d = dDoc.data();
+                    const nome = tipo === 'clientes' ? (d.nome || d.BETINHO || dDoc.id) : (d.equipamento || d.nome || d.descricao);
+                    lista.innerHTML += `<button onclick="definirItem('${tipo}', '${nome}')" class="w-full p-6 text-left border-b font-black uppercase text-blue-900 active:bg-blue-50 italic">${nome}</button>`;
+                });
+            } catch (e) { alert(e.message); }
         };
 
-        window.definirItem = (t, v) => { if(t === 'clientes') document.getElementById('inputCliente').value = v; else document.getElementById('inputEquipamento').value = v; document.getElementById('modal').classList.add('hidden'); };
+        window.definirItem = (tipo, valor) => {
+            if(tipo === 'clientes') document.getElementById('inputCliente').value = valor;
+            else document.getElementById('inputEquipamento').value = valor;
+            document.getElementById('modal').classList.add('hidden');
+        };
 
         window.salvarEntrada = async () => {
-            const c = document.getElementById('inputCliente').value; const e = document.getElementById('inputEquipamento').value; const d = document.getElementById('defeito').value.toUpperCase();
-            if(!c || !e) return alert("DADOS!");
-            const snapID = await getDocs(collection(db, "ordens")); let m = 0; snapID.forEach(s => { const n = parseInt(s.id); if(!isNaN(n) && n > m) m = n; });
-            const nID = (m + 1).toString(); const cod = Math.random().toString(36).substring(2,5).toUpperCase() + Math.floor(100 + Math.random() * 900);
-            const dados = { id: parseInt(nID), codigo_maquina: cod, cliente: c, equipamento: e, defeito: d, status: "PENDENTE", data_entrada: new Date().toLocaleDateString('pt-BR'), timestamp: Date.now(), servico_principal: "", valor_servico: 0, forma_pagamento: "", data_pagamento: "", observacoes: "" };
-            await setDoc(doc(db, "ordens", nID), dados); if(confirm("GRAVADO! COPIAR OS?")) window.gerarTextoCupom(dados, 'OS'); mudarAba('pendentes');
+            const btn = document.getElementById('btnGravar');
+            const c = document.getElementById('inputCliente').value;
+            const e = document.getElementById('inputEquipamento').value;
+            const d = document.getElementById('defeito').value.toUpperCase();
+            if(!c || !e) return alert("DADOS INCOMPLETOS!");
+            btn.disabled = true;
+            try {
+                const snapID = await getDocs(collection(db, "ordens"));
+                let maior = 0;
+                snapID.forEach(docS => { const idN = parseInt(docS.id); if(!isNaN(idN) && idN > maior) maior = idN; });
+                const novoID = (maior + 1).toString();
+                const cod = Math.random().toString(36).substring(2,5).toUpperCase() + Math.floor(100 + Math.random() * 900);
+                const dados = { id: parseInt(novoID), codigo_maquina: cod, cliente: c, equipamento: e, defeito: d, status: "PENDENTE", data_entrada: new Date().toLocaleDateString('pt-BR'), timestamp: Date.now(), servico_principal: "", valor_servico: 0, forma_pagamento: "", data_pagamento: "", observacoes: "" };
+                await setDoc(doc(db, "ordens", novoID), dados);
+                if(confirm("GRAVADO! IMPRIMIR CANHOTO?")) window.imprimirCupom(dados, 'OS');
+                mudarAba('pendentes');
+            } catch (e) { alert(e.message); btn.disabled = false; }
         };
 
         window.onload = () => carregarPendentes();
     </script>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-100 min-h-screen font-sans">
+    <div id="areaImpressao"></div>
 
-    <nav class="flex bg-white shadow p-2 sticky top-0 z-50">
-        <button onclick="mudarAba('entrada')" class="flex-1 p-4 font-black uppercase text-xs text-blue-900">Entrada</button>
-        <button onclick="mudarAba('pendentes')" class="flex-1 p-4 font-black uppercase text-xs bg-blue-900 text-white rounded-xl">Bancada</button>
+    <nav class="flex bg-white shadow-lg p-2 sticky top-0 z-[50]">
+        <button id="btnAbaEntrada" onclick="mudarAba('entrada')" class="flex-1 p-4 rounded-2xl font-black uppercase text-xs text-blue-900">Nova Entrada</button>
+        <button id="btnAbaPendentes" onclick="mudarAba('pendentes')" class="flex-1 p-4 rounded-2xl font-black uppercase text-xs bg-blue-900 text-white shadow-md">Na Bancada</button>
     </nav>
 
     <div id="telaPendentes" class="p-4 max-w-md mx-auto">
-        <div class="bg-blue-900 rounded-[2rem] p-6 mb-4 text-white shadow-xl text-center">
-            <p class="text-[10px] font-black opacity-50 uppercase italic">A Receber</p>
-            <h1 id="resumoGeralBancada" class="text-3xl font-black italic">R$ 0,00</h1>
+        <div class="bg-blue-900 rounded-[2.5rem] p-7 mb-6 text-white shadow-2xl relative overflow-hidden text-center">
+            <p class="text-[10px] font-black opacity-60 uppercase italic tracking-widest">Total a Receber</p>
+            <h1 id="resumoGeralBancada" class="text-4xl font-black italic tracking-tighter">R$ 0,00</h1>
         </div>
 
-        <div id="btnLote" class="hidden bg-green-600 rounded-[2rem] p-5 mb-4 text-white shadow-lg flex justify-between items-center">
-            <h2 id="txtTotalLote" class="text-xl font-black">R$ 0,00</h2>
-            <button onclick="gerarTextoLote()" class="bg-white text-green-600 px-4 py-2 rounded-xl font-black text-xs uppercase">COPIAR LOTE</button>
+        <div id="btnLote" class="hidden bg-green-600 rounded-[2.5rem] p-6 mb-6 text-white shadow-xl flex justify-between items-center animate-bounce">
+            <div>
+                <p id="txtQtdLote" class="text-[10px] font-black uppercase opacity-80 italic">0 ITENS</p>
+                <p id="txtTotalLote" class="text-2xl font-black italic tracking-tighter">R$ 0,00</p>
+            </div>
+            <button onclick="imprimirLote()" class="bg-white text-green-600 px-6 py-4 rounded-3xl font-black text-[10px] uppercase shadow-md active:scale-95">IMPRIMIR LOTE</button>
         </div>
-        <div id="listaPendentes" class="pb-20"></div>
+        <div id="listaPendentes" class="pb-24"></div>
     </div>
 
-    <div id="telaEntrada" class="hidden p-4 space-y-4 max-w-md mx-auto">
-        <input id="inputCliente" readonly onclick="abrirSeletor('clientes')" type="text" placeholder="CLIENTE" class="w-full p-6 rounded-2xl bg-white shadow font-black text-blue-900 uppercase outline-none">
-        <input id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" type="text" placeholder="EQUIPAMENTO" class="w-full p-6 rounded-2xl bg-white shadow font-black text-blue-900 uppercase outline-none">
-        <textarea id="defeito" placeholder="DEFEITO..." class="w-full p-6 rounded-2xl bg-white shadow font-bold text-slate-700 h-32 uppercase outline-none"></textarea>
-        <button onclick="salvarEntrada()" class="w-full bg-blue-900 text-white p-6 rounded-2xl font-black text-lg">GRAVAR</button>
+    <div id="telaEntrada" class="hidden p-4 space-y-5 max-w-md mx-auto">
+        <header class="py-4 text-center"><h1 class="text-4xl font-black text-blue-900 uppercase italic italic tracking-tighter">Nova Entrada</h1></header>
+        <input id="inputCliente" readonly onclick="abrirSeletor('clientes')" type="text" placeholder="CLIENTE" class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-black text-blue-900 uppercase outline-none">
+        <input id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" type="text" placeholder="EQUIPAMENTO" class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-black text-blue-900 uppercase outline-none">
+        <textarea id="defeito" placeholder="DEFEITO RELATADO..." class="w-full p-7 rounded-[2.5rem] bg-white shadow-xl font-bold text-slate-700 h-44 uppercase outline-none"></textarea>
+        <button id="btnGravar" onclick="salvarEntrada()" class="w-full bg-blue-900 text-white p-8 rounded-[3rem] font-black text-xl shadow-2xl active:scale-95 transition-all">GRAVAR SERVIÇO</button>
     </div>
 
     <div id="modalServicos" class="hidden fixed inset-0 bg-blue-900/95 z-[100] p-4 flex items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 flex flex-col max-h-[80vh] shadow-2xl">
-            <h2 class="text-xl font-black text-blue-900 uppercase italic mb-4 text-center">Serviços</h2>
-            <div id="listaDeServicos" class="overflow-y-auto flex-1"></div>
-            <button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="mt-4 w-full p-4 bg-slate-100 rounded-xl font-black text-xs uppercase">Voltar</button>
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 flex flex-col max-h-[85vh] shadow-2xl">
+            <h2 class="text-2xl font-black text-blue-900 uppercase italic mb-6 text-center">Tabela de Preços</h2>
+            <div id="listaDeServicos" class="overflow-y-auto flex-1 pr-2"></div>
+            <button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="mt-6 w-full p-6 bg-slate-100 rounded-3xl font-black text-xs uppercase text-slate-400">Voltar</button>
         </div>
     </div>
 
     <div id="modalPagamento" class="hidden fixed inset-0 bg-blue-900/95 z-[110] p-4 flex items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 flex flex-col">
-            <h2 class="text-xl font-black text-blue-900 uppercase italic text-center mb-4">Receber</h2>
-            <h3 id="displayValor" class="text-4xl font-black text-green-600 italic text-center mb-6">R$ 0,00</h3>
-            <div id="listaFormasPag" class="mb-6"></div>
-            <div class="flex gap-2">
-                <button onclick="document.getElementById('modalPagamento').classList.add('hidden')" class="flex-1 bg-slate-100 p-4 rounded-xl font-black text-xs">Sair</button>
-                <button onclick="confirmarPagamento()" class="flex-2 bg-green-600 text-white p-4 rounded-xl font-black text-xs uppercase">Confirmar</button>
+        <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl p-8 flex flex-col max-h-[90vh]">
+            <h2 class="text-2xl font-black text-blue-900 uppercase italic text-center mb-6">Finalizar</h2>
+            <div class="text-center mb-8"><h3 id="displayValor" class="text-5xl font-black text-green-600 italic tracking-tighter">R$ 0,00</h3></div>
+            <div id="listaFormasPag" class="overflow-y-auto flex-1 mb-8"></div>
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('modalPagamento').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-400 p-6 rounded-3xl font-black text-xs uppercase">Sair</button>
+                <button onclick="confirmarPagamento()" class="flex-2 bg-green-600 text-white p-6 rounded-3xl font-black text-xs uppercase shadow-lg">Confirmar</button>
             </div>
         </div>
     </div>
 
     <div id="modal" class="hidden fixed inset-0 bg-blue-900/90 z-[100] p-4 flex items-center justify-center">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl max-h-[70vh] flex flex-col overflow-hidden">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] shadow-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div class="p-8 border-b flex justify-between items-center bg-slate-50">
+                <h2 class="font-black text-blue-900 text-sm uppercase italic">Selecionar</h2>
+                <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-red-500 font-black text-[10px] uppercase bg-red-100 px-6 py-2 rounded-full">Fechar</button>
+            </div>
             <div id="listaItens" class="overflow-y-auto flex-1"></div>
-            <button onclick="document.getElementById('modal').classList.add('hidden')" class="p-4 bg-red-100 text-red-500 font-black text-xs uppercase">Fechar</button>
         </div>
     </div>
-
 </body>
 </html>
