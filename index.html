@@ -288,29 +288,27 @@
         <button id="btnAbaConsulta" onclick="mudarAba('consulta')" class="flex-1 p-3 rounded-xl font-black uppercase text-[10px] text-blue-900">Consultar</button>
     </nav>
 
-    <div id="telaConsulta" class="hidden p-4 max-w-md mx-auto">
-        <div class="bg-white rounded-[2.5rem] p-6 shadow-xl mb-6">
-            <h2 class="text-xl font-black text-blue-900 uppercase italic mb-4 text-center">Consultar Máquina</h2>
-            <div class="flex gap-2">
-                <input id="inputBuscaCod" type="text" maxlength="6" placeholder="CÓDIGO (EX: ABC123)" class="flex-1 p-5 rounded-2xl bg-slate-100 font-black text-blue-900 uppercase outline-none border-2 border-transparent focus:border-blue-900">
-                <button onclick="buscarHistorico()" class="bg-blue-900 text-white px-6 rounded-2xl font-black italic">VER</button>
+    <div id="telaConsulta" class="hidden p-3 max-w-md mx-auto">
+        <div class="bg-white rounded-[2rem] p-5 shadow-xl mb-6">
+            <h2 class="text-lg font-black text-blue-900 uppercase italic mb-4 text-center">Consultar Máquina</h2>
+            
+            <div class="flex items-center gap-2 w-full overflow-hidden">
+                <input id="inputBuscaCod" type="text" maxlength="6" 
+                    placeholder="CÓDIGO (ABC123)" 
+                    class="flex-1 min-w-0 p-4 rounded-xl bg-slate-100 font-black text-blue-900 uppercase outline-none border-2 border-transparent focus:border-blue-900 text-sm">
+                
+                <button onclick="buscarHistorico()" 
+                    class="bg-blue-900 text-white h-[54px] px-5 rounded-xl font-black italic text-xs uppercase shadow-md active:scale-95 shrink-0">
+                    VER
+                </button>
             </div>
         </div>
-        <div id="resultadoConsulta" class="pb-24">
-            <p class="text-center text-gray-400 font-bold uppercase text-xs p-10">Digite o código acima para ver o histórico de serviços.</p>
-        </div>
-    </div>
 
-    <div id="telaPendentes" class="p-4 max-w-md mx-auto">
-        <div class="bg-blue-900 rounded-[2.5rem] p-7 mb-6 text-white shadow-2xl text-center">
-            <p class="text-[10px] font-black opacity-60 uppercase italic">A Receber na Bancada</p>
-            <h1 id="resumoGeralBancada" class="text-4xl font-black italic">R$ 0,00</h1>
+        <div id="resultadoConsulta" class="pb-24">
+            <p class="text-center text-gray-400 font-bold uppercase text-[10px] p-10 leading-tight">
+                Digite o código acima para ver o histórico de serviços.
+            </p>
         </div>
-        <div id="btnLote" class="hidden bg-green-600 rounded-[2.5rem] p-6 mb-6 text-white shadow-xl flex justify-between items-center">
-            <div><p id="txtQtdLote" class="text-[10px] font-black uppercase italic">0 ITENS</p><p id="txtTotalLote" class="text-2xl font-black italic">R$ 0,00</p></div>
-            <button onclick="imprimirLote()" class="bg-white text-green-600 px-6 py-4 rounded-3xl font-black text-[10px] uppercase">IMPRIMIR LOTE</button>
-        </div>
-        <div id="listaPendentes" class="pb-24"></div>
     </div>
 
     <div id="telaEntrada" class="hidden p-4 space-y-5 max-w-md mx-auto">
