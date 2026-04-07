@@ -218,7 +218,6 @@
         window.toggleSelecao = (idOS) => {
             const d = ordensBancada[idOS];
             const cliente = d.cliente;
-            
             const index = itensSelecionadosLote.findIndex(i => i.id === d.id);
             
             if (index > -1) {
@@ -235,8 +234,8 @@
             }
             
             const total = itensSelecionadosLote.reduce((a, b) => a + parseFloat(b.valor_servico || 0), 0);
-            
             const btnLote = document.getElementById('btnLote');
+            
             if (itensSelecionadosLote.length >= 2) {
                 btnLote.classList.remove('hidden');
                 btnLote.classList.add('flex');
@@ -271,14 +270,12 @@
                     if (status === "PENDENTE" || status === "AGUARDANDO PAGAMENTO") {
                         ordensBancada[d.id] = d; 
                         const valFinal = parseFloat(d.valor_servico || 0); 
+                        const valBruto = parseFloat(d.valor_bruto) || (valFinal + parseFloat(d.desconto || 0));
                         totalA += valFinal;
                         
                         let borderColor = status === 'PENDENTE' ? 'border-l-orange-500' : 'border-l-green-500';
                         let badgeClass = status === 'PENDENTE' ? 'bg-orange-950 text-orange-300' : 'bg-green-950 text-green-300';
-                        let btnLancarReceber = status === 'PENDENTE' ? 
-                            `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600 text-white py-4 rounded-3xl font-black text-xs uppercase shadow-md active:bg-blue-700">LANÇAR</button>` : 
-                            `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-4 rounded-3xl font-black text-xs uppercase shadow-md active:bg-green-700">RECEBER</button>`;
-
+                        
                         let servicoTexto = d.servico_principal ? `<div class="bg-zinc-800 text-slate-200 p-3 rounded-2xl mb-3 font-black uppercase text-[10px] leading-tight border border-zinc-700">🛠 ${d.servico_principal.replace(/\+/g, ' | ')}</div>` : '';
 
                         lista.innerHTML += `
@@ -291,10 +288,28 @@
                                     <span class="text-[10px] font-black text-blue-300 bg-blue-950 px-3 py-1 rounded-lg border border-blue-900"># ${d.codigo_maquina}</span>
                                 </div>
                                 <h3 class="text-xl font-black text-white uppercase leading-none">${d.equipamento}</h3>
-                                <p class="text-[11px] font-bold text-zinc-400 mb-2 uppercase italic">👤 ${d.cliente}</p>
+                                <p class="text-[11px] font-bold text-zinc-400 mb-1 uppercase italic">👤 ${d.cliente}</p>
+                                <p class="text-[10px] font-black text-blue-500 mb-3 uppercase tracking-tighter italic">📅 ENTRADA: ${window.formatarDataBR(d.data_entrada)}</p>
+                                
+                                <div class="bg-zinc-950/50 p-3 rounded-2xl mb-3 border border-zinc-800">
+                                    <p class="text-[9px] font-black text-zinc-500 uppercase mb-1">Defeito Relatado:</p>
+                                    <p class="text-[11px] text-zinc-300 font-bold uppercase leading-tight">${d.defeito || 'NÃO INFORMADO'}</p>
+                                </div>
+
                                 ${servicoTexto}
+
+                                ${valBruto > 0 ? `
+                                    <div class="flex justify-between items-center mb-4 px-1 text-[10px] font-black uppercase">
+                                        <span class="text-zinc-500">Bruto: R$ ${valBruto.toFixed(2)}</span>
+                                        <span class="text-red-500">Desc: R$ ${parseFloat(d.desconto || 0).toFixed(2)}</span>
+                                        <span class="text-green-400 text-xs">Total: R$ ${valFinal.toFixed(2)}</span>
+                                    </div>
+                                ` : ''}
+
                                 <div class="flex gap-2">
-                                    ${btnLancarReceber}
+                                    ${status === 'PENDENTE' ? 
+                                        `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600 text-white py-4 rounded-3xl font-black text-xs uppercase shadow-md active:bg-blue-700">LANÇAR</button>` : 
+                                        `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-4 rounded-3xl font-black text-xs uppercase shadow-md active:bg-green-700">RECEBER</button>`}
                                     <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="bg-zinc-800 border border-zinc-700 text-white p-4 rounded-3xl text-xl active:bg-zinc-700 shadow-inner">🖨️</button>
                                 </div>
                             </div>
@@ -323,7 +338,8 @@
                 listaTabela.innerHTML = "";
                 snap.forEach(dDoc => {
                     const s = dDoc.data(); 
-                    const nomeTabela = s.servicos_lista || s.servico || s.nome || dDoc.id; 
+                    // MELHORADO: Usa o campo 'descricao' conforme as fotos
+                    const nomeTabela = s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id; 
                     const valorTabela = s.valor || s.preco || 0;
                     listaTabela.innerHTML += `
                         <button onclick="adicionarAoCarrinho('${nomeTabela}', ${valorTabela})" class="w-full p-4 mb-2 bg-zinc-800 border border-zinc-700 rounded-xl text-left active:border-blue-500 shadow-sm">
@@ -408,7 +424,7 @@
                 
                 snapP.forEach(dDoc => {
                     const f = dDoc.data();
-                    const nomeF = f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
+                    const nomeF = f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
                     listaP.innerHTML += `
                         <label class="flex items-center p-4 bg-zinc-800 border border-zinc-700 rounded-xl mb-2 has-[:checked]:border-blue-500 has-[:checked]:bg-zinc-700 transition-all cursor-pointer">
                             <input type="radio" name="pag" value="${nomeF}" class="w-6 h-6 accent-blue-500 cursor-pointer">
@@ -465,7 +481,8 @@
                 lista.innerHTML = "";
                 snap.forEach(dDoc => { 
                     const d = dDoc.data(); 
-                    const n = d.nome || d.equipamento || dDoc.id;
+                    // MELHORADO: Reconhece peca e descricao conforme fotos do Firebase
+                    const n = d.descricao || d.peca || d.nome || d.equipamento || dDoc.id;
                     lista.innerHTML += `
                         <button onclick="definirItem('${tipo}', '${n}')" class="w-full p-5 text-left border-b border-zinc-800 font-black uppercase text-white text-sm active:bg-zinc-800">
                             ${n}
@@ -511,7 +528,6 @@
                 const novoID = (maior + 1).toString();
                 
                 let codF = manualCod;
-                // Só valida exclusividade se o sistema estiver gerando o código
                 if (codF === "") {
                     let codigoUnico = false;
                     while (!codigoUnico) {
@@ -579,9 +595,6 @@
                     
                     const colorBorder = h.status === 'PAGO' ? 'border-l-green-500' : 'border-l-orange-500';
                     const colorStatus = h.status === 'PAGO' ? 'text-green-400' : 'text-orange-400';
-                    
-                    const dataEntradaBR = window.formatarDataBR(h.data_entrada);
-                    const dataPagamentoBR = window.formatarDataBR(h.data_pagamento);
 
                     resultado.innerHTML += `
                         <div class="bg-zinc-900 p-5 rounded-[2rem] mb-4 shadow-2xl border border-zinc-800 border-l-8 ${colorBorder}">
@@ -593,11 +606,10 @@
                             <p class="text-xs font-bold text-blue-400 mb-3 uppercase italic">👤 PROP: ${h.cliente}</p>
                             
                             <div class="text-[10px] bg-zinc-800 text-slate-200 border border-zinc-700 p-3 rounded-xl mb-3 space-y-2">
-                                <p><b class="text-zinc-400">ENTRADA:</b> ${dataEntradaBR}</p>
+                                <p><b class="text-zinc-400">ENTRADA:</b> ${window.formatarDataBR(h.data_entrada)}</p>
                                 <p><b class="text-zinc-400">DEFEITO:</b> ${h.defeito}</p>
                                 <div class="h-px bg-zinc-700 w-full my-1"></div>
                                 <p><b class="text-zinc-400">SERVIÇOS:</b> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ' | ') : '---'}</p>
-                                <p><b class="text-zinc-400">DATA PGTO:</b> ${dataPagamentoBR}</p>
                                 <p><b class="text-zinc-400">FORMA PGTO:</b> ${h.forma_pagamento || '---'}</p>
                             </div>
                             
