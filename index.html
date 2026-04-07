@@ -9,7 +9,7 @@
         /* Oculta área de impressão na tela normal */
         #areaImpressao { display: none; }
         
-        /* Configuração exclusiva para Impressora 58mm (Mantém fundo branco no papel) */
+        /* Configuração exclusiva para Impressora 58mm */
         @media print {
             body * { visibility: hidden; }
             #areaImpressao, #areaImpressao * { visibility: visible; }
@@ -31,7 +31,7 @@
             .espaco-fim { height: 60px; }
         }
 
-        /* Ajustes Mobile Android - CORRIGIDO PARA NÃO APAGAR CHECKBOX E RADIO */
+        /* Ajustes Mobile Android - Mantém Checkbox Visível */
         input:not([type="checkbox"]):not([type="radio"]), textarea { 
             -webkit-appearance: none; 
             border-radius: 0; 
@@ -65,7 +65,21 @@
         let clienteAtualSelecao = null;
         let valorBrutoGlobal = 0;
         let listaServicosTemporaria = []; 
-        let ordensBancada = {}; // Guarda as ordens da tela para o lote
+        let ordensBancada = {}; 
+
+        // ==========================================
+        // FUNÇÃO DE CONVERSÃO DE DATA (INGLÊS -> BR)
+        // ==========================================
+        window.formatarDataBR = (dataStr) => {
+            if (!dataStr) return "---";
+            if (dataStr.includes("-")) {
+                const partes = dataStr.split(" ")[0].split("-");
+                if (partes.length === 3 && partes[0].length === 4) {
+                    return `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                }
+            }
+            return dataStr; 
+        };
 
         // ==========================================
         // 1. NAVEGAÇÃO ENTRE ABAS
@@ -95,6 +109,7 @@
             const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
             const desc = parseFloat(dados.desconto || 0);
             const total = parseFloat(dados.valor_servico || 0); 
+            const dataArrumada = window.formatarDataBR(dados.data_entrada);
             
             let layout = `
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
@@ -102,7 +117,7 @@
                 <div class="hr"></div>
                 <div class="b">OS: ${dados.id} - COD: ${dados.codigo_maquina}</div>
                 <div class="hr"></div>
-                <div>DATA: ${dados.data_entrada}</div>
+                <div>DATA: ${dataArrumada}</div>
                 <div>CLIENTE: ${dados.cliente}</div>
                 <div>EQUIP.: ${dados.equipamento}</div>
                 <div class="hr"></div>
@@ -153,6 +168,7 @@
                 const liquido = parseFloat(d.valor_servico || 0);
                 const desconto = parseFloat(d.desconto || 0);
                 const bruto = parseFloat(d.valor_bruto) || (liquido + desconto);
+                const dataArr = window.formatarDataBR(d.data_entrada);
 
                 totalLiquidoLote += liquido; 
                 totalDescontoLote += desconto;
@@ -161,7 +177,7 @@
                 itensHTML += `
                     <div style="margin-top:8px; margin-bottom: 8px; text-align: left;">
                         <div class="b">OS: ${d.id} - COD: ${d.codigo_maquina}</div>
-                        <div>DATA: ${d.data_entrada}</div>
+                        <div>DATA: ${dataArr}</div>
                         <div><span class="b">DEF:</span> ${d.defeito}</div>
                         <div><span class="b">SERV:</span> <span style="font-size:10px">${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</span></div>
                         ${desconto > 0 ? `
@@ -236,7 +252,7 @@
         async function carregarPendentes() {
             itensSelecionadosLote = []; 
             clienteAtualSelecao = null;
-            ordensBancada = {};
+            ordensBancada = {}; 
             document.getElementById('btnLote').classList.add('hidden');
             document.getElementById('btnLote').classList.remove('flex');
             
@@ -465,6 +481,16 @@
             document.getElementById('modalSeletorGeral').classList.add('hidden');
         };
 
+        function gerarCodigoOficina() {
+            const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let txt = '';
+            for (let i = 0; i < 3; i++) {
+                txt += letras.charAt(Math.floor(Math.random() * letras.length));
+            }
+            const num = Math.floor(100 + Math.random() * 900);
+            return txt + num;
+        }
+
         window.salvarEntrada = async () => {
             const c = document.getElementById('inputCliente').value; 
             const e = document.getElementById('inputEquipamento').value; 
@@ -473,13 +499,30 @@
             
             if(!c || !e) return alert("Preencha Cliente e Equipamento!");
             
+            const btnGravar = document.getElementById('btnGravar');
+            const textoOriginal = btnGravar.innerText;
+            btnGravar.innerText = "GRAVANDO...";
+            btnGravar.disabled = true;
+            
             try {
                 const snapID = await getDocs(collection(db, "ordens")); 
                 let maior = 0;
                 snapID.forEach(docS => { const idN = parseInt(docS.id); if(!isNaN(idN) && idN > maior) maior = idN; });
-                
                 const novoID = (maior + 1).toString();
-                const codF = manualCod !== "" ? manualCod : Math.random().toString(36).substring(2,5).toUpperCase() + Math.floor(100 + Math.random() * 900);
+                
+                let codF = manualCod;
+                // Só valida exclusividade se o sistema estiver gerando o código
+                if (codF === "") {
+                    let codigoUnico = false;
+                    while (!codigoUnico) {
+                        codF = gerarCodigoOficina();
+                        const q = query(collection(db, "ordens"), where("codigo_maquina", "==", codF));
+                        const snapVerificacao = await getDocs(q);
+                        if (snapVerificacao.empty) {
+                            codigoUnico = true; 
+                        }
+                    }
+                }
                 
                 const dados = { 
                     id: parseInt(novoID), codigo_maquina: codF, cliente: c, equipamento: e, defeito: d, 
@@ -496,11 +539,16 @@
                 document.getElementById('inputManualCod').value = "";
                 
                 mudarAba('pendentes');
-            } catch (e) { alert("Erro: " + e.message); }
+            } catch (err) { 
+                alert("Erro: " + err.message); 
+            } finally {
+                btnGravar.innerText = textoOriginal;
+                btnGravar.disabled = false;
+            }
         };
 
         // ==========================================
-        // 7. CONSULTA HISTÓRICO
+        // 7. CONSULTA HISTÓRICO PREMIUM
         // ==========================================
         window.buscarHistorico = async () => {
             const cod = document.getElementById('inputBuscaCod').value.toUpperCase().trim();
@@ -522,27 +570,41 @@
                 snap.forEach(d => listaH.push(d.data())); 
                 listaH.sort((a,b) => b.timestamp - a.timestamp);
                 
-                resultado.innerHTML = `<h2 class="text-white font-black mb-4 uppercase italic">Histórico: ${cod}</h2>`;
+                resultado.innerHTML = `<h2 class="text-white font-black mb-4 uppercase italic text-sm tracking-tight">Histórico da Máquina: ${cod}</h2>`;
                 
                 listaH.forEach(h => {
                     const total = parseFloat(h.valor_servico || 0);
+                    const desconto = parseFloat(h.desconto || 0);
+                    const bruto = parseFloat(h.valor_bruto) || (total + desconto);
+                    
                     const colorBorder = h.status === 'PAGO' ? 'border-l-green-500' : 'border-l-orange-500';
                     const colorStatus = h.status === 'PAGO' ? 'text-green-400' : 'text-orange-400';
+                    
+                    const dataEntradaBR = window.formatarDataBR(h.data_entrada);
+                    const dataPagamentoBR = window.formatarDataBR(h.data_pagamento);
 
                     resultado.innerHTML += `
-                        <div class="bg-zinc-900 p-4 rounded-3xl mb-4 shadow-2xl border border-zinc-800 border-l-8 ${colorBorder}">
-                            <div class="flex justify-between mb-2">
-                                <span class="text-[9px] font-black bg-zinc-800 text-zinc-300 border border-zinc-700 p-1 px-2 rounded">OS: ${h.id}</span>
-                                <span class="text-[9px] font-black italic uppercase ${colorStatus}">${h.status}</span>
+                        <div class="bg-zinc-900 p-5 rounded-[2rem] mb-4 shadow-2xl border border-zinc-800 border-l-8 ${colorBorder}">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-black uppercase bg-zinc-800 text-zinc-300 border border-zinc-700 p-1 px-2 rounded">OS: ${h.id}</span>
+                                <span class="text-[10px] font-black italic uppercase ${colorStatus}">${h.status}</span>
                             </div>
-                            <p class="text-xs font-black text-white uppercase">${h.equipamento}</p>
-                            <div class="text-[10px] bg-zinc-800 text-slate-200 border border-zinc-700 p-2 rounded-lg my-2 leading-tight">
-                                <b>DEF:</b> ${h.defeito}<br>
-                                <b>SERV:</b> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ' | ') : '---'}
+                            <h3 class="text-lg font-black text-white uppercase leading-none mb-1">${h.equipamento}</h3>
+                            <p class="text-xs font-bold text-blue-400 mb-3 uppercase italic">👤 PROP: ${h.cliente}</p>
+                            
+                            <div class="text-[10px] bg-zinc-800 text-slate-200 border border-zinc-700 p-3 rounded-xl mb-3 space-y-2">
+                                <p><b class="text-zinc-400">ENTRADA:</b> ${dataEntradaBR}</p>
+                                <p><b class="text-zinc-400">DEFEITO:</b> ${h.defeito}</p>
+                                <div class="h-px bg-zinc-700 w-full my-1"></div>
+                                <p><b class="text-zinc-400">SERVIÇOS:</b> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ' | ') : '---'}</p>
+                                <p><b class="text-zinc-400">DATA PGTO:</b> ${dataPagamentoBR}</p>
+                                <p><b class="text-zinc-400">FORMA PGTO:</b> ${h.forma_pagamento || '---'}</p>
                             </div>
-                            <div class="flex justify-between items-center pt-1 border-t border-zinc-800 mt-2">
-                                <p class="font-black text-green-400 text-xs">PAGO: R$ ${total.toFixed(2)}</p>
-                                <p class="text-[8px] font-bold text-zinc-500">${h.data_entrada}</p>
+                            
+                            <div class="flex flex-col gap-1 text-[10px] font-black text-right pt-2 border-t border-zinc-800">
+                                <p class="text-zinc-400">BRUTO: R$ ${bruto.toFixed(2)}</p>
+                                <p class="text-red-400">DESC: R$ ${desconto.toFixed(2)}</p>
+                                <p class="text-green-400 text-sm mt-1">LÍQUIDO PAGO: R$ ${total.toFixed(2)}</p>
                             </div>
                         </div>
                     `;
@@ -648,7 +710,7 @@
                 <h2 class="font-black text-white text-sm uppercase italic tracking-tight">Selecionar</h2>
             </div>
             <div id="listaSeletorGeral" class="overflow-y-auto flex-1 bg-zinc-950"></div>
-            <button onclick="document.getElementById('modalSeletorGeral').classList.add('hidden')" class="p-5 bg-zinc-800 text-zinc-400 font-black text-xs uppercase border-t border-zinc-800 active:bg-zinc-700 active:text-white">Fechar</button>
+            <button onclick="document.getElementById('modalSeletorGeral').classList.add('hidden')" class="p-5 bg-zinc-800 text-zinc-400 font-black text-xs uppercase border-t border-zinc-800 active:bg-zinc-700 active:text-white">Fechar Janela</button>
         </div>
     </div>
 
