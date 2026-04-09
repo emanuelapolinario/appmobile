@@ -26,11 +26,11 @@
                 line-height: 1.2; 
                 text-transform: uppercase; 
                 color: #000; 
-                font-weight: bold;
+                /* Texto base normal, para ter contraste com o negrito */
             }
             .hr { border-bottom: 2px dashed black; margin: 5px 0; width: 100%; }
             .c { text-align: center; } 
-            .b { font-weight: 900; }
+            .b { font-weight: bold; }
             .espaco-fim { height: 60px; }
         }
 
@@ -175,11 +175,11 @@
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}</div>
                 <div class="hr"></div>
-                <div class="b">OS: ${dados.id} - COD: ${dados.codigo_maquina}</div>
+                <div><span class="b">OS:</span> ${dados.id} - <span class="b">COD:</span> ${dados.codigo_maquina}</div>
                 <div class="hr"></div>
-                <div>DATA: ${dataArrumada}</div>
-                <div>CLIENTE: ${dados.cliente}</div>
-                <div>EQUIP.: ${dados.equipamento}</div>
+                <div><span class="b">DATA:</span> ${dataArrumada}</div>
+                <div><span class="b">CLIENTE:</span> ${dados.cliente}</div>
+                <div><span class="b">EQUIP.:</span> ${dados.equipamento}</div>
                 <div class="hr"></div>
                 <div class="b">DEFEITO:</div>
                 <div>${dados.defeito}</div>
@@ -194,8 +194,8 @@
                 `;
                 if (desc > 0) {
                     layout += `
-                        <div>SUBTOTAL: R$ ${bruto.toFixed(2)}</div>
-                        <div class="b">DESCONTO: R$ ${desc.toFixed(2)}</div>
+                        <div><span class="b">SUBTOTAL:</span> R$ ${bruto.toFixed(2)}</div>
+                        <div><span class="b">DESCONTO:</span> R$ ${desc.toFixed(2)}</div>
                     `;
                 }
                 layout += `<div class="c b" style="font-size:16px; margin-top:5px; border:2px solid black; padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
@@ -203,7 +203,7 @@
                 layout += `
                     <div class="hr"></div>
                     <div style="height:40px; border-bottom:2px solid black; margin-top:20px"></div>
-                    <div class="c">ASSINATURA DO CLIENTE</div>
+                    <div class="c b">ASSINATURA DO CLIENTE</div>
                 `;
             }
 
@@ -236,13 +236,13 @@
                 
                 itensHTML += `
                     <div style="margin-top:8px; margin-bottom: 8px; text-align: left;">
-                        <div class="b">OS: ${d.id} - COD: ${d.codigo_maquina}</div>
-                        <div>DATA: ${dataArr}</div>
+                        <div><span class="b">OS:</span> ${d.id} - <span class="b">COD:</span> ${d.codigo_maquina}</div>
+                        <div><span class="b">DATA:</span> ${dataArr}</div>
                         <div><span class="b">DEF:</span> ${d.defeito}</div>
                         <div><span class="b">SERV:</span> <span>${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</span></div>
                         ${desconto > 0 ? `
-                            <div style="margin-top:3px;">SUBTOTAL: R$ ${bruto.toFixed(2)}</div>
-                            <div>DESCONTO: R$ ${desconto.toFixed(2)}</div>
+                            <div style="margin-top:3px;"><span class="b">SUBTOTAL:</span> R$ ${bruto.toFixed(2)}</div>
+                            <div><span class="b">DESCONTO:</span> R$ ${desconto.toFixed(2)}</div>
                         ` : ''}
                         <div class="b" style="margin-top:3px; text-align: right; font-size: 14px;">VALOR: R$ ${liquido.toFixed(2)}</div>
                     </div>
@@ -254,12 +254,12 @@
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">FECHAMENTO DE SERVICOS</div>
                 <div class="hr"></div>
-                <div class="b">CLIENTE: ${clienteAtualSelecao}</div>
+                <div><span class="b">CLIENTE:</span> ${clienteAtualSelecao}</div>
                 <div class="hr"></div>
                 ${itensHTML}
                 <div style="margin-top: 10px; text-align: right;">
                     ${totalDescontoLote > 0 ? `
-                        <div>SOMA DOS SERVICOS: R$ ${totalBrutoLote.toFixed(2)}</div>
+                        <div><span class="b">SOMA DOS SERVICOS:</span> R$ ${totalBrutoLote.toFixed(2)}</div>
                         <div class="b">TOTAL DESCONTOS: R$ ${totalDescontoLote.toFixed(2)}</div>
                     ` : ''}
                 </div>
@@ -286,7 +286,7 @@
                 
                 itensHTML += `
                     <div style="margin-top:5px;">
-                        <div class="b">DATA: ${dataEntrada} - OS: ${h.id}</div>
+                        <div><span class="b">DATA:</span> ${dataEntrada} - <span class="b">OS:</span> ${h.id}</div>
                         <div><span class="b">DEF:</span> ${h.defeito || '---'}</div>
                         <div><span class="b">SERV:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ', ') : '---'}</div>
                         <div style="text-align: right;" class="b">VALOR: R$ ${total.toFixed(2)}</div>
@@ -299,7 +299,7 @@
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">HISTORICO DE MANUTENCOES</div>
                 <div class="hr"></div>
-                <div class="c b">MAQUINA: ${cod}</div>
+                <div><span class="b">MAQUINA:</span> ${cod}</div>
                 <div class="hr"></div>
                 ${itensHTML}
                 <div class="hr"></div>
