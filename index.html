@@ -21,13 +21,16 @@
             }
             @page { size: 58mm auto; margin: 0; }
             .cupom-texto { 
-                font-family: 'Courier New', monospace; 
-                font-size: 11px; line-height: 1.1; 
-                text-transform: uppercase; color: black; 
+                font-family: Verdana, 'Arial Black', sans-serif; 
+                font-size: 13px; 
+                line-height: 1.2; 
+                text-transform: uppercase; 
+                color: #000; 
+                font-weight: bold;
             }
-            .hr { border-bottom: 1px dashed black; margin: 5px 0; width: 100%; }
+            .hr { border-bottom: 2px dashed black; margin: 5px 0; width: 100%; }
             .c { text-align: center; } 
-            .b { font-weight: bold; }
+            .b { font-weight: 900; }
             .espaco-fim { height: 60px; }
         }
 
@@ -186,28 +189,28 @@
                 layout += `
                     <div class="hr"></div>
                     <div class="b">SERVICOS REALIZADOS:</div>
-                    <div style="font-size:10px">${dados.servico_principal.replace(/\+/g, '<br>')}</div>
+                    <div>${dados.servico_principal.replace(/\+/g, '<br>')}</div>
                     <div class="hr"></div>
                 `;
                 if (desc > 0) {
                     layout += `
                         <div>SUBTOTAL: R$ ${bruto.toFixed(2)}</div>
-                        <div class="b text-red-600">DESCONTO: R$ ${desc.toFixed(2)}</div>
+                        <div class="b">DESCONTO: R$ ${desc.toFixed(2)}</div>
                     `;
                 }
                 layout += `<div class="c b" style="font-size:16px; margin-top:5px; border:2px solid black; padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
             } else {
                 layout += `
                     <div class="hr"></div>
-                    <div style="height:40px; border-bottom:1px solid black; margin-top:20px"></div>
-                    <div class="c" style="font-size:10px">ASSINATURA DO CLIENTE</div>
+                    <div style="height:40px; border-bottom:2px solid black; margin-top:20px"></div>
+                    <div class="c">ASSINATURA DO CLIENTE</div>
                 `;
             }
 
             layout += `
                 <div class="hr"></div>
                 <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                <div class="c" style="font-size:10px">DEUS E FIEL</div>
+                <div class="c">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
@@ -236,12 +239,12 @@
                         <div class="b">OS: ${d.id} - COD: ${d.codigo_maquina}</div>
                         <div>DATA: ${dataArr}</div>
                         <div><span class="b">DEF:</span> ${d.defeito}</div>
-                        <div><span class="b">SERV:</span> <span style="font-size:10px">${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</span></div>
+                        <div><span class="b">SERV:</span> <span>${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</span></div>
                         ${desconto > 0 ? `
-                            <div style="margin-top:3px; font-size:10px;">SUBTOTAL: R$ ${bruto.toFixed(2)}</div>
-                            <div style="font-size:10px;">DESCONTO: R$ ${desconto.toFixed(2)}</div>
+                            <div style="margin-top:3px;">SUBTOTAL: R$ ${bruto.toFixed(2)}</div>
+                            <div>DESCONTO: R$ ${desconto.toFixed(2)}</div>
                         ` : ''}
-                        <div class="b" style="margin-top:3px; text-align: right; font-size: 13px;">VALOR: R$ ${liquido.toFixed(2)}</div>
+                        <div class="b" style="margin-top:3px; text-align: right; font-size: 14px;">VALOR: R$ ${liquido.toFixed(2)}</div>
                     </div>
                     <div class="hr"></div>
                 `;
@@ -251,10 +254,10 @@
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">FECHAMENTO DE SERVICOS</div>
                 <div class="hr"></div>
-                <div class="b" style="font-size: 12px;">CLIENTE: ${clienteAtualSelecao}</div>
+                <div class="b">CLIENTE: ${clienteAtualSelecao}</div>
                 <div class="hr"></div>
                 ${itensHTML}
-                <div style="margin-top: 10px; text-align: right; font-size: 11px;">
+                <div style="margin-top: 10px; text-align: right;">
                     ${totalDescontoLote > 0 ? `
                         <div>SOMA DOS SERVICOS: R$ ${totalBrutoLote.toFixed(2)}</div>
                         <div class="b">TOTAL DESCONTOS: R$ ${totalDescontoLote.toFixed(2)}</div>
@@ -263,7 +266,7 @@
                 <div class="c b" style="font-size:16px; border:2px solid black; padding:4px; margin-top: 5px;">TOTAL A PAGAR: R$ ${totalLiquidoLote.toFixed(2)}</div>
                 <div class="hr"></div>
                 <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                <div class="c" style="font-size:10px">DEUS E FIEL</div>
+                <div class="c">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
@@ -296,14 +299,14 @@
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">HISTORICO DE MANUTENCOES</div>
                 <div class="hr"></div>
-                <div class="c b" style="font-size: 13px;">MAQUINA: ${cod}</div>
+                <div class="c b">MAQUINA: ${cod}</div>
                 <div class="hr"></div>
                 ${itensHTML}
                 <div class="hr"></div>
-                <div class="b" style="text-align: right; font-size: 12px; margin-top: 5px;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
+                <div class="b" style="text-align: right; margin-top: 5px;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
                 <div class="hr"></div>
-                <div class="c" style="font-size:10px; margin-top: 10px;">RELATORIO EM: ${new Date().toLocaleDateString('pt-BR')}</div>
-                <div class="c" style="font-size:10px">DEUS E FIEL</div>
+                <div class="c" style="margin-top: 10px;">RELATORIO EM: ${new Date().toLocaleDateString('pt-BR')}</div>
+                <div class="c">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
