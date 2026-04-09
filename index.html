@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Oficina Emanuel - Sistema Dark</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#09090b"> <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Oculta área de impressão na tela normal */
         #areaImpressao { display: none; }
@@ -744,7 +748,12 @@
     
     <div id="areaImpressao"></div>
 
-    <header class="flex flex-col items-center justify-center pt-5 pb-3 bg-zinc-950 border-b border-zinc-900">
+    <header class="flex items-center justify-center pt-5 pb-3 bg-zinc-950 border-b border-zinc-900 gap-3">
+        <img src="https://img.icons8.com/?size=100&id=113063&format=png&color=3b82f6" 
+             alt="Logo Oficina Emanuel" 
+             class="h-8 w-8 object-contain" 
+             id="logoAplicativo">
+
         <h1 class="text-xl font-black text-blue-500 uppercase tracking-tighter italic">Emanuel Soluções</h1>
     </header>
 
