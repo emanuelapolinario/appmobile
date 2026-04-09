@@ -66,6 +66,7 @@
         let valorBrutoGlobal = 0;
         let listaServicosTemporaria = []; 
         let ordensBancada = {}; 
+        let historicoAtual = []; // Variável para armazenar busca de histórico
 
         // ==========================================
         // FUNÇÃO DE CONVERSÃO DE DATA (INGLÊS -> BR)
@@ -262,6 +263,46 @@
                 <div class="c b" style="font-size:16px; border:2px solid black; padding:4px; margin-top: 5px;">TOTAL A PAGAR: R$ ${totalLiquidoLote.toFixed(2)}</div>
                 <div class="hr"></div>
                 <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
+                <div class="c" style="font-size:10px">DEUS E FIEL</div>
+                <div class="espaco-fim"></div>
+            `;
+            window.dispararPrint(layout);
+        };
+
+        // NOVA FUNÇÃO: IMPRIMIR HISTÓRICO COMPLETO 58MM
+        window.prepararImpressaoHistorico = (cod) => {
+            if (!historicoAtual || historicoAtual.length === 0) return;
+
+            let itensHTML = "";
+            let totalGeral = 0;
+
+            historicoAtual.forEach((h, index) => {
+                const total = parseFloat(h.valor_servico || 0);
+                totalGeral += total;
+                const dataEntrada = window.formatarDataBR(h.data_entrada);
+                
+                itensHTML += `
+                    <div style="margin-top:5px;">
+                        <div class="b">DATA: ${dataEntrada} - OS: ${h.id}</div>
+                        <div><span class="b">DEF:</span> ${h.defeito || '---'}</div>
+                        <div><span class="b">SERV:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ', ') : '---'}</div>
+                        <div style="text-align: right;" class="b">VALOR: R$ ${total.toFixed(2)}</div>
+                    </div>
+                    ${index < historicoAtual.length - 1 ? '<div class="hr"></div>' : ''}
+                `;
+            });
+
+            const layout = `
+                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
+                <div class="c b">HISTORICO DE MANUTENCOES</div>
+                <div class="hr"></div>
+                <div class="c b" style="font-size: 13px;">MAQUINA: ${cod}</div>
+                <div class="hr"></div>
+                ${itensHTML}
+                <div class="hr"></div>
+                <div class="b" style="text-align: right; font-size: 12px; margin-top: 5px;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
+                <div class="hr"></div>
+                <div class="c" style="font-size:10px; margin-top: 10px;">RELATORIO EM: ${new Date().toLocaleDateString('pt-BR')}</div>
                 <div class="c" style="font-size:10px">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
@@ -634,6 +675,7 @@
                 
                 if(snap.empty) { 
                     resultado.innerHTML = "<p class='p-10 text-center text-red-400 font-black'>NENHUM HISTÓRICO ENCONTRADO!</p>"; 
+                    historicoAtual = [];
                     return; 
                 }
                 
@@ -641,7 +683,16 @@
                 snap.forEach(d => listaH.push(d.data())); 
                 listaH.sort((a,b) => b.timestamp - a.timestamp);
                 
-                resultado.innerHTML = `<h2 class="text-white font-black mb-4 uppercase italic text-sm tracking-tight">Histórico da Máquina: ${cod}</h2>`;
+                historicoAtual = listaH; // Salva para impressão total
+
+                resultado.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-white font-black uppercase italic text-sm tracking-tight">Histórico: ${cod}</h2>
+                        <button onclick="window.prepararImpressaoHistorico('${cod}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg active:bg-blue-700">
+                            🖨️ Imprimir Tudo
+                        </button>
+                    </div>
+                `;
                 
                 listaH.forEach(h => {
                     const total = parseFloat(h.valor_servico || 0);
