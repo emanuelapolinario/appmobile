@@ -18,11 +18,8 @@
         
         /* Regras exclusivas para quando apertar o botão de IMPRIMIR */
         @media print {
-            /* 1. Esconde todo o site */
             body * { visibility: hidden; }
-            /* 2. Mostra apenas a div de impressão */
             #areaImpressao, #areaImpressao * { visibility: visible; }
-            /* 3. Posiciona a área de impressão no topo e define o tamanho da bobina (52mm útil) */
             #areaImpressao { 
                 display: block !important; 
                 position: absolute; left: 0; top: 0; 
@@ -31,7 +28,6 @@
             }
             @page { size: 58mm auto; margin: 0; }
             
-            /* Estilo da fonte do cupomzinho */
             .cupom-texto { 
                 font-family: Verdana, 'Arial Black', sans-serif; 
                 font-size: 13px; 
@@ -42,27 +38,25 @@
             .hr { border-bottom: 2px dashed black; margin: 5px 0; width: 100%; }
             .c { text-align: center; } 
             .b { font-weight: bold; }
-            .espaco-fim { height: 60px; } /* Dá um espaço para a impressora cortar o papel certo */
+            .espaco-fim { height: 60px; } 
         }
 
-        /* Ajustes Mobile: Evita que caixas de texto fiquem com design antigo no Android/iOS */
+        /* Ajustes Mobile */
         input:not([type="checkbox"]):not([type="radio"]), textarea { 
             -webkit-appearance: none; 
             border-radius: 0; 
         }
         
-        /* Design da barra de rolagem (Scrollbar) */
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #18181b; }
         ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     </style>
 
     <script type="module">
-        // Importa os módulos necessários do Google Firebase (Banco de Dados)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CHAVES DE ACESSO AO BANCO DE DADOS
         const firebaseConfig = {
             apiKey: "AIzaSyB9_vQUtyjCx8KQw3k5fPlutOD-ekCaHw8",
             authDomain: "projeto-app-entregadores.firebaseapp.com",
@@ -75,9 +69,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app); 
         
-        // ==========================================
-        // 📌 ZONA 3: VARIÁVEIS GLOBAIS
-        // ==========================================
+        // --- VARIÁVEIS GLOBAIS ---
         let idAtual = null; 
         let itensSelecionadosLote = []; 
         let clienteAtualSelecao = null; 
@@ -85,12 +77,10 @@
         let listaServicosTemporaria = []; 
         let ordensBancada = {}; 
         let historicoAtual = []; 
-        let modoPagamento = 'SINGLE'; // Controla se estamos pagando 1 OS ('SINGLE') ou várias ('LOTE')
+        let modoPagamento = 'SINGLE'; 
+        let tipoSeletorAtual = ''; // Controla se estamos cadastrando cliente ou equipamento
 
-        // ==========================================
-        // 📌 ZONA 4: FUNÇÕES DO APLICATIVO
-        // ==========================================
-
+        // --- FUNÇÕES UTILITÁRIAS ---
         window.formatarDataBR = (dataStr) => {
             if (!dataStr) return "---";
             if (dataStr.includes("-")) {
@@ -102,7 +92,7 @@
             return dataStr; 
         };
 
-        // --- INTEGRAÇÃO COM APLICATIVO RawBT ---
+        // --- INTEGRAÇÃO RAWBT ---
         window.copiarParaRawBT = (texto) => {
             navigator.clipboard.writeText(texto).then(() => {
                 alert("RECIBO COPIADO! Cole no RawBT.");
@@ -172,7 +162,7 @@
             if(aba === 'pendentes') carregarPendentes();
         };
 
-        // --- SISTEMA DE IMPRESSÃO ---
+        // --- SISTEMA DE IMPRESSÃO BROWSER ---
         window.dispararPrint = (html) => {
             const area = document.getElementById('areaImpressao');
             area.innerHTML = `<div class="cupom-texto">${html}</div>`;
@@ -288,7 +278,6 @@
 
         window.prepararImpressaoHistorico = (cod) => {
             if (!historicoAtual || historicoAtual.length === 0) return;
-
             let itensHTML = "";
             let totalGeral = 0;
 
@@ -325,7 +314,7 @@
             window.dispararPrint(layout);
         };
 
-        // --- ABA BANCADA ---
+        // --- ABA BANCADA E SELEÇÃO DE LOTE ---
         window.toggleSelecao = (idOS) => {
             const d = ordensBancada[idOS];
             const cliente = d.cliente;
@@ -432,7 +421,7 @@
             } catch (e) { alert(e.message); }
         }
 
-        // --- SISTEMA DE LANÇAMENTOS ---
+        // --- SISTEMA DE LANÇAMENTOS (CARRINHO) ---
         window.abrirLancamento = async (id) => {
             idAtual = id; 
             listaServicosTemporaria = []; 
@@ -494,7 +483,6 @@
             const nomesCompilados = listaServicosTemporaria.map(s => s.nome).join(' + ');
             const valorBruto = listaServicosTemporaria.reduce((a, b) => a + b.preco, 0);
             const descLanc = parseFloat(document.getElementById('inputDescontoLancamento').value || 0);
-            
             const valorLiquido = valorBruto - descLanc;
 
             try {
@@ -510,8 +498,7 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE PAGAMENTO E FECHAMENTO ---
-
+        // --- SISTEMA DE PAGAMENTO (SEM IMPRESSÃO AUTOMÁTICA) ---
         window.carregarFormasPagamentoModal = async () => {
             const snapP = await getDocs(collection(db, "formas_pagamento"));
             const listaP = document.getElementById('listaFormasPag'); 
@@ -575,6 +562,7 @@
             document.getElementById('displayValorPagamento').innerText = "R$ " + total.toFixed(2);
         };
 
+        // SALVA O PAGAMENTO NO BANCO SEM EXIBIR ALERTA E SEM IMPRIMIR
         window.confirmarPagamento = async () => {
             const radio = document.querySelector('input[name="pag"]:checked');
             if(!radio) return alert("Selecione a Forma de Pagamento!");
@@ -585,6 +573,7 @@
             const dataHoje = new Date().toLocaleDateString('pt-BR');
             
             try {
+                // Esconde a tela na mesma hora
                 document.getElementById('modalPagamento').classList.add('hidden'); 
 
                 if (modoPagamento === 'SINGLE') {
@@ -600,7 +589,6 @@
                     dados.valor_bruto = valorBrutoGlobal;
                     
                     await updateDoc(docRef, dados); 
-                    if(confirm("PAGO! Deseja imprimir o recibo agora?")) window.imprimirCupom(dados, 'RECIBO');
 
                 } else if (modoPagamento === 'LOTE') {
                     const promessasAtualizacao = itensSelecionadosLote.map(async (itemAtual) => {
@@ -625,17 +613,22 @@
                     });
 
                     await Promise.all(promessasAtualizacao);
-                    if(confirm("LOTE PAGO COM SUCESSO! Deseja imprimir o comprovante de fechamento?")) window.imprimirLote();
                 }
                 
+                // Recarrega a bancada direto e em silêncio
                 carregarPendentes(); 
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE ENTRADA ---
+        // --- SISTEMA DE ENTRADA E SELETORES (COM CADASTRO NOVO) ---
         window.abrirSeletor = async (tipo) => {
+            tipoSeletorAtual = tipo; 
+            
             const modal = document.getElementById('modalSeletorGeral'); 
             const lista = document.getElementById('listaSeletorGeral');
+            
+            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? 'CLIENTES' : 'EQUIPAMENTOS';
+
             modal.classList.remove('hidden'); 
             lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse text-blue-400'>Buscando...</p>";
             
@@ -660,6 +653,42 @@
             document.getElementById('modalSeletorGeral').classList.add('hidden');
         };
 
+        // Abre modal para cadastrar novo
+        window.abrirNovoCadastro = () => {
+            const titulo = tipoSeletorAtual === 'clientes' ? 'NOVO CLIENTE' : 'NOVO EQUIPAMENTO';
+            document.getElementById('tituloNovoCadastro').innerText = titulo;
+            document.getElementById('inputNovoCadastro').value = '';
+            document.getElementById('inputNovoCadastro').placeholder = `DIGITE O NOME...`;
+            document.getElementById('modalNovoCadastro').classList.remove('hidden');
+        };
+
+        // Salva novo cliente/maquina no banco
+        window.salvarNovoCadastro = async () => {
+            const nomeDigitado = document.getElementById('inputNovoCadastro').value.toUpperCase().trim();
+            if(!nomeDigitado) return alert("Preencha o nome!");
+            
+            const btn = document.getElementById('btnSalvarCadastroNovo');
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            try {
+                const novaRef = doc(collection(db, tipoSeletorAtual)); 
+                await setDoc(novaRef, {
+                    nome: nomeDigitado,
+                    descricao: nomeDigitado
+                });
+                
+                document.getElementById('modalNovoCadastro').classList.add('hidden');
+                window.definirItem(tipoSeletorAtual, nomeDigitado);
+                
+            } catch(e) {
+                alert("Erro ao salvar: " + e.message);
+            } finally {
+                btn.innerText = "SALVAR";
+                btn.disabled = false;
+            }
+        };
+
         function gerarCodigoOficina() {
             const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let txt = '';
@@ -671,9 +700,9 @@
         }
 
         window.salvarEntrada = async () => {
-            const c = document.getElementById('inputCliente').value; 
-            const e = document.getElementById('inputEquipamento').value; 
-            const d = document.getElementById('defeito').value.toUpperCase();
+            const c = document.getElementById('inputCliente').value.toUpperCase().trim(); 
+            const e = document.getElementById('inputEquipamento').value.toUpperCase().trim(); 
+            const d = document.getElementById('defeito').value.toUpperCase().trim();
             const manualCod = document.getElementById('inputManualCod').value.toUpperCase().trim();
             
             if(!c || !e) return alert("Preencha Cliente e Equipamento!");
@@ -725,7 +754,7 @@
             }
         };
 
-        // --- SISTEMA DE CONSULTA ---
+        // --- SISTEMA DE CONSULTA (HISTÓRICO) ---
         window.buscarHistorico = async () => {
             const cod = document.getElementById('inputBuscaCod').value.toUpperCase().trim();
             const resultado = document.getElementById('resultadoConsulta');
@@ -852,8 +881,8 @@
 
     <div id="telaEntrada" class="tela hidden p-4 space-y-5 max-w-md mx-auto text-center">
         <header class="py-2"><h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Nova Entrada</h1></header>
-        <input id="inputCliente" readonly onclick="abrirSeletor('clientes')" type="text" placeholder="SELECIONAR CLIENTE" class="w-full p-6 rounded-[2rem] bg-zinc-900 shadow-xl font-black text-white uppercase outline-none border border-zinc-800 placeholder:text-zinc-500 active:bg-zinc-800">
-        <input id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" type="text" placeholder="EQUIPAMENTO" class="w-full p-6 rounded-[2rem] bg-zinc-900 shadow-xl font-black text-white uppercase outline-none border border-zinc-800 placeholder:text-zinc-500 active:bg-zinc-800">
+        <input id="inputCliente" readonly onclick="abrirSeletor('clientes')" type="text" placeholder="SELECIONAR CLIENTE" class="w-full p-6 rounded-[2rem] bg-zinc-900 shadow-xl font-black text-white uppercase outline-none border border-zinc-800 placeholder:text-zinc-500 active:bg-zinc-800 cursor-pointer">
+        <input id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" type="text" placeholder="EQUIPAMENTO" class="w-full p-6 rounded-[2rem] bg-zinc-900 shadow-xl font-black text-white uppercase outline-none border border-zinc-800 placeholder:text-zinc-500 active:bg-zinc-800 cursor-pointer">
         <input id="inputManualCod" type="text" maxlength="6" placeholder="CÓDIGO MANUAL (OPCIONAL)" class="w-full p-6 rounded-[2rem] bg-zinc-800 shadow-md font-black text-white uppercase outline-none border border-zinc-700 focus:border-blue-500 placeholder:text-zinc-600">
         <textarea id="defeito" placeholder="DESCREVA O DEFEITO..." class="w-full p-6 rounded-[2rem] bg-zinc-800 shadow-md font-bold text-slate-200 h-36 uppercase outline-none border border-zinc-700 focus:border-blue-500 placeholder:text-zinc-600"></textarea>
         <button id="btnGravar" onclick="salvarEntrada()" class="w-full bg-blue-600 text-white p-7 rounded-[3rem] font-black text-xl shadow-2xl active:bg-blue-700 mt-4">GRAVAR ENTRADA</button>
@@ -899,13 +928,27 @@
         </div>
     </div>
 
+    <!-- SELETOR GERAL DE CLIENTE / EQUIPAMENTO -->
     <div id="modalSeletorGeral" class="hidden fixed inset-0 bg-black/90 z-[100] p-4 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-zinc-900 w-full max-w-sm rounded-[3rem] shadow-2xl max-h-[80vh] flex flex-col overflow-hidden border border-zinc-800">
             <div class="p-6 border-b border-zinc-800 bg-zinc-800/50 flex justify-between items-center">
-                <h2 class="font-black text-white text-sm uppercase italic tracking-tight">Selecionar</h2>
+                <h2 id="tituloSeletorGeral" class="font-black text-white text-sm uppercase italic tracking-tight">Selecionar</h2>
+                <button onclick="abrirNovoCadastro()" class="bg-blue-600 text-white px-3 py-2 rounded-xl font-black text-[10px] uppercase shadow-md active:bg-blue-700">➕ Novo</button>
             </div>
             <div id="listaSeletorGeral" class="overflow-y-auto flex-1 bg-zinc-950"></div>
             <button onclick="document.getElementById('modalSeletorGeral').classList.add('hidden')" class="p-5 bg-zinc-800 text-zinc-400 font-black text-xs uppercase border-t border-zinc-800 active:bg-zinc-700 active:text-white">Fechar Janela</button>
+        </div>
+    </div>
+
+    <!-- CADASTRO RÁPIDO DE CLIENTE / EQUIPAMENTO -->
+    <div id="modalNovoCadastro" class="hidden fixed inset-0 bg-black/95 z-[120] p-4 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-zinc-900 w-full max-w-sm rounded-[2rem] p-6 shadow-2xl border border-zinc-800 text-center">
+            <h2 id="tituloNovoCadastro" class="text-lg font-black text-white uppercase italic mb-5">Novo Cadastro</h2>
+            <input id="inputNovoCadastro" type="text" class="w-full p-5 rounded-2xl bg-zinc-800 font-black text-white outline-none border border-zinc-700 focus:border-blue-500 mb-5 text-center uppercase placeholder:text-zinc-600 shadow-inner">
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('modalNovoCadastro').classList.add('hidden')" class="flex-1 bg-zinc-700 text-zinc-300 p-4 rounded-2xl font-black text-xs uppercase active:bg-zinc-600">Cancelar</button>
+                <button id="btnSalvarCadastroNovo" onclick="salvarNovoCadastro()" class="flex-2 bg-blue-600 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-lg active:bg-blue-700">Salvar</button>
+            </div>
         </div>
     </div>
 
