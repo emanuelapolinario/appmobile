@@ -62,7 +62,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CHAVES DE ACESSO AO BANCO DE DADOS (Nunca altere a menos que mude de conta no Google)
+        // CHAVES DE ACESSO AO BANCO DE DADOS
         const firebaseConfig = {
             apiKey: "AIzaSyB9_vQUtyjCx8KQw3k5fPlutOD-ekCaHw8",
             authDomain: "projeto-app-entregadores.firebaseapp.com",
@@ -73,28 +73,24 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // 'db' é a variável que usamos para conversar com o banco
+        const db = getFirestore(app); 
         
         // ==========================================
-        // 📌 ZONA 3: VARIÁVEIS GLOBAIS (A "Memória" do app)
-        // Se for criar uma função que precisa lembrar de algo, declare a variável aqui!
+        // 📌 ZONA 3: VARIÁVEIS GLOBAIS
         // ==========================================
-        let idAtual = null; // Guarda o ID da OS que está sendo editada/paga no momento
-        let itensSelecionadosLote = []; // Guarda as OS marcadas com "check" na bancada
-        let clienteAtualSelecao = null; // Trava a seleção de lote para permitir apenas o mesmo cliente
-        let valorBrutoGlobal = 0; // Guarda o valor total antes do desconto na tela de pagamento
-        let listaServicosTemporaria = []; // É o "carrinho de compras" quando estamos lançando serviços
-        let ordensBancada = {}; // Guarda uma cópia de todas as OS pendentes para fácil acesso
-        let historicoAtual = []; // Guarda a busca feita na aba histórico
+        let idAtual = null; 
+        let itensSelecionadosLote = []; 
+        let clienteAtualSelecao = null; 
+        let valorBrutoGlobal = 0; 
+        let listaServicosTemporaria = []; 
+        let ordensBancada = {}; 
+        let historicoAtual = []; 
+        let modoPagamento = 'SINGLE'; // Controla se estamos pagando 1 OS ('SINGLE') ou várias ('LOTE')
 
         // ==========================================
         // 📌 ZONA 4: FUNÇÕES DO APLICATIVO
-        // Se for adicionar um novo botão ou regra, crie a função nesta zona.
         // ==========================================
 
-        // --- FUNÇÕES DE UTILIDADE (Ajudam outras funções) ---
-        
-        // Converte a data do formato do banco (Inglês) para o Brasileiro (DD/MM/AAAA)
         window.formatarDataBR = (dataStr) => {
             if (!dataStr) return "---";
             if (dataStr.includes("-")) {
@@ -106,16 +102,13 @@
             return dataStr; 
         };
 
-        // --- INTEGRAÇÃO COM APLICATIVO RawBT (Impressão Bluetooth Android) ---
-        
-        // Joga o texto na área de transferência (copiar) do celular
+        // --- INTEGRAÇÃO COM APLICATIVO RawBT ---
         window.copiarParaRawBT = (texto) => {
             navigator.clipboard.writeText(texto).then(() => {
                 alert("RECIBO COPIADO! Cole no RawBT.");
             }).catch(err => alert("Erro ao copiar: " + err));
         };
 
-        // Monta o texto puro (sem HTML) para o RawBT de UMA ordem
         window.prepararTextoRecibo = (d, tipo = 'OS') => {
             const div = "--------------------------------";
             const valTotal = parseFloat(d.valor_servico || 0).toFixed(2);
@@ -148,7 +141,6 @@
             return t.toUpperCase();
         };
 
-        // Monta o texto puro para o RawBT de VÁRIAS ordens (LOTE)
         window.copiarLoteRawBT = () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
             const div = "--------------------------------";
@@ -166,35 +158,27 @@
             window.copiarParaRawBT(t.toUpperCase());
         };
 
-        // --- SISTEMA DE NAVEGAÇÃO (Abas) ---
-        // Esconde todas as abas e mostra apenas a que o usuário clicou
+        // --- SISTEMA DE NAVEGAÇÃO ---
         window.mudarAba = (aba) => {
-            // Esconde tudo que tem a classe 'tela'
             document.querySelectorAll('.tela').forEach(t => t.classList.add('hidden'));
-            // Tira a cor azul dos botões do menu
             document.querySelectorAll('nav button').forEach(b => b.className = "flex-1 p-3 rounded-xl font-black uppercase text-[10px] text-zinc-400");
             
-            // Ativa a tela e pinta o botão escolhido de azul
             const btn = document.getElementById('btnAba' + aba.charAt(0).toUpperCase() + aba.slice(1));
             const tela = document.getElementById('tela' + aba.charAt(0).toUpperCase() + aba.slice(1));
             
             tela.classList.remove('hidden');
             btn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
             
-            // Se foi pra aba de Bancada, recarrega as OS pendentes
             if(aba === 'pendentes') carregarPendentes();
         };
 
-        // --- SISTEMA DE IMPRESSÃO (Navegador/PC) ---
-        
-        // Pega o HTML gerado e joga na div oculta, depois aciona o print() do navegador
+        // --- SISTEMA DE IMPRESSÃO ---
         window.dispararPrint = (html) => {
             const area = document.getElementById('areaImpressao');
             area.innerHTML = `<div class="cupom-texto">${html}</div>`;
-            setTimeout(() => { window.print(); }, 500); // Espera 0.5s para o HTML renderizar antes de abrir a janela de impressão
+            setTimeout(() => { window.print(); }, 500);
         };
 
-        // Cria o visual do cupom de UMA ordem
         window.imprimirCupom = (dados, tipo = 'OS') => {
             const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
             const desc = parseFloat(dados.desconto || 0);
@@ -243,10 +227,9 @@
                 <div class="c">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
-            window.dispararPrint(layout); // Manda imprimir
+            window.dispararPrint(layout);
         };
 
-        // Cria o visual do cupom de LOTE (várias ordens)
         window.imprimirLote = () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS para imprimir lote!");
             
@@ -255,7 +238,6 @@
             let totalBrutoLote = 0;
             let itensHTML = "";
             
-            // Passa por cada OS selecionada e cria um pedaço de HTML para ela
             itensSelecionadosLote.forEach(d => {
                 const liquido = parseFloat(d.valor_servico || 0);
                 const desconto = parseFloat(d.desconto || 0);
@@ -282,7 +264,6 @@
                 `;
             });
             
-            // Junta tudo
             const layout = `
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">FECHAMENTO DE SERVICOS</div>
@@ -305,7 +286,6 @@
             window.dispararPrint(layout);
         };
 
-        // Cria o visual do cupom de HISTÓRICO DA MÁQUINA
         window.prepararImpressaoHistorico = (cod) => {
             if (!historicoAtual || historicoAtual.length === 0) return;
 
@@ -345,30 +325,25 @@
             window.dispararPrint(layout);
         };
 
-        // --- ABA BANCADA (Busca e Listagem) ---
-        
-        // Verifica as "caixinhas" marcadas para gerar lote
+        // --- ABA BANCADA ---
         window.toggleSelecao = (idOS) => {
             const d = ordensBancada[idOS];
             const cliente = d.cliente;
             const index = itensSelecionadosLote.findIndex(i => i.id === d.id);
             
-            // Se já está na lista, tira.
             if (index > -1) {
                 itensSelecionadosLote.splice(index, 1);
                 if (itensSelecionadosLote.length === 0) clienteAtualSelecao = null;
             } else {
-                // Se o cliente for diferente da primeira OS selecionada, bloqueia!
                 if (clienteAtualSelecao && clienteAtualSelecao !== cliente) {
                     alert("Selecione apenas equipamentos do MESMO CLIENTE para gerar o lote!");
                     document.getElementById('chk' + idOS).checked = false;
                     return;
                 }
                 clienteAtualSelecao = cliente;
-                itensSelecionadosLote.push(d); // Adiciona na lista
+                itensSelecionadosLote.push(d); 
             }
             
-            // Atualiza a barra verde flutuante do lote
             const total = itensSelecionadosLote.reduce((a, b) => a + parseFloat(b.valor_servico || 0), 0);
             const btnLote = document.getElementById('btnLote');
             
@@ -384,9 +359,7 @@
             document.getElementById('txtQtdLote').innerText = `${itensSelecionadosLote.length} MÁQS`;
         };
 
-        // Busca todas as OS Pendentes ou Aguardando Pagamento no Banco de Dados
         async function carregarPendentes() {
-            // Zera a seleção ao recarregar a página
             itensSelecionadosLote = []; 
             clienteAtualSelecao = null;
             ordensBancada = {}; 
@@ -397,12 +370,10 @@
             lista.innerHTML = "<p class='p-10 text-center animate-pulse font-black text-blue-400'>Sincronizando Banco...</p>";
             
             try {
-                // Puxa da coleção "ordens"
                 const snap = await getDocs(collection(db, "ordens"));
                 lista.innerHTML = ""; 
                 let totalA = 0;
                 
-                // Passa por cada ordem que voltou do banco
                 snap.forEach(dDoc => {
                     const d = dDoc.data(); 
                     const status = (d.status || "").toUpperCase().trim();
@@ -418,7 +389,6 @@
                         
                         let servicoTexto = d.servico_principal ? `<div class="bg-zinc-800 text-slate-200 p-3 rounded-2xl mb-3 font-black uppercase text-[10px] leading-tight border border-zinc-700">🛠 ${d.servico_principal.replace(/\+/g, ' | ')}</div>` : '';
 
-                        // "Desenha" os cards das OS na tela injetando HTML
                         lista.innerHTML += `
                             <div class="bg-zinc-900 p-5 rounded-[2.5rem] mb-5 shadow-2xl border border-zinc-800 border-l-[14px] ${borderColor} relative">
                                 <div class="absolute right-6 top-6">
@@ -462,26 +432,22 @@
             } catch (e) { alert(e.message); }
         }
 
-        // --- SISTEMA DE LANÇAMENTOS ("Carrinho" de Serviços) ---
-        
-        // Abre a janela preta (modal) de lançar serviços e busca a lista no banco
+        // --- SISTEMA DE LANÇAMENTOS ---
         window.abrirLancamento = async (id) => {
             idAtual = id; 
-            listaServicosTemporaria = []; // Zera o carrinho
+            listaServicosTemporaria = []; 
             atualizarListaCarrinho();
             document.getElementById('inputDescontoLancamento').value = "";
-            document.getElementById('modalServicos').classList.remove('hidden'); // Mostra a tela modal
+            document.getElementById('modalServicos').classList.remove('hidden'); 
             
             const listaTabela = document.getElementById('listaDeServicos');
             listaTabela.innerHTML = "<p class='p-5 text-center font-black animate-pulse text-blue-400'>Buscando...</p>";
             
             try {
-                // Busca a tabela de preços "servicos_lista"
                 const snap = await getDocs(collection(db, "servicos_lista"));
                 listaTabela.innerHTML = "";
                 snap.forEach(dDoc => {
                     const s = dDoc.data(); 
-                    // Tenta achar o nome em vários campos diferentes (caso o banco esteja bagunçado)
                     const nomeTabela = s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id; 
                     const valorTabela = s.valor || s.preco || 0;
                     listaTabela.innerHTML += `
@@ -495,16 +461,15 @@
         };
 
         window.adicionarAoCarrinho = (nome, preco) => {
-            listaServicosTemporaria.push({nome: nome, preco: preco}); // Adiciona no Array (Lista)
+            listaServicosTemporaria.push({nome: nome, preco: preco}); 
             atualizarListaCarrinho();
         };
 
         window.removerDoCarrinho = (index) => {
-            listaServicosTemporaria.splice(index, 1); // Remove da Lista pelo número (posição)
+            listaServicosTemporaria.splice(index, 1); 
             atualizarListaCarrinho();
         };
 
-        // Redesenha a tela do carrinho sempre que algo é adicionado/removido
         window.atualizarListaCarrinho = () => {
             const divCarrinho = document.getElementById('carrinhoServicos');
             const totalDisplay = document.getElementById('totalCarrinho');
@@ -523,11 +488,9 @@
             totalDisplay.innerText = "R$ " + soma.toFixed(2);
         };
 
-        // Junta tudo do carrinho, calcula o desconto e salva a OS como "AGUARDANDO PAGAMENTO"
         window.finalizarAgrupamento = async () => {
             if(listaServicosTemporaria.length === 0) return alert("Adicione ao menos 1 serviço!");
             
-            // Junta os nomes: "Serviço A + Serviço B"
             const nomesCompilados = listaServicosTemporaria.map(s => s.nome).join(' + ');
             const valorBruto = listaServicosTemporaria.reduce((a, b) => a + b.preco, 0);
             const descLanc = parseFloat(document.getElementById('inputDescontoLancamento').value || 0);
@@ -535,7 +498,6 @@
             const valorLiquido = valorBruto - descLanc;
 
             try {
-                // Atualiza o Documento (OS) no Firestore
                 await updateDoc(doc(db, "ordens", idAtual.toString()), { 
                     servico_principal: nomesCompilados.toUpperCase(), 
                     valor_bruto: valorBruto, 
@@ -543,16 +505,33 @@
                     desconto: descLanc, 
                     status: "AGUARDANDO PAGAMENTO" 
                 });
-                document.getElementById('modalServicos').classList.add('hidden'); // Esconde a modal
-                carregarPendentes(); // Atualiza a tela principal
+                document.getElementById('modalServicos').classList.add('hidden'); 
+                carregarPendentes(); 
             } catch (e) { alert("Erro: " + e.message); }
         };
 
         // --- SISTEMA DE PAGAMENTO E FECHAMENTO ---
-        
-        // Abre a tela de confirmar pagamento e busca as formas (Pix, Cartão, Dinheiro...)
+
+        window.carregarFormasPagamentoModal = async () => {
+            const snapP = await getDocs(collection(db, "formas_pagamento"));
+            const listaP = document.getElementById('listaFormasPag'); 
+            listaP.innerHTML = "";
+            
+            snapP.forEach(dDoc => {
+                const f = dDoc.data();
+                const nomeF = f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
+                listaP.innerHTML += `
+                    <label class="flex items-center p-4 bg-zinc-800 border border-zinc-700 rounded-xl mb-2 has-[:checked]:border-blue-500 has-[:checked]:bg-zinc-700 transition-all cursor-pointer">
+                        <input type="radio" name="pag" value="${nomeF}" class="w-6 h-6 accent-blue-500 cursor-pointer">
+                        <span class="ml-4 font-black text-white uppercase text-xs italic">${nomeF}</span>
+                    </label>
+                `;
+            });
+        };
+
         window.prepararFinalizacao = async (id) => {
             idAtual = id; 
+            modoPagamento = 'SINGLE'; 
             document.getElementById('modalPagamento').classList.remove('hidden');
             
             try {
@@ -564,64 +543,96 @@
                 
                 document.getElementById('inputDescontoPagamento').value = descGravado > 0 ? descGravado : "";
                 atualizarTotalComDescontoPagamento();
-                
-                // Busca Formas de Pagamento
-                const snapP = await getDocs(collection(db, "formas_pagamento"));
-                const listaP = document.getElementById('listaFormasPag'); 
-                listaP.innerHTML = "";
-                
-                snapP.forEach(dDoc => {
-                    const f = dDoc.data();
-                    const nomeF = f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
-                    listaP.innerHTML += `
-                        <label class="flex items-center p-4 bg-zinc-800 border border-zinc-700 rounded-xl mb-2 has-[:checked]:border-blue-500 has-[:checked]:bg-zinc-700 transition-all cursor-pointer">
-                            <input type="radio" name="pag" value="${nomeF}" class="w-6 h-6 accent-blue-500 cursor-pointer">
-                            <span class="ml-4 font-black text-white uppercase text-xs italic">${nomeF}</span>
-                        </label>
-                    `;
-                });
+                await carregarFormasPagamentoModal();
             } catch(e) { alert("Erro: " + e.message); }
         };
 
-        // Recalcula o valor verde gigante na tela de pagamento quando altera o desconto
+        window.prepararPagamentoLote = async () => {
+            if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
+            modoPagamento = 'LOTE'; 
+            
+            let brutoTotalLote = 0;
+            let descGravadoTotal = 0;
+
+            itensSelecionadosLote.forEach(d => {
+                const liq = parseFloat(d.valor_servico || 0);
+                const desc = parseFloat(d.desconto || 0);
+                brutoTotalLote += parseFloat(d.valor_bruto) || (liq + desc);
+                descGravadoTotal += desc;
+            });
+
+            valorBrutoGlobal = brutoTotalLote;
+            document.getElementById('inputDescontoPagamento').value = descGravadoTotal > 0 ? descGravadoTotal : "";
+            atualizarTotalComDescontoPagamento();
+            
+            await carregarFormasPagamentoModal();
+            document.getElementById('modalPagamento').classList.remove('hidden');
+        };
+
         window.atualizarTotalComDescontoPagamento = () => {
             const desc = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
             const total = valorBrutoGlobal - desc;
             document.getElementById('displayValorPagamento').innerText = "R$ " + total.toFixed(2);
         };
 
-        // Marca como PAGO e gera a data de pagamento
         window.confirmarPagamento = async () => {
             const radio = document.querySelector('input[name="pag"]:checked');
             if(!radio) return alert("Selecione a Forma de Pagamento!");
             
-            const novoDesc = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
-            const novoLiquido = valorBrutoGlobal - novoDesc;
+            const novoDescTotal = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
+            const novoLiquidoTotal = valorBrutoGlobal - novoDescTotal;
+            const formaPag = radio.value.toUpperCase();
+            const dataHoje = new Date().toLocaleDateString('pt-BR');
             
             try {
-                const docRef = doc(db, "ordens", idAtual.toString()); 
-                const dSnap = await getDoc(docRef); 
-                const dados = dSnap.data();
-                
-                dados.status = "PAGO"; 
-                dados.forma_pagamento = radio.value.toUpperCase(); 
-                dados.data_pagamento = new Date().toLocaleDateString('pt-BR');
-                dados.desconto = novoDesc;
-                dados.valor_servico = novoLiquido;
-                dados.valor_bruto = valorBrutoGlobal;
-                
-                await updateDoc(docRef, dados); // Salva no banco
-                
-                // Pergunta se já quer imprimir
-                if(confirm("PAGO! Deseja imprimir o recibo agora?")) window.imprimirCupom(dados, 'RECIBO');
                 document.getElementById('modalPagamento').classList.add('hidden'); 
-                carregarPendentes();
+
+                if (modoPagamento === 'SINGLE') {
+                    const docRef = doc(db, "ordens", idAtual.toString()); 
+                    const dSnap = await getDoc(docRef); 
+                    const dados = dSnap.data();
+                    
+                    dados.status = "PAGO"; 
+                    dados.forma_pagamento = formaPag; 
+                    dados.data_pagamento = dataHoje;
+                    dados.desconto = novoDescTotal;
+                    dados.valor_servico = novoLiquidoTotal;
+                    dados.valor_bruto = valorBrutoGlobal;
+                    
+                    await updateDoc(docRef, dados); 
+                    if(confirm("PAGO! Deseja imprimir o recibo agora?")) window.imprimirCupom(dados, 'RECIBO');
+
+                } else if (modoPagamento === 'LOTE') {
+                    const promessasAtualizacao = itensSelecionadosLote.map(async (itemAtual) => {
+                        const docRef = doc(db, "ordens", itemAtual.id.toString());
+                        const dSnap = await getDoc(docRef);
+                        const dados = dSnap.data();
+
+                        const brutoItem = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
+
+                        const proporcaoDesconto = valorBrutoGlobal > 0 ? (brutoItem / valorBrutoGlobal) : 0;
+                        const descontoDoItem = novoDescTotal * proporcaoDesconto;
+                        const liquidoDoItem = brutoItem - descontoDoItem;
+
+                        dados.status = "PAGO";
+                        dados.forma_pagamento = formaPag;
+                        dados.data_pagamento = dataHoje;
+                        dados.desconto = descontoDoItem;
+                        dados.valor_servico = liquidoDoItem;
+                        dados.valor_bruto = brutoItem;
+
+                        return updateDoc(docRef, dados);
+                    });
+
+                    await Promise.all(promessasAtualizacao);
+                    if(confirm("LOTE PAGO COM SUCESSO! Deseja imprimir o comprovante de fechamento?")) window.imprimirLote();
+                }
+                
+                carregarPendentes(); 
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE ENTRADA (Criar Nova OS) ---
-        
-        // Abre os seletores (a listinha de clientes ou equipamentos)
+        // --- SISTEMA DE ENTRADA ---
         window.abrirSeletor = async (tipo) => {
             const modal = document.getElementById('modalSeletorGeral'); 
             const lista = document.getElementById('listaSeletorGeral');
@@ -643,14 +654,12 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // Bota o valor clicado no seletor dentro da caixa de texto correta
         window.definirItem = (tipo, valor) => {
             if(tipo === 'clientes') document.getElementById('inputCliente').value = valor;
             else document.getElementById('inputEquipamento').value = valor;
             document.getElementById('modalSeletorGeral').classList.add('hidden');
         };
 
-        // Cria o código da etiqueta (ex: "ABC123") aleatório
         function gerarCodigoOficina() {
             const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let txt = '';
@@ -661,7 +670,6 @@
             return txt + num;
         }
 
-        // Salva de fato a nova OS no banco de dados
         window.salvarEntrada = async () => {
             const c = document.getElementById('inputCliente').value; 
             const e = document.getElementById('inputEquipamento').value; 
@@ -673,16 +681,14 @@
             const btnGravar = document.getElementById('btnGravar');
             const textoOriginal = btnGravar.innerText;
             btnGravar.innerText = "GRAVANDO...";
-            btnGravar.disabled = true; // Impede duplo clique
+            btnGravar.disabled = true; 
             
             try {
-                // Descobre qual o último ID para criar o próximo (Auto Incremento)
                 const snapID = await getDocs(collection(db, "ordens")); 
                 let maior = 0;
                 snapID.forEach(docS => { const idN = parseInt(docS.id); if(!isNaN(idN) && idN > maior) maior = idN; });
                 const novoID = (maior + 1).toString();
                 
-                // Gera o código ou pega o manual
                 let codF = manualCod;
                 if (codF === "") {
                     let codigoUnico = false;
@@ -691,7 +697,7 @@
                         const q = query(collection(db, "ordens"), where("codigo_maquina", "==", codF));
                         const snapVerificacao = await getDocs(q);
                         if (snapVerificacao.empty) {
-                            codigoUnico = true; // Garante que não crie código duplicado
+                            codigoUnico = true; 
                         }
                     }
                 }
@@ -702,16 +708,15 @@
                     servico_principal: "", valor_servico: 0, forma_pagamento: "", data_pagamento: "", desconto: 0, valor_bruto: 0 
                 };
                 
-                await setDoc(doc(db, "ordens", novoID), dados); // Salva!
+                await setDoc(doc(db, "ordens", novoID), dados); 
                 alert(`GRAVADO COM SUCESSO!\n\nID OS: ${novoID}\nCÓDIGO: ${codF}`);
                 
-                // Limpa os campos
                 document.getElementById('inputCliente').value = ""; 
                 document.getElementById('inputEquipamento').value = ""; 
                 document.getElementById('defeito').value = ""; 
                 document.getElementById('inputManualCod').value = "";
                 
-                mudarAba('pendentes'); // Joga o usuário pra tela de bancada
+                mudarAba('pendentes'); 
             } catch (err) { 
                 alert("Erro: " + err.message); 
             } finally {
@@ -720,9 +725,7 @@
             }
         };
 
-        // --- SISTEMA DE CONSULTA (Histórico) ---
-        
-        // Busca na coleção de Ordens todas as OS que tem o mesmo código
+        // --- SISTEMA DE CONSULTA ---
         window.buscarHistorico = async () => {
             const cod = document.getElementById('inputBuscaCod').value.toUpperCase().trim();
             const resultado = document.getElementById('resultadoConsulta');
@@ -731,7 +734,6 @@
             resultado.innerHTML = "<p class='p-10 text-center animate-pulse font-black text-blue-400'>Buscando...</p>";
             
             try {
-                // A 'query' é o filtro do banco de dados (Ache onde codigo == cod_digitado)
                 const q = query(collection(db, "ordens"), where("codigo_maquina", "==", cod));
                 const snap = await getDocs(q);
                 
@@ -743,7 +745,7 @@
                 
                 let listaH = []; 
                 snap.forEach(d => listaH.push(d.data())); 
-                listaH.sort((a,b) => b.timestamp - a.timestamp); // Ordena da mais nova pra mais velha
+                listaH.sort((a,b) => b.timestamp - a.timestamp); 
                 
                 historicoAtual = listaH; 
 
@@ -756,7 +758,6 @@
                     </div>
                 `;
                 
-                // Desenha os cards do histórico na tela
                 listaH.forEach(h => {
                     const total = parseFloat(h.valor_servico || 0);
                     const desconto = parseFloat(h.desconto || 0);
@@ -797,7 +798,6 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // Quando o site abre pela primeira vez, chama a Bancada automaticamente
         window.onload = () => carregarPendentes();
     </script>
 </head>
@@ -841,6 +841,7 @@
                 <p id="txtTotalLote" class="text-2xl font-black italic text-white">R$ 0,00</p>
             </div>
             <div class="flex gap-2">
+                <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-4 rounded-2xl font-black text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
                 <button onclick="imprimirLote()" class="bg-white text-green-700 p-4 rounded-2xl font-black text-xl shadow-md active:scale-95 transition-all">🖨️</button>
                 <button onclick="copiarLoteRawBT()" class="bg-white text-green-700 px-5 py-4 rounded-2xl font-black text-[10px] uppercase shadow-md active:scale-95 transition-all">📋 COPIAR</button>
             </div>
