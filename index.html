@@ -55,7 +55,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB9_vQUtyjCx8KQw3k5fPlutOD-ekCaHw8",
@@ -78,7 +78,7 @@
         let ordensBancada = {}; 
         let historicoAtual = []; 
         let modoPagamento = 'SINGLE'; 
-        let tipoSeletorAtual = ''; // Controla se estamos cadastrando cliente ou equipamento
+        let tipoSeletorAtual = ''; 
 
         // --- FUNÇÕES UTILITÁRIAS ---
         window.formatarDataBR = (dataStr) => {
@@ -314,6 +314,21 @@
             window.dispararPrint(layout);
         };
 
+        // --- FUNÇÃO PARA EXCLUIR UMA ORDEM DE SERVIÇO ---
+        window.excluirOrdemServico = async (idOS) => {
+            if (!confirm(`⚠️ ALERTA: TEM CERTEZA QUE DESEJA EXCLUIR DEFINITIVAMENTE A OS Nº ${idOS}? ESSA AÇÃO NÃO PODE SER DESFEITA.`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, "ordens", idOS.toString()));
+                alert("ORDEM DE SERVIÇO EXCLUÍDA!");
+                carregarPendentes();
+            } catch (e) {
+                alert("Erro ao excluir OS: " + e.message);
+            }
+        };
+
         // --- ABA BANCADA E SELEÇÃO DE LOTE ---
         window.toggleSelecao = (idOS) => {
             const d = ordensBancada[idOS];
@@ -383,8 +398,13 @@
                                 <div class="absolute right-6 top-6">
                                     <input type="checkbox" id="chk${d.id}" onchange="toggleSelecao('${d.id}')" class="w-8 h-8 accent-blue-500 shadow-lg cursor-pointer rounded">
                                 </div>
-                                <div class="flex justify-between items-center mb-2 pr-12">
-                                    <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full ${badgeClass} italic border border-current/20">${status}</span>
+                                <div class="flex justify-between items-center mb-2 pr-12 gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full ${badgeClass} italic border border-current/20">${status}</span>
+                                        <button onclick="window.excluirOrdemServico('${d.id}')" class="text-red-400 bg-red-950/30 border border-red-900/50 p-1 px-2 rounded-lg text-[10px] font-bold active:bg-red-900 active:text-white transition-all">
+                                            🗑️ Excluir
+                                        </button>
+                                    </div>
                                     <span class="text-[10px] font-black text-blue-300 bg-blue-950 px-3 py-1 rounded-lg border border-blue-900"># ${d.codigo_maquina}</span>
                                 </div>
                                 <h3 class="text-xl font-black text-white uppercase leading-none">${d.equipamento}</h3>
@@ -498,7 +518,7 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE PAGAMENTO (SEM IMPRESSÃO AUTOMÁTICA) ---
+        // --- SISTEMA DE PAGAMENTO ---
         window.carregarFormasPagamentoModal = async () => {
             const snapP = await getDocs(collection(db, "formas_pagamento"));
             const listaP = document.getElementById('listaFormasPag'); 
@@ -562,7 +582,6 @@
             document.getElementById('displayValorPagamento').innerText = "R$ " + total.toFixed(2);
         };
 
-        // SALVA O PAGAMENTO NO BANCO SEM EXIBIR ALERTA E SEM IMPRIMIR
         window.confirmarPagamento = async () => {
             const radio = document.querySelector('input[name="pag"]:checked');
             if(!radio) return alert("Selecione a Forma de Pagamento!");
@@ -573,7 +592,6 @@
             const dataHoje = new Date().toLocaleDateString('pt-BR');
             
             try {
-                // Esconde a tela na mesma hora
                 document.getElementById('modalPagamento').classList.add('hidden'); 
 
                 if (modoPagamento === 'SINGLE') {
@@ -615,12 +633,11 @@
                     await Promise.all(promessasAtualizacao);
                 }
                 
-                // Recarrega a bancada direto e em silêncio
                 carregarPendentes(); 
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE ENTRADA E SELETORES (COM CADASTRO NOVO) ---
+        // --- SISTEMA DE ENTRADA E SELETORES ---
         window.abrirSeletor = async (tipo) => {
             tipoSeletorAtual = tipo; 
             
@@ -653,7 +670,6 @@
             document.getElementById('modalSeletorGeral').classList.add('hidden');
         };
 
-        // Abre modal para cadastrar novo
         window.abrirNovoCadastro = () => {
             const titulo = tipoSeletorAtual === 'clientes' ? 'NOVO CLIENTE' : 'NOVO EQUIPAMENTO';
             document.getElementById('tituloNovoCadastro').innerText = titulo;
@@ -662,7 +678,6 @@
             document.getElementById('modalNovoCadastro').classList.remove('hidden');
         };
 
-        // Salva novo cliente/maquina no banco
         window.salvarNovoCadastro = async () => {
             const nomeDigitado = document.getElementById('inputNovoCadastro').value.toUpperCase().trim();
             if(!nomeDigitado) return alert("Preencha o nome!");
