@@ -1,58 +1,373 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html class="dark" lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oficina Emanuel - Sistema Dark</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>Emanuel Soluções</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#09090b"> 
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <meta name="theme-color" content="#10131a"> 
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffdcc6",
+                        "surface-container-highest": "#32353c",
+                        "inverse-on-surface": "#2e3038",
+                        "surface-dim": "#10131a",
+                        "secondary-container": "#474649",
+                        "surface-tint": "#adc6ff",
+                        "primary": "#adc6ff",
+                        "secondary-fixed-dim": "#c8c6c8",
+                        "tertiary": "#ffb786",
+                        "on-error-container": "#ffdad6",
+                        "inverse-primary": "#005ac2",
+                        "on-background": "#e1e2ec",
+                        "surface-container-low": "#191b23",
+                        "background": "#10131a",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "on-primary-container": "#00285d",
+                        "on-tertiary": "#502400",
+                        "inverse-surface": "#e1e2ec",
+                        "on-primary": "#002e6a",
+                        "surface-variant": "#32353c",
+                        "surface-container-high": "#272a31",
+                        "tertiary-fixed-dim": "#ffb786",
+                        "on-secondary-fixed": "#1c1b1d",
+                        "on-primary-fixed-variant": "#004395",
+                        "surface-container-lowest": "#0b0e15",
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "outline": "#8c909f",
+                        "on-secondary-container": "#b7b4b7",
+                        "secondary": "#c8c6c8",
+                        "surface-container": "#1d2027",
+                        "on-tertiary-fixed": "#311400",
+                        "on-primary-fixed": "#001a42",
+                        "error": "#ffb4ab",
+                        "surface-bright": "#363941",
+                        "secondary-fixed": "#e5e1e4",
+                        "on-secondary-fixed-variant": "#474649",
+                        "primary-container": "#4d8eff",
+                        "on-secondary": "#313032",
+                        "outline-variant": "#424754",
+                        "primary-fixed": "#d8e2ff",
+                        "on-tertiary-container": "#461f00",
+                        "on-surface": "#e1e2ec",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface": "#10131a",
+                        "primary-fixed-dim": "#adc6ff",
+                        "tertiary-container": "#df7412",
+                        "brand-blue": "#3b82f6",
+                        "brand-green": "#22c55e",
+                        "brand-zinc": "#18181b",
+                        "brand-border": "#27272a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-margin": "20px",
+                        "stack-gap-lg": "32px",
+                        "card-padding": "24px",
+                        "unit": "8px",
+                        "stack-gap-md": "16px",
+                        "stack-gap-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "body-base": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "headline-lg-mobile": ["Geist"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-base": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Oculta a área que será impressa enquanto o usuário navega normalmente */
-        #areaImpressao { display: none; }
+        body { font-family: 'Geist', sans-serif; background-color: #0b0e14; color: #e1e2ec; }
+        .cyber-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+        .input-tech { background-color: #09090b; border: 1px solid #27272a; color: #e1e2ec; border-radius: 0.75rem; padding: 0.85rem 1.25rem; width: 100%; transition: all 0.2s; font-size: 15px; }
+        .input-tech:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        .input-tech::placeholder { color: #52525b; }
         
-        /* Regras exclusivas para quando apertar o botão de IMPRIMIR */
+        .card-tech { background-color: #13161e; border: 1px solid #22252d; border-radius: 1.25rem; padding: 1.5rem; transition: all 0.2s; }
+        .btn-primary { background-color: #3b82f6; color: white; font-weight: 700; border-radius: 1rem; padding: 0.9rem 1.5rem; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.025em; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-success { background-color: #22c55e; color: white; font-weight: 700; border-radius: 1rem; padding: 0.9rem 1.5rem; transition: all 0.2s; text-transform: uppercase; }
+        .btn-success:active { transform: scale(0.98); }
+        .btn-icon { background-color: #1d2027; color: #e1e2ec; border-radius: 0.75rem; padding: 0.65rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: 1px solid #32353c; }
+        .btn-icon:active { transform: scale(0.95); }
+
+        .modal-overlay { background-color: rgba(4, 5, 8, 0.85); backdrop-filter: blur(12px); }
+        .modal-content { background-color: #13161e; border: 1px solid #22252d; border-radius: 2rem; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0b0e14; }
+        ::-webkit-scrollbar-thumb { background: #272a31; border-radius: 10px; }
+
         @media print {
             body * { visibility: hidden; }
             #areaImpressao, #areaImpressao * { visibility: visible; }
             #areaImpressao { 
-                display: block !important; 
+                display: block !important;
                 position: absolute; left: 0; top: 0; 
                 width: 52mm; margin: 0; padding: 0; 
-                background: white; 
+                background: white; color: black;
             }
             @page { size: 58mm auto; margin: 0; }
-            
-            .cupom-texto { 
-                font-family: Verdana, 'Arial Black', sans-serif; 
-                font-size: 13px; 
-                line-height: 1.2; 
-                text-transform: uppercase; 
-                color: #000; 
-            }
-            .hr { border-bottom: 2px dashed black; margin: 5px 0; width: 100%; }
+            .cupom-texto { font-family: monospace; font-size: 12px; line-height: 1.3; text-transform: uppercase; color: #000; }
+            .hr { border-bottom: 1px dashed black; margin: 5px 0; width: 100%; }
             .c { text-align: center; } 
             .b { font-weight: bold; }
-            .espaco-fim { height: 60px; } 
+            .espaco-fim { height: 45px; } 
         }
-
-        /* Ajustes Mobile */
-        input:not([type="checkbox"]):not([type="radio"]), textarea { 
-            -webkit-appearance: none; 
-            border-radius: 0; 
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #18181b; }
-        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
     </style>
+</head>
+<body class="pb-24 pt-16 h-screen flex flex-col bg-surface-container-lowest">
 
+    <!-- Área Oculta de Impressão -->
+    <div id="areaImpressao"></div>
+
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 backdrop-blur-md border-b border-outline-variant/30 bg-surface-dim/70 flex items-center justify-between px-container-margin h-16">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary active:scale-95 transition-transform" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary tracking-tight">Emanuel Soluções</h1>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
+            <span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
+        </div>
+    </header>
+
+    <!-- Canvas Principal de Conteúdo -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto space-y-6">
+        
+        <!-- Tela Bancada (Dashboard) -->
+        <div class="space-y-6" id="telaPendentes">
+            <!-- Card de Métricas Principais -->
+            <div class="card-tech cyber-glow flex flex-col items-center justify-center py-8 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">A Receber Total</span>
+                <span class="font-display-lg text-display-lg text-primary tracking-tighter italic" id="valorPendenteGeral">R$ 0,00</span>
+            </div>
+
+            <!-- Header da Lista & Ações em Lote -->
+            <div id="btnLote" class="hidden justify-between items-center bg-surface-container border border-outline-variant/30 rounded-2xl p-4 shadow-xl animate-fade-in">
+                <div>
+                    <p id="txtQtdLote" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">0 MÁQUINAS</p>
+                    <p id="txtTotalLote" class="text-xl font-bold text-green-400">R$ 0,00</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
+                    <button onclick="imprimirLote()" class="bg-zinc-800 text-white p-2.5 rounded-xl font-black text-sm border border-zinc-700 active:scale-95 transition-all">🖨️</button>
+                    <button onclick="copiarLoteRawBT()" class="bg-zinc-800 text-zinc-300 px-3 py-2.5 rounded-xl font-bold text-[10px] uppercase border border-zinc-700 active:scale-95 transition-all">📋 COPIAR</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-end border-b border-brand-border pb-2">
+                <h2 class="font-headline-md text-headline-md text-on-surface">Serviços Pendentes</h2>
+            </div>
+
+            <!-- Lista de Ordens Ativas -->
+            <div class="space-y-4" id="listaPendentes"></div>
+        </div>
+
+        <!-- Tela Nova Entrada -->
+        <div class="hidden space-y-6" id="telaCadastro">
+            <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Nova Ordem de Serviço</h2>
+            <div class="card-tech space-y-5">
+                <div class="flex flex-col gap-1">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Cliente</label>
+                    <input autocomplete="off" readonly onclick="abrirSeletor('clientes')" class="input-tech cursor-pointer text-left font-semibold" id="inputCliente" placeholder="SELECIONAR CLIENTE..." type="text"/>
+                </div>
+                
+                <div class="flex flex-col gap-1">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Equipamento / Máquina</label>
+                    <input autocomplete="off" readonly onclick="abrirSeletor('maquinas')" class="input-tech cursor-pointer text-left font-semibold" id="inputEquipamento" placeholder="SELECIONAR MAQUINA..." type="text"/>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Código Manual (Opcional)</label>
+                    <input class="input-tech" id="inputManualCod" placeholder="EX: ABC123" maxlength="6" type="text"/>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Defeito Relatado</label>
+                    <textarea class="input-tech min-h-[100px] font-medium" id="defeito" placeholder="Descreva os problemas relatados pelo cliente..."></textarea>
+                </div>
+
+                <button id="btnGravar" class="btn-primary w-full flex items-center justify-center gap-2 mt-4 cyber-glow" onclick="salvarEntrada()">
+                    <span class="material-symbols-outlined">add_task</span>
+                    Lançar Serviço na Bancada
+                </button>
+            </div>
+        </div>
+
+        <!-- Tela Histórico -->
+        <div class="hidden space-y-6" id="telaHistorico">
+            <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Histórico de Concluídos</h2>
+            <div class="card-tech mb-4 p-3 flex gap-2">
+                <input class="input-tech flex-1" id="inputBuscaCod" placeholder="DIGITE O CÓDIGO DA MÁQUINA..." type="text" maxlength="6"/>
+                <button class="btn-primary px-5 flex items-center justify-center" onclick="buscarHistorico()">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+            </div>
+            <div class="space-y-4" id="resultadoConsulta"></div>
+        </div>
+    </main>
+
+    <!-- BottomNavBar Desktop-Hidden -->
+    <nav class="fixed bottom-0 w-full z-50 rounded-t-2xl backdrop-blur-xl border-t border-outline-variant/20 bg-surface-container-low/80 shadow-[0_-4px_20px_0_rgba(59,130,246,0.08)]">
+        <div class="flex justify-around items-center h-20 px-4 pb-safe">
+            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" onclick="mudarAba('entrada', this)">
+                <span class="material-symbols-outlined mb-1">add_circle</span>
+                <span class="font-label-sm text-label-sm">Nova Entrada</span>
+            </button>
+            <button class="nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200" onclick="mudarAba('pendentes', this)">
+                <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">build</span>
+                <span class="font-label-sm text-label-sm">Bancada</span>
+            </button>
+            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" onclick="mudarAba('consulta', this)">
+                <span class="material-symbols-outlined mb-1">history</span>
+                <span class="font-label-sm text-label-sm">Histórico</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modais do Ecossistema -->
+    
+    <!-- Modal Receber (Single e Lote) -->
+    <div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay" id="modalPagamento">
+        <div class="modal-content w-full max-w-sm p-6 space-y-5">
+            <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2 border-b border-brand-border pb-2">
+                <span class="material-symbols-outlined text-brand-green">payments</span>
+                Liquidar Ordem
+            </h3>
+            <div class="text-center py-2 bg-background rounded-xl border border-outline-variant/20">
+                <p class="font-label-sm text-[10px] text-on-surface-variant uppercase">Valor Líquico</p>
+                <h4 class="text-3xl font-bold text-green-400 tracking-tight mt-1" id="displayValorPagamento">R$ 0,00</h4>
+            </div>
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Alterar Desconto (R$)</label>
+                    <input type="number" oninput="atualizarTotalComDescontoPagamento()" placeholder="0,00" class="input-tech text-center text-red-400 font-bold" id="inputDescontoPagamento">
+                </div>
+                <div class="space-y-2">
+                    <p class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Selecione o Meio de Captura</p>
+                    <div id="listaFormasPag" class="max-h-[160px] overflow-y-auto space-y-1.5 pr-1"></div>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-3 border-t border-brand-border">
+                <button class="flex-1 input-tech py-2.5 text-center text-xs font-semibold uppercase bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-xl" onclick="document.getElementById('modalPagamento').classList.add('hidden')">Sair</button>
+                <button class="flex-1 btn-success py-2.5 text-xs text-white rounded-xl shadow-lg" onclick="confirmarPagamento()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lançar Serviços (Carrinho Estilizado) -->
+    <div id="modalServicos" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-sm p-6 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b border-brand-border pb-3">
+                <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">gavel</span>
+                    Lançar Serviços
+                </h3>
+                <!-- Botão Adicionado para Criar Novo Tipo de Serviço na Lista -->
+                <button onclick="abrirCriarNovoServico()" class="bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-background transition-colors px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-0.5">
+                    <span class="material-symbols-outlined text-xs">add</span> Criar Serviço
+                </button>
+            </div>
+            
+            <div id="carrinhoServicos" class="bg-black/40 border border-outline-variant/30 p-3 rounded-xl min-h-[60px] max-h-[110px] overflow-y-auto my-3 space-y-1"></div>
+            
+            <div class="flex justify-between px-1 mb-3 border-b border-brand-border/40 pb-2 items-center">
+                <span class="font-label-sm text-[10px] text-on-surface-variant uppercase">Soma Parcial:</span>
+                <span id="totalCarrinho" class="font-bold text-green-400 text-lg">R$ 0,00</span>
+            </div>
+            <div class="mb-3 space-y-1">
+                <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Aplicar Desconto (R$)</label>
+                <input id="inputDescontoLancamento" type="number" placeholder="0.00" class="input-tech text-center text-red-400 font-bold">
+            </div>
+            <div id="listaDeServicos" class="overflow-y-auto flex-1 pr-1 space-y-1.5 border-t border-brand-border pt-3"></div>
+            <div class="flex gap-2 mt-4 pt-3 border-t border-brand-border">
+                <button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="flex-1 bg-zinc-800 text-zinc-400 border border-zinc-700 p-3 rounded-xl font-bold text-xs uppercase active:bg-zinc-700">Voltar</button>
+                <button onclick="finalizarAgrupamento()" class="flex-1 btn-primary p-3 rounded-xl text-xs shadow-lg">Salvar O.S</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seletor Unificado Clientes/Máquinas -->
+    <div id="modalSeletorGeral" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-sm flex flex-col max-h-[75vh] overflow-hidden">
+            <div class="p-5 border-b border-brand-border bg-background flex justify-between items-center">
+                <h3 id="tituloSeletorGeral" class="font-headline-md text-sm text-white tracking-tight uppercase">Selecionar</h3>
+                <button onclick="abrirNovoCadastro()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase shadow-md active:scale-95 transition-transform flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">add</span> Novo
+                </button>
+            </div>
+            <div id="listaSeletorGeral" class="overflow-y-auto flex-1 bg-surface-container-lowest/50 divide-y divide-brand-border"></div>
+            <button onclick="document.getElementById('modalSeletorGeral').classList.add('hidden')" class="p-4 bg-background text-on-surface-variant font-bold text-xs uppercase border-t border-brand-border text-center active:bg-zinc-900">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Cadastro de Rápido Clientes/Máquinas -->
+    <div id="modalNovoCadastro" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-sm p-6 text-center space-y-4">
+            <h3 id="tituloNovoCadastro" class="font-headline-md text-base text-white uppercase">Novo Registro</h3>
+            <input id="inputNovoCadastro" type="text" class="input-tech text-center uppercase font-semibold" placeholder="Insira a descrição...">
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('modalNovoCadastro').classList.add('hidden')" class="flex-1 bg-zinc-800 text-zinc-400 border border-zinc-700 p-3 rounded-xl font-bold text-xs uppercase">Cancelar</button>
+                <button id="btnSalvarCadastroNovo" onclick="salvarNovoCadastro()" class="flex-1 btn-primary p-3 rounded-xl text-xs shadow-lg">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionado: Cadastro de Serviço + Preço diretamente na tabela -->
+    <div id="modalNovoServicoTabela" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-sm p-6 space-y-4">
+            <h3 class="font-headline-md text-base text-white uppercase text-center border-b border-brand-border pb-2">Cadastrar Novo Serviço</h3>
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Nome do Serviço / Peça</label>
+                    <input id="inputNovoServicoNome" type="text" class="input-tech uppercase font-semibold" placeholder="EX: TROCA DE CONECTOR S20">
+                </div>
+                <div class="space-y-1">
+                    <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Preço / Valor de Venda (R$)</label>
+                    <input id="inputNovoServicoPreco" type="number" step="0.01" class="input-tech font-bold text-green-400 text-center animate-none" placeholder="0.00">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-brand-border">
+                <button onclick="document.getElementById('modalNovoServicoTabela').classList.add('hidden')" class="flex-1 bg-zinc-800 text-zinc-400 border border-zinc-700 p-3 rounded-xl font-bold text-xs uppercase">Voltar</button>
+                <button id="btnSalvarServicoTabela" onclick="salvarNovoServicoNaTabela()" class="flex-1 btn-primary p-3 rounded-xl text-xs shadow-lg">Cadastrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase App Integrado com Padrões Modulares -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -67,36 +382,33 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); 
-        
-        // --- VARIÁVEIS GLOBAIS ---
-        let idAtual = null; 
-        let itensSelecionadosLote = []; 
-        let clienteAtualSelecao = null; 
-        let valorBrutoGlobal = 0; 
-        let listaServicosTemporaria = []; 
-        let ordensBancada = {}; 
-        let historicoAtual = []; 
-        let modoPagamento = 'SINGLE'; 
-        let tipoSeletorAtual = ''; 
+        const db = getFirestore(app);
 
-        // --- FUNÇÕES UTILITÁRIAS ---
+        let idAtual = null;
+        let itensSelecionadosLote = [];
+        let clienteAtualSelecao = null;
+        let valorBrutoGlobal = 0;
+        let listaServicosTemporaria = [];
+        let ordensBancada = {};
+        let historicoAtual = [];
+        let modoPagamento = 'SINGLE';
+        let tipoSeletorAtual = '';
+
         window.formatarDataBR = (dataStr) => {
             if (!dataStr) return "---";
             if (dataStr.includes("-")) {
                 const partes = dataStr.split(" ")[0].split("-");
                 if (partes.length === 3 && partes[0].length === 4) {
-                    return `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                    return `${partes[2]}/${partes[1]}/${partes[0]}`;
                 }
             }
-            return dataStr; 
+            return dataStr;
         };
 
-        // --- INTEGRAÇÃO RAWBT ---
         window.copiarParaRawBT = (texto) => {
             navigator.clipboard.writeText(texto).then(() => {
                 alert("RECIBO COPIADO! Cole no RawBT.");
-            }).catch(err => alert("Erro ao copiar: " + err));
+            }).catch(err => alert("Erro: " + err));
         };
 
         window.prepararTextoRecibo = (d, tipo = 'OS') => {
@@ -148,21 +460,30 @@
             window.copiarParaRawBT(t.toUpperCase());
         };
 
-        // --- SISTEMA DE NAVEGAÇÃO ---
-        window.mudarAba = (aba) => {
-            document.querySelectorAll('.tela').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.className = "flex-1 p-3 rounded-xl font-black uppercase text-[10px] text-zinc-400");
-            
-            const btn = document.getElementById('btnAba' + aba.charAt(0).toUpperCase() + aba.slice(1));
-            const tela = document.getElementById('tela' + aba.charAt(0).toUpperCase() + aba.slice(1));
-            
-            tela.classList.remove('hidden');
-            btn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-            
-            if(aba === 'pendentes') carregarPendentes();
+        window.mudarAba = (aba, navElement) => {
+            document.getElementById('telaPendentes').classList.add('hidden');
+            document.getElementById('telaCadastro').classList.add('hidden');
+            document.getElementById('telaHistorico').classList.add('hidden');
+
+            if(navElement) {
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.className = "nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200";
+                    let icon = el.querySelector('.material-symbols-outlined');
+                    if(icon) icon.style.fontVariationSettings = "'FILL' 0";
+                });
+                navElement.className = "nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200";
+                let activeIcon = navElement.querySelector('.material-symbols-outlined');
+                if(activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
+            }
+
+            if(aba === 'entrada') document.getElementById('telaCadastro').classList.remove('hidden');
+            if(aba === 'pendentes') {
+                document.getElementById('telaPendentes').classList.remove('hidden');
+                carregarPendentes();
+            }
+            if(aba === 'consulta') document.getElementById('telaHistorico').classList.remove('hidden');
         };
 
-        // --- SISTEMA DE IMPRESSÃO BROWSER ---
         window.dispararPrint = (html) => {
             const area = document.getElementById('areaImpressao');
             area.innerHTML = `<div class="cupom-texto">${html}</div>`;
@@ -172,7 +493,7 @@
         window.imprimirCupom = (dados, tipo = 'OS') => {
             const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
             const desc = parseFloat(dados.desconto || 0);
-            const total = parseFloat(dados.valor_servico || 0); 
+            const total = parseFloat(dados.valor_servico || 0);
             const dataArrumada = window.formatarDataBR(dados.data_entrada);
             
             let layout = `
@@ -202,12 +523,12 @@
                         <div><span class="b">DESCONTO:</span> R$ ${desc.toFixed(2)}</div>
                     `;
                 }
-                layout += `<div class="c b" style="font-size:16px; margin-top:5px; border:2px solid black; padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
+                layout += `<div class="c b" style="font-size:14px; margin-top:5px; border:2px solid black; padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
             } else {
                 layout += `
                     <div class="hr"></div>
-                    <div style="height:40px; border-bottom:2px solid black; margin-top:20px"></div>
-                    <div class="c b">ASSINATURA DO CLIENTE</div>
+                    <div style="height:35px; border-bottom:1px solid black; margin-top:15px"></div>
+                    <div class="c b" style="font-size:10px;">ASSINATURA DO CLIENTE</div>
                 `;
             }
 
@@ -221,9 +542,8 @@
         };
 
         window.imprimirLote = () => {
-            if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS para imprimir lote!");
-            
-            let totalLiquidoLote = 0; 
+            if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
+            let totalLiquidoLote = 0;
             let totalDescontoLote = 0;
             let totalBrutoLote = 0;
             let itensHTML = "";
@@ -234,21 +554,16 @@
                 const bruto = parseFloat(d.valor_bruto) || (liquido + desconto);
                 const dataArr = window.formatarDataBR(d.data_entrada);
 
-                totalLiquidoLote += liquido; 
+                totalLiquidoLote += liquido;
                 totalDescontoLote += desconto;
                 totalBrutoLote += bruto;
                 
                 itensHTML += `
-                    <div style="margin-top:8px; margin-bottom: 8px; text-align: left;">
+                    <div style="margin-top:6px; text-align: left;">
                         <div><span class="b">OS:</span> ${d.id} - <span class="b">COD:</span> ${d.codigo_maquina}</div>
                         <div><span class="b">DATA:</span> ${dataArr}</div>
-                        <div><span class="b">DEF:</span> ${d.defeito}</div>
-                        <div><span class="b">SERV:</span> <span>${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</span></div>
-                        ${desconto > 0 ? `
-                            <div style="margin-top:3px;"><span class="b">SUBTOTAL:</span> R$ ${bruto.toFixed(2)}</div>
-                            <div><span class="b">DESCONTO:</span> R$ ${desconto.toFixed(2)}</div>
-                        ` : ''}
-                        <div class="b" style="margin-top:3px; text-align: right; font-size: 14px;">VALOR: R$ ${liquido.toFixed(2)}</div>
+                        <div><span class="b">SERV:</span> ${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</div>
+                        <div class="b" style="text-align: right;">VALOR: R$ ${liquido.toFixed(2)}</div>
                     </div>
                     <div class="hr"></div>
                 `;
@@ -261,16 +576,9 @@
                 <div><span class="b">CLIENTE:</span> ${clienteAtualSelecao}</div>
                 <div class="hr"></div>
                 ${itensHTML}
-                <div style="margin-top: 10px; text-align: right;">
-                    ${totalDescontoLote > 0 ? `
-                        <div><span class="b">SOMA DOS SERVICOS:</span> R$ ${totalBrutoLote.toFixed(2)}</div>
-                        <div class="b">TOTAL DESCONTOS: R$ ${totalDescontoLote.toFixed(2)}</div>
-                    ` : ''}
-                </div>
-                <div class="c b" style="font-size:16px; border:2px solid black; padding:4px; margin-top: 5px;">TOTAL A PAGAR: R$ ${totalLiquidoLote.toFixed(2)}</div>
+                <div class="c b" style="font-size:14px; border:2px solid black; padding:3px;">TOTAL EM LOTE: R$ ${totalLiquidoLote.toFixed(2)}</div>
                 <div class="hr"></div>
-                <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                <div class="c">DEUS E FIEL</div>
+                <div class="c b">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
@@ -285,11 +593,9 @@
                 const total = parseFloat(h.valor_servico || 0);
                 totalGeral += total;
                 const dataEntrada = window.formatarDataBR(h.data_entrada);
-                
                 itensHTML += `
-                    <div style="margin-top:5px;">
+                    <div>
                         <div><span class="b">DATA:</span> ${dataEntrada} - <span class="b">OS:</span> ${h.id}</div>
-                        <div><span class="b">DEF:</span> ${h.defeito || '---'}</div>
                         <div><span class="b">SERV:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ', ') : '---'}</div>
                         <div style="text-align: right;" class="b">VALOR: R$ ${total.toFixed(2)}</div>
                     </div>
@@ -305,31 +611,23 @@
                 <div class="hr"></div>
                 ${itensHTML}
                 <div class="hr"></div>
-                <div class="b" style="text-align: right; margin-top: 5px;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
+                <div class="b" style="text-align: right;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
                 <div class="hr"></div>
-                <div class="c" style="margin-top: 10px;">RELATORIO EM: ${new Date().toLocaleDateString('pt-BR')}</div>
                 <div class="c">DEUS E FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
         };
 
-        // --- FUNÇÃO PARA EXCLUIR UMA ORDEM DE SERVIÇO ---
         window.excluirOrdemServico = async (idOS) => {
-            if (!confirm(`⚠️ ALERTA: TEM CERTEZA QUE DESEJA EXCLUIR DEFINITIVAMENTE A OS Nº ${idOS}? ESSA AÇÃO NÃO PODE SER DESFEITA.`)) {
-                return;
-            }
-
+            if (!confirm(`⚠️ EXCLUIR DEFINITIVAMENTE A OS Nº ${idOS}?`)) return;
             try {
                 await deleteDoc(doc(db, "ordens", idOS.toString()));
-                alert("ORDEM DE SERVIÇO EXCLUÍDA!");
+                alert("ORDEM REMOVIDA!");
                 carregarPendentes();
-            } catch (e) {
-                alert("Erro ao excluir OS: " + e.message);
-            }
+            } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- ABA BANCADA E SELEÇÃO DE LOTE ---
         window.toggleSelecao = (idOS) => {
             const d = ordensBancada[idOS];
             const cliente = d.cliente;
@@ -340,7 +638,7 @@
                 if (itensSelecionadosLote.length === 0) clienteAtualSelecao = null;
             } else {
                 if (clienteAtualSelecao && clienteAtualSelecao !== cliente) {
-                    alert("Selecione apenas equipamentos do MESMO CLIENTE para gerar o lote!");
+                    alert("Selecione apenas equipamentos do MESMO CLIENTE!");
                     document.getElementById('chk' + idOS).checked = false;
                     return;
                 }
@@ -368,10 +666,9 @@
             clienteAtualSelecao = null;
             ordensBancada = {}; 
             document.getElementById('btnLote').classList.add('hidden');
-            document.getElementById('btnLote').classList.remove('flex');
             
             const lista = document.getElementById('listaPendentes');
-            lista.innerHTML = "<p class='p-10 text-center animate-pulse font-black text-blue-400'>Sincronizando Banco...</p>";
+            lista.innerHTML = "<p class='p-10 text-center animate-pulse text-xs text-primary/70 font-semibold'>Buscando ordens ativas...</p>";
             
             try {
                 const snap = await getDocs(collection(db, "ordens"));
@@ -388,60 +685,48 @@
                         const valBruto = parseFloat(d.valor_bruto) || (valFinal + parseFloat(d.desconto || 0));
                         totalA += valFinal;
                         
-                        let borderColor = status === 'PENDENTE' ? 'border-l-orange-500' : 'border-l-green-500';
-                        let badgeClass = status === 'PENDENTE' ? 'bg-orange-950 text-orange-300' : 'bg-green-950 text-green-300';
-                        
-                        let servicoTexto = d.servico_principal ? `<div class="bg-zinc-800 text-slate-200 p-3 rounded-2xl mb-3 font-black uppercase text-[10px] leading-tight border border-zinc-700">🛠 ${d.servico_principal.replace(/\+/g, ' | ')}</div>` : '';
+                        let badgeClass = status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                        let borderLeftColor = status === 'PENDENTE' ? 'border-l-amber-500' : 'border-l-emerald-500';
+                        let servicoTexto = d.servico_principal ? `<div class="bg-black/30 text-on-surface-variant p-3 rounded-xl text-xs font-semibold border border-outline-variant/30">🛠 ${d.servico_principal.replace(/\+/g, ' | ')}</div>` : '';
 
                         lista.innerHTML += `
-                            <div class="bg-zinc-900 p-5 rounded-[2.5rem] mb-5 shadow-2xl border border-zinc-800 border-l-[14px] ${borderColor} relative">
-                                <div class="absolute right-6 top-6">
-                                    <input type="checkbox" id="chk${d.id}" onchange="toggleSelecao('${d.id}')" class="w-8 h-8 accent-blue-500 shadow-lg cursor-pointer rounded">
+                            <div class="card-tech flex flex-col gap-3 relative overflow-hidden group border-l-[6px] ${borderLeftColor}">
+                                <div class="absolute right-5 top-5">
+                                    <input type="checkbox" id="chk${d.id}" onchange="toggleSelecao('${d.id}')" class="w-6 h-6 rounded-md bg-zinc-900 border-outline-variant text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer">
                                 </div>
-                                <div class="flex justify-between items-center mb-2 pr-12 gap-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[10px] font-black uppercase px-3 py-1 rounded-full ${badgeClass} italic border border-current/20">${status}</span>
-                                        <button onclick="window.excluirOrdemServico('${d.id}')" class="text-red-400 bg-red-950/30 border border-red-900/50 p-1 px-2 rounded-lg text-[10px] font-bold active:bg-red-900 active:text-white transition-all">
-                                            🗑️ Excluir
-                                        </button>
+                                <div class="flex items-center gap-2 pr-8">
+                                    <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md border ${badgeClass}">${status}</span>
+                                    <span class="text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-md border border-primary/20">#${d.codigo_maquina}</span>
+                                    <button onclick="window.excluirOrdemServico('${d.id}')" class="text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all">🗑️ Apagar</button>
+                                </div>
+                                <div class="flex justify-between items-start mt-1">
+                                    <div>
+                                        <h3 class="font-headline-md text-base text-white uppercase">${d.equipamento}</h3>
+                                        <p class="text-xs text-on-surface-variant font-medium mt-0.5">👤 CLIENTE: ${d.cliente}</p>
+                                        <p class="text-[11px] font-semibold text-primary/70 mt-0.5">📅 ENTRADA: ${window.formatarDataBR(d.data_entrada)}</p>
                                     </div>
-                                    <span class="text-[10px] font-black text-blue-300 bg-blue-950 px-3 py-1 rounded-lg border border-blue-900"># ${d.codigo_maquina}</span>
+                                    <span class="text-lg font-bold text-primary italic">R$ ${valFinal.toFixed(2)}</span>
                                 </div>
-                                <h3 class="text-xl font-black text-white uppercase leading-none">${d.equipamento}</h3>
-                                <p class="text-[11px] font-bold text-zinc-400 mb-1 uppercase italic">👤 ${d.cliente}</p>
-                                <p class="text-[10px] font-black text-blue-500 mb-3 uppercase tracking-tighter italic">📅 ENTRADA: ${window.formatarDataBR(d.data_entrada)}</p>
-                                
-                                <div class="bg-zinc-950/50 p-3 rounded-2xl mb-3 border border-zinc-800">
-                                    <p class="text-[9px] font-black text-zinc-500 uppercase mb-1">Defeito Relatado:</p>
-                                    <p class="text-[11px] text-zinc-300 font-bold uppercase leading-tight">${d.defeito || 'NÃO INFORMADO'}</p>
+                                <div class="bg-black/20 p-3 rounded-xl border border-outline-variant/10">
+                                    <p class="text-[10px] font-bold text-zinc-500 uppercase mb-0.5">Relato do Defeito:</p>
+                                    <p class="text-xs text-zinc-300 font-medium uppercase leading-tight">${d.defeito || 'NÃO INFORMADO'}</p>
                                 </div>
-
                                 ${servicoTexto}
-
-                                ${valBruto > 0 ? `
-                                    <div class="flex justify-between items-center mb-4 px-1 text-[10px] font-black uppercase">
-                                        <span class="text-zinc-500">Bruto: R$ ${valBruto.toFixed(2)}</span>
-                                        <span class="text-red-500">Desc: R$ ${parseFloat(d.desconto || 0).toFixed(2)}</span>
-                                        <span class="text-green-400 text-xs">Total: R$ ${valFinal.toFixed(2)}</span>
-                                    </div>
-                                ` : ''}
-
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 pt-2 border-t border-brand-border/60">
                                     ${status === 'PENDENTE' ? 
-                                        `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600 text-white py-4 rounded-3xl font-black text-xs uppercase shadow-md active:bg-blue-700">LANÇAR</button>` : 
-                                        `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-green-600 text-white py-4 rounded-3xl font-black text-xs uppercase shadow-md active:bg-green-700">RECEBER</button>`}
-                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="bg-zinc-800 border border-zinc-700 text-white p-4 rounded-3xl text-xl active:bg-zinc-700 shadow-inner">🖨️</button>
-                                    <button onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${JSON.stringify(d)}, "OS"))' class="bg-zinc-800 border border-zinc-700 text-white p-4 rounded-3xl text-xl active:bg-zinc-700 shadow-inner">📋</button>
+                                        `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">LANÇAR MÃO DE OBRA</button>` : 
+                                        `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">BAIXAR PAGAMENTO</button>`}
+                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3">🖨️</button>
+                                    <button onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${JSON.stringify(d)}, "OS"))' class="btn-icon px-3">📋</button>
                                 </div>
                             </div>
                         `;
                     }
                 });
-                document.getElementById('resumoGeralBancada').innerText = `R$ ${totalA.toFixed(2)}`;
+                document.getElementById('valorPendenteGeral').innerText = `R$ ${totalA.toFixed(2)}`;
             } catch (e) { alert(e.message); }
         }
 
-        // --- SISTEMA DE LANÇAMENTOS (CARRINHO) ---
         window.abrirLancamento = async (id) => {
             idAtual = id; 
             listaServicosTemporaria = []; 
@@ -450,7 +735,7 @@
             document.getElementById('modalServicos').classList.remove('hidden'); 
             
             const listaTabela = document.getElementById('listaDeServicos');
-            listaTabela.innerHTML = "<p class='p-5 text-center font-black animate-pulse text-blue-400'>Buscando...</p>";
+            listaTabela.innerHTML = "<p class='p-4 text-center font-medium animate-pulse text-primary/80'>Buscando tabela...</p>";
             
             try {
                 const snap = await getDocs(collection(db, "servicos_lista"));
@@ -460,13 +745,55 @@
                     const nomeTabela = s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id; 
                     const valorTabela = s.valor || s.preco || 0;
                     listaTabela.innerHTML += `
-                        <button onclick="adicionarAoCarrinho('${nomeTabela}', ${valorTabela})" class="w-full p-4 mb-2 bg-zinc-800 border border-zinc-700 rounded-xl text-left active:border-blue-500 shadow-sm">
-                            <div class="font-black text-white uppercase text-[10px]">${nomeTabela}</div>
-                            <div class="text-green-400 font-black text-[10px]">R$ ${parseFloat(valorTabela).toFixed(2)}</div>
+                        <button onclick="adicionarAoCarrinho('${nomeTabela}', ${valorTabela})" class="w-full p-3 mb-1.5 bg-background border border-outline-variant/30 rounded-xl text-left active:border-primary flex justify-between items-center transition-all">
+                            <span class="font-bold text-white uppercase text-xs">${nomeTabela}</span>
+                            <span class="text-green-400 font-bold text-xs">R$ ${parseFloat(valorTabela).toFixed(2)}</span>
                         </button>
                     `;
                 });
             } catch (e) { alert("Erro: " + e.message); }
+        };
+
+        // --- FUNÇÕES DE CADASTRO DE SERVIÇOS DIRETAMENTE NA TABELA (servicos_lista) ---
+        window.abrirCriarNovoServico = () => {
+            document.getElementById('inputNovoServicoNome').value = "";
+            document.getElementById('inputNovoServicoPreco').value = "";
+            document.getElementById('modalNovoServicoTabela').classList.remove('hidden');
+        };
+
+        window.salvarNovoServicoNaTabela = async () => {
+            const nomeServ = document.getElementById('inputNovoServicoNome').value.toUpperCase().trim();
+            const precoServ = parseFloat(document.getElementById('inputNovoServicoPreco').value || 0);
+
+            if (!nomeServ || precoServ <= 0) {
+                return alert("Preencha o Nome do Serviço e um Preço Maior que Zero!");
+            }
+
+            const btn = document.getElementById('btnSalvarServicoTabela');
+            btn.innerText = "GRAVANDO...";
+            btn.disabled = true;
+
+            try {
+                // Cria uma referência de documento com ID baseado no próprio nome para evitar duplicados
+                const docRef = doc(collection(db, "servicos_lista"));
+                await setDoc(docRef, {
+                    nome: nomeServ,
+                    descricao: nomeServ,
+                    valor: precoServ
+                });
+
+                document.getElementById('modalNovoServicoTabela').classList.add('hidden');
+                
+                // Recarrega automaticamente a lista de seleção por trás do carrinho
+                if (idAtual) {
+                    window.abrirLancamento(idAtual);
+                }
+            } catch (e) {
+                alert("Erro ao cadastrar serviço: " + e.message);
+            } finally {
+                btn.innerText = "CADASTRAR";
+                btn.disabled = false;
+            }
         };
 
         window.adicionarAoCarrinho = (nome, preco) => {
@@ -488,9 +815,9 @@
             listaServicosTemporaria.forEach((s, i) => {
                 soma += s.preco;
                 divCarrinho.innerHTML += `
-                    <div class="flex justify-between items-center bg-zinc-800 border border-zinc-700 p-2 rounded-lg mb-1">
-                        <span class="text-[9px] font-black uppercase text-white">${s.nome}</span>
-                        <button onclick="removerDoCarrinho(${i})" class="text-red-400 font-bold px-3 text-lg active:text-red-600">×</button>
+                    <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-2 rounded-lg">
+                        <span class="text-[11px] font-semibold uppercase text-zinc-300">${s.nome}</span>
+                        <button onclick="removerDoCarrinho(${i})" class="text-red-400 font-bold px-2 text-base">×</button>
                     </div>
                 `;
             });
@@ -498,8 +825,7 @@
         };
 
         window.finalizarAgrupamento = async () => {
-            if(listaServicosTemporaria.length === 0) return alert("Adicione ao menos 1 serviço!");
-            
+            if(listaServicosTemporaria.length === 0) return alert("Insira um serviço!");
             const nomesCompilados = listaServicosTemporaria.map(s => s.nome).join(' + ');
             const valorBruto = listaServicosTemporaria.reduce((a, b) => a + b.preco, 0);
             const descLanc = parseFloat(document.getElementById('inputDescontoLancamento').value || 0);
@@ -518,19 +844,17 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE PAGAMENTO ---
         window.carregarFormasPagamentoModal = async () => {
             const snapP = await getDocs(collection(db, "formas_pagamento"));
             const listaP = document.getElementById('listaFormasPag'); 
             listaP.innerHTML = "";
-            
             snapP.forEach(dDoc => {
                 const f = dDoc.data();
                 const nomeF = f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
                 listaP.innerHTML += `
-                    <label class="flex items-center p-4 bg-zinc-800 border border-zinc-700 rounded-xl mb-2 has-[:checked]:border-blue-500 has-[:checked]:bg-zinc-700 transition-all cursor-pointer">
-                        <input type="radio" name="pag" value="${nomeF}" class="w-6 h-6 accent-blue-500 cursor-pointer">
-                        <span class="ml-4 font-black text-white uppercase text-xs italic">${nomeF}</span>
+                    <label class="flex items-center p-3 bg-background border border-outline-variant/20 rounded-xl has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-all cursor-pointer">
+                        <input type="radio" name="pag" value="${nomeF}" class="w-5 h-5 bg-zinc-900 border-zinc-700 text-primary focus:ring-0 cursor-pointer">
+                        <span class="ml-3 font-bold text-white text-xs uppercase">${nomeF}</span>
                     </label>
                 `;
             });
@@ -540,14 +864,11 @@
             idAtual = id; 
             modoPagamento = 'SINGLE'; 
             document.getElementById('modalPagamento').classList.remove('hidden');
-            
             try {
                 const dSnap = await getDoc(doc(db, "ordens", id.toString())); 
                 const dados = dSnap.data();
-                
                 valorBrutoGlobal = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
                 const descGravado = parseFloat(dados.desconto || 0);
-                
                 document.getElementById('inputDescontoPagamento').value = descGravado > 0 ? descGravado : "";
                 atualizarTotalComDescontoPagamento();
                 await carregarFormasPagamentoModal();
@@ -557,21 +878,17 @@
         window.prepararPagamentoLote = async () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
             modoPagamento = 'LOTE'; 
-            
             let brutoTotalLote = 0;
             let descGravadoTotal = 0;
-
             itensSelecionadosLote.forEach(d => {
                 const liq = parseFloat(d.valor_servico || 0);
                 const desc = parseFloat(d.desconto || 0);
                 brutoTotalLote += parseFloat(d.valor_bruto) || (liq + desc);
                 descGravadoTotal += desc;
             });
-
             valorBrutoGlobal = brutoTotalLote;
             document.getElementById('inputDescontoPagamento').value = descGravadoTotal > 0 ? descGravadoTotal : "";
             atualizarTotalComDescontoPagamento();
-            
             await carregarFormasPagamentoModal();
             document.getElementById('modalPagamento').classList.remove('hidden');
         };
@@ -584,7 +901,7 @@
 
         window.confirmarPagamento = async () => {
             const radio = document.querySelector('input[name="pag"]:checked');
-            if(!radio) return alert("Selecione a Forma de Pagamento!");
+            if(!radio) return alert("Selecione o Meio de Pagamento!");
             
             const novoDescTotal = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
             const novoLiquidoTotal = valorBrutoGlobal - novoDescTotal;
@@ -605,7 +922,6 @@
                     dados.desconto = novoDescTotal;
                     dados.valor_servico = novoLiquidoTotal;
                     dados.valor_bruto = valorBrutoGlobal;
-                    
                     await updateDoc(docRef, dados); 
 
                 } else if (modoPagamento === 'LOTE') {
@@ -613,7 +929,6 @@
                         const docRef = doc(db, "ordens", itemAtual.id.toString());
                         const dSnap = await getDoc(docRef);
                         const dados = dSnap.data();
-
                         const brutoItem = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
 
                         const proporcaoDesconto = valorBrutoGlobal > 0 ? (brutoItem / valorBrutoGlobal) : 0;
@@ -626,28 +941,21 @@
                         dados.desconto = descontoDoItem;
                         dados.valor_servico = liquidoDoItem;
                         dados.valor_bruto = brutoItem;
-
                         return updateDoc(docRef, dados);
                     });
-
                     await Promise.all(promessasAtualizacao);
                 }
-                
                 carregarPendentes(); 
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- SISTEMA DE ENTRADA E SELETORES ---
         window.abrirSeletor = async (tipo) => {
             tipoSeletorAtual = tipo; 
-            
             const modal = document.getElementById('modalSeletorGeral'); 
             const lista = document.getElementById('listaSeletorGeral');
-            
-            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? 'CLIENTES' : 'EQUIPAMENTOS';
-
+            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? 'Selecionar Cliente' : 'Selecionar Máquina';
             modal.classList.remove('hidden'); 
-            lista.innerHTML = "<p class='p-10 text-center font-black animate-pulse text-blue-400'>Buscando...</p>";
+            lista.innerHTML = "<p class='p-8 text-center animate-pulse text-xs text-primary/70 font-semibold'>Carregando registros...</p>";
             
             try {
                 const snap = await getDocs(collection(db, tipo)); 
@@ -656,7 +964,7 @@
                     const d = dDoc.data(); 
                     const n = d.descricao || d.peca || d.nome || d.equipamento || dDoc.id;
                     lista.innerHTML += `
-                        <button onclick="definirItem('${tipo}', '${n}')" class="w-full p-5 text-left border-b border-zinc-800 font-black uppercase text-white text-sm active:bg-zinc-800">
+                        <button onclick="definirItem('${tipo}', '${n}')" class="w-full p-4 text-left font-bold uppercase text-white hover:bg-zinc-900 text-xs transition-colors">
                             ${n}
                         </button>
                     `; 
@@ -671,35 +979,27 @@
         };
 
         window.abrirNovoCadastro = () => {
-            const titulo = tipoSeletorAtual === 'clientes' ? 'NOVO CLIENTE' : 'NOVO EQUIPAMENTO';
+            const titulo = tipoSeletorAtual === 'clientes' ? 'NOVO CLIENTE' : 'NOVA MÁQUINA';
             document.getElementById('tituloNovoCadastro').innerText = titulo;
             document.getElementById('inputNovoCadastro').value = '';
-            document.getElementById('inputNovoCadastro').placeholder = `DIGITE O NOME...`;
             document.getElementById('modalNovoCadastro').classList.remove('hidden');
         };
 
         window.salvarNovoCadastro = async () => {
             const nomeDigitado = document.getElementById('inputNovoCadastro').value.toUpperCase().trim();
-            if(!nomeDigitado) return alert("Preencha o nome!");
-            
+            if(!nomeDigitado) return alert("Campo obrigatório!");
             const btn = document.getElementById('btnSalvarCadastroNovo');
             btn.innerText = "...";
             btn.disabled = true;
 
             try {
                 const novaRef = doc(collection(db, tipoSeletorAtual)); 
-                await setDoc(novaRef, {
-                    nome: nomeDigitado,
-                    descricao: nomeDigitado
-                });
-                
+                await setDoc(novaRef, { nome: nomeDigitado, descricao: nomeDigitado });
                 document.getElementById('modalNovoCadastro').classList.add('hidden');
                 window.definirItem(tipoSeletorAtual, nomeDigitado);
-                
-            } catch(e) {
-                alert("Erro ao salvar: " + e.message);
-            } finally {
-                btn.innerText = "SALVAR";
+            } catch(e) { alert("Erro: " + e.message); }
+            finally {
+                btn.innerText = "Salvar";
                 btn.disabled = false;
             }
         };
@@ -707,9 +1007,7 @@
         function gerarCodigoOficina() {
             const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let txt = '';
-            for (let i = 0; i < 3; i++) {
-                txt += letras.charAt(Math.floor(Math.random() * letras.length));
-            }
+            for (let i = 0; i < 3; i++) txt += letras.charAt(Math.floor(Math.random() * letras.length));
             const num = Math.floor(100 + Math.random() * 900);
             return txt + num;
         }
@@ -720,11 +1018,10 @@
             const d = document.getElementById('defeito').value.toUpperCase().trim();
             const manualCod = document.getElementById('inputManualCod').value.toUpperCase().trim();
             
-            if(!c || !e) return alert("Preencha Cliente e Equipamento!");
+            if(!c || !e) return alert("Selecione Cliente e Máquina!");
             
             const btnGravar = document.getElementById('btnGravar');
-            const textoOriginal = btnGravar.innerText;
-            btnGravar.innerText = "GRAVANDO...";
+            btnGravar.innerText = "SALVANDO NO BANCO...";
             btnGravar.disabled = true; 
             
             try {
@@ -740,9 +1037,7 @@
                         codF = gerarCodigoOficina();
                         const q = query(collection(db, "ordens"), where("codigo_maquina", "==", codF));
                         const snapVerificacao = await getDocs(q);
-                        if (snapVerificacao.empty) {
-                            codigoUnico = true; 
-                        }
+                        if (snapVerificacao.empty) codigoUnico = true; 
                     }
                 }
                 
@@ -753,36 +1048,34 @@
                 };
                 
                 await setDoc(doc(db, "ordens", novoID), dados); 
-                alert(`GRAVADO COM SUCESSO!\n\nID OS: ${novoID}\nCÓDIGO: ${codF}`);
+                alert(`OS REGISTRADA COM SUCESSO!\n\nID: ${novoID}\nCÓDIGO: ${codF}`);
                 
                 document.getElementById('inputCliente').value = ""; 
                 document.getElementById('inputEquipamento').value = ""; 
                 document.getElementById('defeito').value = ""; 
                 document.getElementById('inputManualCod').value = "";
                 
-                mudarAba('pendentes'); 
-            } catch (err) { 
-                alert("Erro: " + err.message); 
-            } finally {
-                btnGravar.innerText = textoOriginal;
+                window.mudarAba('pendentes', document.querySelectorAll('.nav-item')[1]); 
+            } catch (err) { alert("Erro: " + err.message); } 
+            finally {
+                btnGravar.innerText = "Lançar Serviço na Bancada";
                 btnGravar.disabled = false;
             }
         };
 
-        // --- SISTEMA DE CONSULTA (HISTÓRICO) ---
         window.buscarHistorico = async () => {
             const cod = document.getElementById('inputBuscaCod').value.toUpperCase().trim();
             const resultado = document.getElementById('resultadoConsulta');
             
-            if(cod.length < 3) return alert("Digite o Código da Máquina!");
-            resultado.innerHTML = "<p class='p-10 text-center animate-pulse font-black text-blue-400'>Buscando...</p>";
+            if(cod.length < 3) return alert("Digite um termo ou código válido!");
+            resultado.innerHTML = "<p class='p-8 text-center animate-pulse text-xs text-primary/70 font-semibold'>Processando consulta...</p>";
             
             try {
                 const q = query(collection(db, "ordens"), where("codigo_maquina", "==", cod));
                 const snap = await getDocs(q);
                 
                 if(snap.empty) { 
-                    resultado.innerHTML = "<p class='p-10 text-center text-red-400 font-black'>NENHUM HISTÓRICO ENCONTRADO!</p>"; 
+                    resultado.innerHTML = "<p class='p-8 text-center text-red-400 font-bold text-xs uppercase'>Nenhum registro localizado para este código!</p>"; 
                     historicoAtual = [];
                     return; 
                 }
@@ -790,14 +1083,13 @@
                 let listaH = []; 
                 snap.forEach(d => listaH.push(d.data())); 
                 listaH.sort((a,b) => b.timestamp - a.timestamp); 
-                
                 historicoAtual = listaH; 
 
                 resultado.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-white font-black uppercase italic text-sm tracking-tight">Histórico: ${cod}</h2>
-                        <button onclick="window.prepararImpressaoHistorico('${cod}')" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg active:bg-blue-700">
-                            🖨️ Imprimir Tudo
+                    <div class="flex justify-between items-center mb-2 px-1">
+                        <h3 class="text-zinc-400 font-bold text-xs uppercase tracking-wider">Histórico de Eventos: ${cod}</h3>
+                        <button onclick="window.prepararImpressaoHistorico('${cod}')" class="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase shadow-md">
+                            🖨️ Emitir Relatório
                         </button>
                     </div>
                 `;
@@ -806,35 +1098,30 @@
                     const total = parseFloat(h.valor_servico || 0);
                     const desconto = parseFloat(h.desconto || 0);
                     const bruto = parseFloat(h.valor_bruto) || (total + desconto);
-                    
-                    const colorBorder = h.status === 'PAGO' ? 'border-l-green-500' : 'border-l-orange-500';
-                    const colorStatus = h.status === 'PAGO' ? 'text-green-400' : 'text-orange-400';
-                    
-                    const dataEntradaBR = window.formatarDataBR(h.data_entrada);
-                    const dataPagamentoBR = window.formatarDataBR(h.data_pagamento);
+                    const badgeColor = h.status === 'PAGO' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                    const colorBorder = h.status === 'PAGO' ? 'border-l-emerald-500' : 'border-l-amber-500';
 
                     resultado.innerHTML += `
-                        <div class="bg-zinc-900 p-5 rounded-[2rem] mb-4 shadow-2xl border border-zinc-800 border-l-8 ${colorBorder}">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-[10px] font-black uppercase bg-zinc-800 text-zinc-300 border border-zinc-700 p-1 px-2 rounded">OS: ${h.id}</span>
-                                <span class="text-[10px] font-black italic uppercase ${colorStatus}">${h.status}</span>
+                        <div class="card-tech border-l-[6px] ${colorBorder} opacity-90">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] font-bold uppercase bg-background border border-outline-variant/30 px-2 py-0.5 rounded-md">OS: #${h.id}</span>
+                                <span class="text-[10px] font-bold uppercase border px-2 py-0.5 rounded-md ${badgeColor}">${h.status}</span>
                             </div>
-                            <h3 class="text-lg font-black text-white uppercase leading-none mb-1">${h.equipamento}</h3>
-                            <p class="text-xs font-bold text-blue-400 mb-3 uppercase italic">👤 PROP: ${h.cliente}</p>
+                            <h4 class="text-base font-bold text-white uppercase">${h.equipamento}</h4>
+                            <p class="text-xs text-blue-400 font-semibold mb-3">👤 PROP: ${h.cliente}</p>
                             
-                            <div class="text-[10px] bg-zinc-800 text-slate-200 border border-zinc-700 p-3 rounded-xl mb-3 space-y-2">
-                                <p><b class="text-zinc-400">ENTRADA:</b> ${dataEntradaBR}</p>
-                                <p><b class="text-zinc-400">DEFEITO:</b> ${h.defeito}</p>
-                                <div class="h-px bg-zinc-700 w-full my-1"></div>
-                                <p><b class="text-zinc-400">SERVIÇOS:</b> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ' | ') : '---'}</p>
-                                <p><b class="text-zinc-400">DATA PGTO:</b> ${dataPagamentoBR}</p>
-                                <p><b class="text-zinc-400">FORMA PGTO:</b> ${h.forma_pagamento || '---'}</p>
+                            <div class="text-[11px] bg-black/30 border border-outline-variant/10 p-3 rounded-xl space-y-1.5 font-medium text-zinc-300">
+                                <p><span class="text-zinc-500 font-bold">ENTRADA:</span> ${window.formatarDataBR(h.data_entrada)}</p>
+                                <p><span class="text-zinc-500 font-bold">DEFEITO:</span> ${h.defeito}</p>
+                                <div class="h-px bg-brand-border my-1"></div>
+                                <p><span class="text-zinc-500 font-bold">SERVIÇOS:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ' | ') : '---'}</p>
+                                <p><span class="text-zinc-500 font-bold">LIQUIDAÇÃO:</span> ${window.formatarDataBR(h.data_pagamento) || '---'} (${h.forma_pagamento || '---'})</p>
                             </div>
                             
-                            <div class="flex flex-col gap-1 text-[10px] font-black text-right pt-2 border-t border-zinc-800">
-                                <p class="text-zinc-400">BRUTO: R$ ${bruto.toFixed(2)}</p>
-                                <p class="text-red-400">DESC: R$ ${desconto.toFixed(2)}</p>
-                                <p class="text-green-400 text-sm mt-1">LÍQUIDO PAGO: R$ ${total.toFixed(2)}</p>
+                            <div class="flex flex-col gap-0.5 text-[10px] font-bold text-right pt-2 border-t border-brand-border/60">
+                                <p class="text-zinc-500">VALOR BRUTO: R$ ${bruto.toFixed(2)}</p>
+                                <p class="text-red-400">DESCONTO: R$ ${desconto.toFixed(2)}</p>
+                                <p class="text-emerald-400 text-sm mt-0.5 font-bold">TOTAL PAGO: R$ ${total.toFixed(2)}</p>
                             </div>
                         </div>
                     `;
@@ -844,128 +1131,5 @@
 
         window.onload = () => carregarPendentes();
     </script>
-</head>
-
-<body class="bg-zinc-950 text-slate-100 min-h-screen font-sans">
-    
-    <div id="areaImpressao"></div>
-
-    <header class="flex items-center justify-center pt-5 pb-3 bg-zinc-950 border-b border-zinc-900 gap-3">
-        <img src="https://img.icons8.com/?size=100&id=113063&format=png&color=3b82f6" 
-             alt="Logo Oficina Emanuel" 
-             class="h-8 w-8 object-contain" 
-             id="logoAplicativo">
-        <h1 class="text-xl font-black text-blue-500 uppercase tracking-tighter italic">Emanuel Soluções</h1>
-    </header>
-
-    <nav class="flex bg-zinc-900 shadow-xl p-2 sticky top-0 z-[50] gap-1 border-b border-zinc-800">
-        <button id="btnAbaEntrada" onclick="mudarAba('entrada')" class="flex-1 p-3 rounded-xl font-black uppercase text-[10px] text-zinc-400 transition-all">Nova Entrada</button>
-        <button id="btnAbaPendentes" onclick="mudarAba('pendentes')" class="flex-1 p-3 rounded-xl font-black uppercase text-[10px] bg-blue-600 text-white shadow-md transition-all">Bancada</button>
-        <button id="btnAbaConsulta" onclick="mudarAba('consulta')" class="flex-1 p-3 rounded-xl font-black uppercase text-[10px] text-zinc-400 transition-all">Histórico</button>
-    </nav>
-
-    <div id="telaConsulta" class="tela hidden p-4 max-w-md mx-auto">
-        <div class="bg-zinc-900 rounded-[2rem] p-6 shadow-2xl mb-6 text-center border border-zinc-800">
-            <h2 class="text-lg font-black text-white uppercase italic mb-4">Buscar Código</h2>
-            <input id="inputBuscaCod" type="text" maxlength="6" placeholder="EX: ABC123" class="w-full p-5 rounded-2xl bg-zinc-800 font-black text-white uppercase text-center outline-none mb-4 border border-zinc-700 focus:border-blue-500 placeholder:text-zinc-600">
-            <button onclick="buscarHistorico()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black italic uppercase shadow-lg active:bg-blue-700">VER HISTÓRICO</button>
-        </div>
-        <div id="resultadoConsulta" class="pb-24"></div>
-    </div>
-
-    <div id="telaPendentes" class="tela p-4 max-w-md mx-auto">
-        <div class="bg-blue-600 rounded-[2.5rem] p-7 mb-6 text-white text-center shadow-2xl border border-blue-500">
-            <p class="text-[10px] font-black opacity-80 uppercase italic tracking-widest">A Receber Total</p>
-            <h1 id="resumoGeralBancada" class="text-4xl font-black italic tracking-tighter">R$ 0,00</h1>
-        </div>
-        
-        <div id="btnLote" class="hidden justify-between items-center bg-green-600 rounded-[2.5rem] p-6 mb-6 text-white shadow-2xl border border-green-500 animate-bounce">
-            <div>
-                <p id="txtQtdLote" class="text-[10px] font-black uppercase italic">0 MÁQS</p>
-                <p id="txtTotalLote" class="text-2xl font-black italic text-white">R$ 0,00</p>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-4 rounded-2xl font-black text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
-                <button onclick="imprimirLote()" class="bg-white text-green-700 p-4 rounded-2xl font-black text-xl shadow-md active:scale-95 transition-all">🖨️</button>
-                <button onclick="copiarLoteRawBT()" class="bg-white text-green-700 px-5 py-4 rounded-2xl font-black text-[10px] uppercase shadow-md active:scale-95 transition-all">📋 COPIAR</button>
-            </div>
-        </div>
-        
-        <div id="listaPendentes" class="pb-24"></div>
-    </div>
-
-    <div id="telaEntrada" class="tela hidden p-4 space-y-5 max-w-md mx-auto text-center">
-        <header class="py-2"><h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Nova Entrada</h1></header>
-        <input id="inputCliente" readonly onclick="abrirSeletor('clientes')" type="text" placeholder="SELECIONAR CLIENTE" class="w-full p-6 rounded-[2rem] bg-zinc-900 shadow-xl font-black text-white uppercase outline-none border border-zinc-800 placeholder:text-zinc-500 active:bg-zinc-800 cursor-pointer">
-        <input id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" type="text" placeholder="EQUIPAMENTO" class="w-full p-6 rounded-[2rem] bg-zinc-900 shadow-xl font-black text-white uppercase outline-none border border-zinc-800 placeholder:text-zinc-500 active:bg-zinc-800 cursor-pointer">
-        <input id="inputManualCod" type="text" maxlength="6" placeholder="CÓDIGO MANUAL (OPCIONAL)" class="w-full p-6 rounded-[2rem] bg-zinc-800 shadow-md font-black text-white uppercase outline-none border border-zinc-700 focus:border-blue-500 placeholder:text-zinc-600">
-        <textarea id="defeito" placeholder="DESCREVA O DEFEITO..." class="w-full p-6 rounded-[2rem] bg-zinc-800 shadow-md font-bold text-slate-200 h-36 uppercase outline-none border border-zinc-700 focus:border-blue-500 placeholder:text-zinc-600"></textarea>
-        <button id="btnGravar" onclick="salvarEntrada()" class="w-full bg-blue-600 text-white p-7 rounded-[3rem] font-black text-xl shadow-2xl active:bg-blue-700 mt-4">GRAVAR ENTRADA</button>
-    </div>
-
-    <div id="modalPagamento" class="hidden fixed inset-0 bg-black/95 z-[110] p-4 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-zinc-900 w-full max-w-sm rounded-[3rem] p-8 flex flex-col max-h-[90vh] shadow-2xl border border-zinc-800">
-            <h2 class="text-2xl font-black text-white uppercase italic text-center mb-4">Receber</h2>
-            <div class="text-center mb-4">
-                <p class="text-[10px] font-black text-zinc-500 uppercase">Valor Líquido</p>
-                <h3 class="text-5xl font-black text-green-400 italic tracking-tighter" id="displayValorPagamento">R$ 0,00</h3>
-            </div>
-            <div class="mb-5">
-                <p class="text-[9px] font-black text-zinc-400 mb-1 px-1">ALTERAR DESCONTO (R$)</p>
-                <input type="number" oninput="atualizarTotalComDescontoPagamento()" placeholder="0,00" class="w-full p-4 rounded-xl bg-zinc-800 font-black text-red-400 outline-none border border-zinc-700 focus:border-red-500 text-center placeholder:text-zinc-600" id="inputDescontoPagamento">
-            </div>
-            <p class="text-[10px] font-black text-zinc-400 mb-2 px-1">FORMA DE PAGAMENTO:</p>
-            <div id="listaFormasPag" class="overflow-y-auto flex-1 mb-6 pr-1 max-h-[25vh]"></div>
-            <div class="flex gap-3 pt-3 border-t border-zinc-800">
-                <button onclick="document.getElementById('modalPagamento').classList.add('hidden')" class="flex-1 bg-zinc-700 text-zinc-300 p-5 rounded-3xl font-black text-xs uppercase active:bg-zinc-600">Sair</button>
-                <button onclick="confirmarPagamento()" class="flex-2 bg-green-600 text-white p-5 rounded-3xl font-black text-xs uppercase shadow-lg active:bg-green-700">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalServicos" class="hidden fixed inset-0 bg-black/95 z-[100] p-4 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-zinc-900 w-full max-w-sm rounded-[3rem] p-6 flex flex-col max-h-[90vh] shadow-2xl border border-zinc-800">
-            <h2 class="text-xl font-black text-white uppercase italic mb-4 text-center tracking-tight">Lançar Serviços</h2>
-            <div id="carrinhoServicos" class="bg-zinc-800 border border-zinc-700 p-3 rounded-2xl min-h-[60px] max-h-[150px] overflow-y-auto mb-3"></div>
-            <div class="flex justify-between px-2 mb-4 border-b border-zinc-800 pb-3 items-center">
-                <span class="font-black text-zinc-400 uppercase text-[10px]">Total Parcial:</span>
-                <span id="totalCarrinho" class="font-black text-green-400 text-xl tracking-tighter">R$ 0,00</span>
-            </div>
-            <div class="mb-4">
-                <p class="text-[9px] font-black text-zinc-400 mb-1 px-1">APLICAR DESCONTO (R$)</p>
-                <input id="inputDescontoLancamento" type="number" placeholder="0.00" class="w-full p-4 rounded-xl bg-zinc-800 border border-zinc-700 font-black text-center text-red-400 outline-none focus:border-red-500 placeholder:text-zinc-600">
-            </div>
-            <div id="listaDeServicos" class="overflow-y-auto flex-1 pr-1 border-t border-zinc-800 pt-3"></div>
-            <div class="flex gap-2 mt-4 pt-3 border-t border-zinc-800">
-                <button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="flex-1 bg-zinc-700 text-zinc-300 p-4 rounded-2xl font-black text-xs uppercase active:bg-zinc-600">Cancelar</button>
-                <button onclick="finalizarAgrupamento()" class="flex-2 bg-blue-600 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-lg active:bg-blue-700">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SELETOR GERAL DE CLIENTE / EQUIPAMENTO -->
-    <div id="modalSeletorGeral" class="hidden fixed inset-0 bg-black/90 z-[100] p-4 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-zinc-900 w-full max-w-sm rounded-[3rem] shadow-2xl max-h-[80vh] flex flex-col overflow-hidden border border-zinc-800">
-            <div class="p-6 border-b border-zinc-800 bg-zinc-800/50 flex justify-between items-center">
-                <h2 id="tituloSeletorGeral" class="font-black text-white text-sm uppercase italic tracking-tight">Selecionar</h2>
-                <button onclick="abrirNovoCadastro()" class="bg-blue-600 text-white px-3 py-2 rounded-xl font-black text-[10px] uppercase shadow-md active:bg-blue-700">➕ Novo</button>
-            </div>
-            <div id="listaSeletorGeral" class="overflow-y-auto flex-1 bg-zinc-950"></div>
-            <button onclick="document.getElementById('modalSeletorGeral').classList.add('hidden')" class="p-5 bg-zinc-800 text-zinc-400 font-black text-xs uppercase border-t border-zinc-800 active:bg-zinc-700 active:text-white">Fechar Janela</button>
-        </div>
-    </div>
-
-    <!-- CADASTRO RÁPIDO DE CLIENTE / EQUIPAMENTO -->
-    <div id="modalNovoCadastro" class="hidden fixed inset-0 bg-black/95 z-[120] p-4 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-zinc-900 w-full max-w-sm rounded-[2rem] p-6 shadow-2xl border border-zinc-800 text-center">
-            <h2 id="tituloNovoCadastro" class="text-lg font-black text-white uppercase italic mb-5">Novo Cadastro</h2>
-            <input id="inputNovoCadastro" type="text" class="w-full p-5 rounded-2xl bg-zinc-800 font-black text-white outline-none border border-zinc-700 focus:border-blue-500 mb-5 text-center uppercase placeholder:text-zinc-600 shadow-inner">
-            <div class="flex gap-2">
-                <button onclick="document.getElementById('modalNovoCadastro').classList.add('hidden')" class="flex-1 bg-zinc-700 text-zinc-300 p-4 rounded-2xl font-black text-xs uppercase active:bg-zinc-600">Cancelar</button>
-                <button id="btnSalvarCadastroNovo" onclick="salvarNovoCadastro()" class="flex-2 bg-blue-600 text-white p-4 rounded-2xl font-black text-xs uppercase shadow-lg active:bg-blue-700">Salvar</button>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>
