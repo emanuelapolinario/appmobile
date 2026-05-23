@@ -1,373 +1,782 @@
 <!DOCTYPE html>
-<html class="dark" lang="pt-BR">
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
     <title>Emanuel Soluções</title>
-    
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#10131a"> 
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "tertiary-fixed": "#ffdcc6",
-                        "surface-container-highest": "#32353c",
-                        "inverse-on-surface": "#2e3038",
-                        "surface-dim": "#10131a",
-                        "secondary-container": "#474649",
-                        "surface-tint": "#adc6ff",
-                        "primary": "#adc6ff",
-                        "secondary-fixed-dim": "#c8c6c8",
-                        "tertiary": "#ffb786",
-                        "on-error-container": "#ffdad6",
-                        "inverse-primary": "#005ac2",
-                        "on-background": "#e1e2ec",
-                        "surface-container-low": "#191b23",
-                        "background": "#10131a",
-                        "on-tertiary-fixed-variant": "#723600",
-                        "on-primary-container": "#00285d",
-                        "on-tertiary": "#502400",
-                        "inverse-surface": "#e1e2ec",
-                        "on-primary": "#002e6a",
-                        "surface-variant": "#32353c",
-                        "surface-container-high": "#272a31",
-                        "tertiary-fixed-dim": "#ffb786",
-                        "on-secondary-fixed": "#1c1b1d",
-                        "on-primary-fixed-variant": "#004395",
-                        "surface-container-lowest": "#0b0e15",
-                        "on-error": "#690005",
-                        "error-container": "#93000a",
-                        "outline": "#8c909f",
-                        "on-secondary-container": "#b7b4b7",
-                        "secondary": "#c8c6c8",
-                        "surface-container": "#1d2027",
-                        "on-tertiary-fixed": "#311400",
-                        "on-primary-fixed": "#001a42",
-                        "error": "#ffb4ab",
-                        "surface-bright": "#363941",
-                        "secondary-fixed": "#e5e1e4",
-                        "on-secondary-fixed-variant": "#474649",
-                        "primary-container": "#4d8eff",
-                        "on-secondary": "#313032",
-                        "outline-variant": "#424754",
-                        "primary-fixed": "#d8e2ff",
-                        "on-tertiary-container": "#461f00",
-                        "on-surface": "#e1e2ec",
-                        "on-surface-variant": "#c2c6d6",
-                        "surface": "#10131a",
-                        "primary-fixed-dim": "#adc6ff",
-                        "tertiary-container": "#df7412",
-                        "brand-blue": "#3b82f6",
-                        "brand-green": "#22c55e",
-                        "brand-zinc": "#18181b",
-                        "brand-border": "#27272a"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "gutter": "16px",
-                        "container-margin": "20px",
-                        "stack-gap-lg": "32px",
-                        "card-padding": "24px",
-                        "unit": "8px",
-                        "stack-gap-md": "16px",
-                        "stack-gap-sm": "8px"
-                    },
-                    "fontFamily": {
-                        "display-lg": ["Geist"],
-                        "label-sm": ["Geist"],
-                        "body-base": ["Geist"],
-                        "headline-md": ["Geist"],
-                        "headline-lg": ["Geist"],
-                        "headline-lg-mobile": ["Geist"]
-                    },
-                    "fontSize": {
-                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
-                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
-                        "body-base": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                        "headline-md": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
-                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }]
-                    }
-                }
-            }
-        }
-    </script>
+    <meta name="theme-color" content="#040608">
+    <!-- ZERO dependências externas: sem Tailwind CDN, sem Google Fonts, sem Material Symbols -->
     <style>
-        body { font-family: 'Geist', sans-serif; background-color: #0b0e14; color: #e1e2ec; }
-        .cyber-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
-        .input-tech { background-color: #09090b; border: 1px solid #27272a; color: #e1e2ec; border-radius: 0.75rem; padding: 0.85rem 1.25rem; width: 100%; transition: all 0.2s; font-size: 15px; }
-        .input-tech:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-        .input-tech::placeholder { color: #52525b; }
-        
-        .card-tech { background-color: #13161e; border: 1px solid #22252d; border-radius: 1.25rem; padding: 1.5rem; transition: all 0.2s; }
-        .btn-primary { background-color: #3b82f6; color: white; font-weight: 700; border-radius: 1rem; padding: 0.9rem 1.5rem; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.025em; }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-success { background-color: #22c55e; color: white; font-weight: 700; border-radius: 1rem; padding: 0.9rem 1.5rem; transition: all 0.2s; text-transform: uppercase; }
-        .btn-success:active { transform: scale(0.98); }
-        .btn-icon { background-color: #1d2027; color: #e1e2ec; border-radius: 0.75rem; padding: 0.65rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: 1px solid #32353c; }
-        .btn-icon:active { transform: scale(0.95); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .modal-overlay { background-color: rgba(4, 5, 8, 0.85); backdrop-filter: blur(12px); }
-        .modal-content { background-color: #13161e; border: 1px solid #22252d; border-radius: 2rem; }
+        :root {
+            --bg:         #040608;
+            --bg-card:    rgba(8,12,16,0.92);
+            --bg-input:   rgba(8,12,16,0.85);
+            --border:     rgba(0,210,255,0.18);
+            --border-2:   rgba(0,210,255,0.3);
+            --text:       #f8fafc;
+            --text-muted: #64748b;
+            --cyan:       #00d2ff;
+            --cyan-bright:#00ffff;
+            --green:      #00ff88;
+            --orange:     #ff5500;
+            --red:        #ff3b3b;
+            --amber:      #f59e0b;
+            --radius-sm:  0.125rem;
+            --radius:     0.25rem;
+            --radius-lg:  0.375rem;
+        }
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #0b0e14; }
-        ::-webkit-scrollbar-thumb { background: #272a31; border-radius: 10px; }
+        html, body { height: 100%; }
 
+        body {
+            font-family: system-ui, -apple-system, monospace;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.5;
+            padding-top: 72px;
+            padding-bottom: 84px;
+            overflow-x: hidden;
+            /* Grade tech de fundo */
+            background-image:
+                linear-gradient(to right,  rgba(0,210,255,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,210,255,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Linha scanline animada */
+        .scanline-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(to right, transparent, rgba(0,210,255,0.6), transparent);
+            box-shadow: 0 0 12px rgba(0,210,255,0.9);
+            pointer-events: none; z-index: 999;
+            animation: scanline 7s linear infinite;
+        }
+        @keyframes scanline {
+            0%   { top: 0; opacity: 1; }
+            90%  { opacity: 0.3; }
+            100% { top: 100vh; opacity: 0; }
+        }
+
+        /* Overlay de scanlines */
+        .scan-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: 998;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px, transparent 3px,
+                rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+            );
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: rgba(0,210,255,0.3); border-radius: 2px; }
+
+        /* === TOPBAR === */
+        #topbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 72px; z-index: 50;
+            background: rgba(4,6,8,0.92);
+            border-bottom: 1px solid var(--border-2);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.8);
+        }
+        #topbar::after {
+            content: '';
+            position: absolute; bottom: -1px; left: 5%; right: 5%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            opacity: 0.4;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-icon-box {
+            width: 38px; height: 38px; border-radius: var(--radius);
+            background: rgba(0,210,255,0.08);
+            border: 1px solid var(--border-2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 12px rgba(0,210,255,0.12);
+        }
+        #topbar h1 {
+            font-size: 18px; font-weight: 800; letter-spacing: -0.03em;
+            text-transform: uppercase; color: #fff;
+            text-shadow: 0 0 12px rgba(0,210,255,0.25);
+        }
+        #topbar h1 span { color: var(--cyan-bright); }
+        .topbar-avatar {
+            width: 38px; height: 38px; border-radius: var(--radius);
+            background: var(--bg-card); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .topbar-avatar:hover { border-color: var(--cyan); }
+
+        /* === MAIN === */
+        #main { max-width: 640px; margin: 0 auto; padding: 16px; position: relative; z-index: 10; }
+
+        /* === SCREENS === */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* === CARD TECH (com cantos decorativos) === */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+        /* Cantos decorativos */
+        .card::before, .card::after,
+        .card .corner-bl, .card .corner-br {
+            content: '';
+            position: absolute;
+            width: 10px; height: 10px;
+            border-color: var(--cyan);
+            border-style: solid;
+            opacity: 0.7;
+        }
+        .card::before  { top: -1px;    left: -1px;  border-width: 2px 0 0 2px; }
+        .card::after   { top: -1px;    right: -1px; border-width: 2px 2px 0 0; }
+        .card .corner-bl { bottom: -1px; left: -1px;  border-width: 0 0 2px 2px; }
+        .card .corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+        /* === METRIC CARD === */
+        #metricCard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-2);
+            border-radius: var(--radius);
+            padding: 36px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,210,255,0.06), inset 0 0 20px rgba(0,210,255,0.03);
+        }
+        #metricCard::before { top: -1px; left: -1px;  border-width: 2px 0 0 2px; content: ''; position: absolute; width: 12px; height: 12px; border-color: var(--cyan); border-style: solid; }
+        #metricCard::after  { top: -1px; right: -1px; border-width: 2px 2px 0 0; content: ''; position: absolute; width: 12px; height: 12px; border-color: var(--cyan); border-style: solid; }
+        #metricCard .m-bl   { bottom: -1px; left: -1px;  border-width: 0 0 2px 2px; position: absolute; width: 12px; height: 12px; border-color: var(--cyan); border-style: solid; }
+        #metricCard .m-br   { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; position: absolute; width: 12px; height: 12px; border-color: var(--cyan); border-style: solid; }
+        #metricCard .bg-glow {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,210,255,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        #metricCard .sys-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+            text-transform: uppercase; color: rgba(0,210,255,0.7);
+            margin-bottom: 10px;
+        }
+        #valorPendenteGeral {
+            font-size: 44px; font-weight: 800; letter-spacing: -0.04em;
+            color: var(--cyan-bright);
+            text-shadow: 0 0 20px rgba(0,255,255,0.5), 0 0 40px rgba(0,255,255,0.2);
+            display: block;
+        }
+        #metricCard .sys-status {
+            position: absolute; bottom: 8px; right: 12px;
+            font-size: 8px; font-weight: 700; letter-spacing: 0.15em;
+            color: var(--text-muted); text-transform: uppercase;
+        }
+
+        /* === SECTION HEADER === */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px; margin-bottom: 16px;
+            position: relative;
+        }
+        .section-header::after {
+            content: '';
+            position: absolute; bottom: -1px; left: 0;
+            width: 48px; height: 2px;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+        }
+        .section-header h2 {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+            text-transform: uppercase; color: #fff;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-header h2 .dot {
+            width: 6px; height: 6px; background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan-bright);
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+        /* === LOTE BAR === */
+        #btnLote {
+            display: none;
+            justify-content: space-between; align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-2);
+            border-radius: var(--radius);
+            padding: 12px 16px; margin-bottom: 16px;
+            box-shadow: 0 0 20px rgba(0,210,255,0.06);
+        }
+        #btnLote.visible { display: flex; }
+        #txtTotalLote { font-size: 18px; font-weight: 800; color: var(--green); text-shadow: 0 0 10px rgba(0,255,136,0.4); }
+        #txtQtdLote   { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+        .lote-actions { display: flex; gap: 8px; }
+
+        /* === OS CARD === */
+        .os-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            border-left: 3px solid var(--orange);
+            margin-bottom: 12px;
+            position: relative;
+            box-shadow: -2px 0 12px rgba(255,85,0,0.12);
+        }
+        .os-card.aguardando {
+            border-left-color: var(--green);
+            box-shadow: -2px 0 12px rgba(0,255,136,0.1);
+        }
+        .os-card::after  { top: -1px;    right: -1px; border-width: 2px 2px 0 0; content: ''; position: absolute; width: 8px; height: 8px; border-color: rgba(0,210,255,0.5); border-style: solid; }
+        .os-card::before { top: -1px;    left:  3px;  border-width: 2px 0 0 0;   content: ''; position: absolute; width: 8px; height: 8px; border-color: rgba(0,210,255,0.5); border-style: solid; }
+        .os-card .c-bl   { bottom: -1px; left:  3px;  border-width: 0 0 2px 0;   position: absolute; width: 8px; height: 8px; border-color: rgba(0,210,255,0.5); border-style: solid; }
+        .os-card .c-br   { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; position: absolute; width: 8px; height: 8px; border-color: rgba(0,210,255,0.5); border-style: solid; }
+
+        .os-top { display: flex; align-items: center; gap: 7px; margin-bottom: 12px; padding-right: 28px; flex-wrap: wrap; }
+        .os-chk { position: absolute; right: 12px; top: 14px; width: 20px; height: 20px; cursor: pointer; accent-color: var(--cyan); }
+
+        /* Badges */
+        .badge {
+            display: inline-block; font-size: 9px; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 2px 7px; border-radius: 2px; border: 1px solid;
+        }
+        .b-orange { color: var(--orange); background: rgba(255,85,0,0.1);   border-color: rgba(255,85,0,0.3); }
+        .b-green  { color: var(--green);  background: rgba(0,255,136,0.08); border-color: rgba(0,255,136,0.3); }
+        .b-cyan   { color: var(--cyan);   background: rgba(0,210,255,0.08); border-color: rgba(0,210,255,0.25); }
+        .b-red    { color: var(--red);    background: rgba(255,59,59,0.08);  border-color: rgba(255,59,59,0.25); cursor: pointer; }
+        .b-amber  { color: var(--amber);  background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); }
+
+        .os-body { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .os-body h3 { font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.02em; }
+        .os-meta { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+        .os-meta .highlight { color: rgba(0,210,255,0.7); }
+        .os-valor { font-size: 17px; font-weight: 800; color: #fff; white-space: nowrap; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+
+        .os-defeito {
+            background: rgba(0,0,0,0.35); border: 1px solid rgba(0,210,255,0.08);
+            border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px;
+            border-left: 2px solid rgba(0,210,255,0.4);
+        }
+        .os-defeito .lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(0,210,255,0.5); margin-bottom: 3px; }
+        .os-defeito p { font-size: 11px; color: #94a3b8; font-weight: 500; text-transform: uppercase; line-height: 1.4; }
+
+        .os-servico {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,136,0.15);
+            border-radius: var(--radius-sm); padding: 7px 10px; margin-bottom: 10px;
+            font-size: 10px; font-weight: 600; color: rgba(0,255,136,0.8);
+            text-transform: uppercase;
+        }
+
+        .os-actions { display: flex; gap: 7px; padding-top: 10px; border-top: 1px solid rgba(0,210,255,0.1); }
+        .btn-lancar {
+            flex: 1; padding: 9px; border-radius: var(--radius-sm);
+            font-weight: 700; font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.08em; cursor: pointer;
+            background: rgba(0,210,255,0.07); color: var(--cyan);
+            border: 1px solid rgba(0,210,255,0.25);
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        .btn-lancar:active { background: rgba(0,210,255,0.18); }
+        .btn-baixar {
+            flex: 1; padding: 9px; border-radius: var(--radius-sm);
+            font-weight: 700; font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.08em; cursor: pointer;
+            background: rgba(0,255,136,0.07); color: var(--green);
+            border: 1px solid rgba(0,255,136,0.25);
+            transition: background 0.15s;
+            font-family: inherit;
+            box-shadow: 0 0 10px rgba(0,255,136,0.08);
+        }
+        .btn-baixar:active { background: rgba(0,255,136,0.18); }
+        .btn-icon-sm {
+            background: rgba(8,12,16,0.8); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 9px 12px;
+            cursor: pointer; font-size: 14px; transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-icon-sm:active { background: rgba(0,210,255,0.1); border-color: var(--cyan); }
+
+        /* === INPUTS === */
+        input, textarea, select {
+            background: var(--bg-input);
+            border: 1px solid rgba(0,210,255,0.2);
+            color: var(--cyan-bright);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            width: 100%;
+            font-size: 13px;
+            font-family: system-ui, -apple-system, monospace;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--cyan-bright);
+            outline: none;
+            box-shadow: 0 0 15px rgba(0,255,255,0.1), inset 0 0 10px rgba(0,255,255,0.05);
+        }
+        input::placeholder, textarea::placeholder { color: rgba(100,116,139,0.6); }
+        input[readonly] { cursor: pointer; }
+        textarea { min-height: 88px; resize: none; line-height: 1.5; }
+        select option { background: #040608; color: var(--cyan-bright); }
+
+        /* === FIELD === */
+        .field { margin-bottom: 16px; }
+        label.fl {
+            display: block;
+            font-size: 9px; font-weight: 700; letter-spacing: 0.18em;
+            text-transform: uppercase; color: rgba(0,210,255,0.65);
+            margin-bottom: 6px;
+        }
+
+        /* === BUTTONS === */
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            transition: all 0.15s; display: inline-flex; align-items: center;
+            justify-content: center; gap: 7px;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.45; }
+
+        .btn-primary {
+            background: rgba(0,210,255,0.1); color: var(--cyan-bright);
+            border: 1px solid rgba(0,210,255,0.4);
+            border-radius: var(--radius-sm); padding: 13px 20px;
+            font-size: 11px; width: 100%;
+            box-shadow: 0 0 15px rgba(0,210,255,0.1);
+            position: relative; overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.12), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .btn-primary:active::before { left: 150%; }
+        .btn-primary:active { background: rgba(0,210,255,0.2); }
+
+        .btn-success {
+            background: rgba(0,255,136,0.1); color: var(--green);
+            border: 1px solid rgba(0,255,136,0.35);
+            border-radius: var(--radius-sm); padding: 13px 20px;
+            font-size: 11px;
+            box-shadow: 0 0 12px rgba(0,255,136,0.08);
+        }
+        .btn-success:active { background: rgba(0,255,136,0.2); }
+
+        .btn-ghost {
+            background: rgba(8,12,16,0.8); color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 11px 16px; font-size: 10px;
+        }
+        .btn-ghost:active { background: rgba(0,210,255,0.06); }
+
+        .btn-blue-sm {
+            background: rgba(0,86,204,0.3); color: #60a5fa;
+            border: 1px solid rgba(59,130,246,0.4);
+            border-radius: var(--radius-sm); padding: 9px 14px; font-size: 10px;
+        }
+        .btn-zinc-sm {
+            background: rgba(8,12,16,0.9); color: #94a3b8;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 9px 12px; font-size: 12px;
+        }
+
+        /* === BOTTOM NAV === */
+        #bottomnav {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+            background: rgba(4,6,8,0.94);
+            border-top: 1px solid var(--border-2);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
+        }
+        #bottomnav::before {
+            content: '';
+            position: absolute; top: -1px; left: 10%; right: 10%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            opacity: 0.4;
+        }
+        .nav-wrap { display: flex; justify-content: space-around; align-items: center; height: 72px; padding: 0 8px; }
+        .nav-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 8px 20px; border-radius: var(--radius);
+            border: none; background: transparent; color: var(--text-muted);
+            font-family: inherit; font-size: 8px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.15em;
+            cursor: pointer; transition: color 0.15s; position: relative;
+        }
+        .nav-btn .nav-icon { font-size: 22px; line-height: 1; }
+        .nav-btn.active { color: var(--cyan-bright); }
+        .nav-btn.active::after {
+            content: '';
+            position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 2px;
+            background: var(--cyan-bright);
+            box-shadow: 0 0 10px rgba(0,255,255,0.8);
+        }
+        .nav-btn:active { opacity: 0.7; }
+
+        /* === MODAIS === */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 60;
+            background: rgba(4,6,8,0.92);
+            backdrop-filter: blur(10px);
+            align-items: center; justify-content: center; padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: rgba(8,12,16,0.97);
+            border: 1px solid var(--cyan);
+            border-radius: var(--radius);
+            width: 100%; max-width: 360px;
+            padding: 22px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,210,255,0.12), 0 0 0 1px rgba(0,210,255,0.25);
+        }
+        .modal-box::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+        }
+        .modal-box.flex-modal { display: flex; flex-direction: column; }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;
+        }
+        .modal-header h3 {
+            font-size: 12px; font-weight: 700; color: #fff;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-footer {
+            display: flex; gap: 8px;
+            padding-top: 14px; border-top: 1px solid var(--border); margin-top: 4px;
+        }
+        .modal-footer .btn { flex: 1; font-size: 10px; padding: 11px; border-radius: var(--radius-sm); }
+
+        /* Modal seletor */
+        #modalSeletorGeral .modal-box { padding: 0; overflow: hidden; border-color: var(--cyan); }
+        .seletor-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--bg); }
+        .seletor-header h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); }
+        #listaSeletorGeral { overflow-y: auto; max-height: 320px; }
+        #listaSeletorGeral button { width: 100%; padding: 13px 18px; text-align: left; font-weight: 700; font-size: 11px; text-transform: uppercase; color: #fff; background: transparent; border: none; border-bottom: 1px solid var(--border); cursor: pointer; font-family: inherit; letter-spacing: 0.04em; transition: background 0.1s; }
+        #listaSeletorGeral button:active { background: rgba(0,210,255,0.07); color: var(--cyan-bright); }
+        .seletor-footer { padding: 10px 18px; border-top: 1px solid var(--border); background: var(--bg); text-align: center; }
+        .seletor-footer button { background: transparent; border: none; color: var(--text-muted); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer; font-family: inherit; padding: 6px; }
+
+        /* Modal pagamento */
+        .pag-display {
+            text-align: center; padding: 14px;
+            background: var(--bg); border: 1px solid rgba(0,255,136,0.2);
+            border-radius: var(--radius-sm); margin-bottom: 14px;
+        }
+        .pag-display .pag-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,255,136,0.6); margin-bottom: 5px; }
+        #displayValorPagamento { font-size: 30px; font-weight: 800; color: var(--green); letter-spacing: -0.03em; text-shadow: 0 0 15px rgba(0,255,136,0.4); }
+
+        /* Formas pagamento */
+        #listaFormasPag label {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 13px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); cursor: pointer;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: #fff; margin-bottom: 6px;
+            transition: border-color 0.15s;
+        }
+        #listaFormasPag label:has(input:checked) { border-color: var(--cyan); background: rgba(0,210,255,0.06); color: var(--cyan-bright); }
+        #listaFormasPag input[type=radio] { accent-color: var(--cyan); width: 16px; height: 16px; flex-shrink: 0; }
+
+        /* Modal serviços carrinho */
+        #carrinhoServicos {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); min-height: 52px; max-height: 96px;
+            overflow-y: auto; padding: 8px; margin-bottom: 10px;
+        }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); border: 1px solid rgba(0,210,255,0.12); border-radius: 2px; padding: 5px 9px; margin-bottom: 3px; }
+        .cart-item span { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.04em; }
+        .cart-item button { color: var(--red); background: none; border: none; font-size: 16px; line-height: 1; cursor: pointer; padding: 0 3px; }
+        .cart-total { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        .cart-total span:first-child { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); }
+        #totalCarrinho { font-size: 18px; font-weight: 800; color: var(--green); text-shadow: 0 0 10px rgba(0,255,136,0.3); }
+
+        #listaDeServicos { overflow-y: auto; flex: 1; }
+        .servico-btn {
+            width: 100%; padding: 9px 13px; margin-bottom: 5px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); text-align: left; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: inherit; transition: border-color 0.1s, background 0.1s;
+        }
+        .servico-btn:active { border-color: var(--cyan); background: rgba(0,210,255,0.05); }
+        .s-nome { font-weight: 700; color: #fff; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
+        .s-val  { font-weight: 800; color: var(--green); font-size: 11px; }
+
+        /* Histórico */
+        .hist-busca { display: flex; gap: 8px; margin-bottom: 16px; }
+        .hist-busca input { flex: 1; border-color: rgba(0,255,136,0.2); color: var(--green); }
+        .hist-busca input:focus { border-color: var(--green); box-shadow: 0 0 15px rgba(0,255,136,0.08); }
+        .hist-busca input::placeholder { color: rgba(0,255,136,0.25); }
+
+        .hist-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+            border-left: 3px solid var(--green);
+            box-shadow: -2px 0 10px rgba(0,255,136,0.08);
+        }
+        .hist-card.pendente { border-left-color: var(--amber); box-shadow: -2px 0 10px rgba(245,158,11,0.08); }
+        .hist-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .hist-card h4 { font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; margin: 6px 0 2px; }
+        .hist-prop { font-size: 10px; color: rgba(0,210,255,0.7); font-weight: 600; margin-bottom: 8px; }
+        .hist-info { background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,136,0.08); border-radius: var(--radius-sm); padding: 9px 11px; font-size: 10px; color: #94a3b8; }
+        .hist-info p { margin-bottom: 3px; }
+        .hist-info p:last-child { margin: 0; }
+        .hist-info strong { color: var(--text-muted); font-weight: 700; }
+        .hist-div { height: 1px; background: var(--border); margin: 5px 0; }
+        .hist-totais { text-align: right; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 8px; }
+        .hist-totais p { font-size: 10px; font-weight: 700; margin-bottom: 2px; }
+        .hist-rel-btn { float: right; background: rgba(0,210,255,0.07); color: var(--cyan); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 12px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; font-family: inherit; }
+
+        /* Loading */
+        .loading-msg { padding: 36px; text-align: center; font-size: 10px; font-weight: 700; color: rgba(0,210,255,0.6); text-transform: uppercase; letter-spacing: 0.15em; animation: blink 1.5s ease-in-out infinite; }
+        .empty-msg { padding: 36px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+
+        /* Print */
         @media print {
             body * { visibility: hidden; }
             #areaImpressao, #areaImpressao * { visibility: visible; }
-            #areaImpressao { 
-                display: block !important;
-                position: absolute; left: 0; top: 0; 
-                width: 52mm; margin: 0; padding: 0; 
-                background: white; color: black;
-            }
+            #areaImpressao { display: block !important; position: absolute; left: 0; top: 0; width: 52mm; margin: 0; padding: 0; background: white; color: black; }
             @page { size: 58mm auto; margin: 0; }
-            .cupom-texto { font-family: monospace; font-size: 12px; line-height: 1.3; text-transform: uppercase; color: #000; }
+            .ct { font-family: monospace; font-size: 12px; line-height: 1.3; text-transform: uppercase; color: #000; }
             .hr { border-bottom: 1px dashed black; margin: 5px 0; width: 100%; }
-            .c { text-align: center; } 
-            .b { font-weight: bold; }
-            .espaco-fim { height: 45px; } 
+            .c  { text-align: center; }
+            .b  { font-weight: bold; }
+            .ef { height: 45px; }
         }
     </style>
 </head>
-<body class="pb-24 pt-16 h-screen flex flex-col bg-surface-container-lowest">
+<body>
+    <div class="scan-overlay"></div>
+    <div class="scanline-bar"></div>
+    <div id="areaImpressao" style="display:none;"></div>
 
-    <!-- Área Oculta de Impressão -->
-    <div id="areaImpressao"></div>
-
-    <!-- TopAppBar -->
-    <header class="fixed top-0 w-full z-50 backdrop-blur-md border-b border-outline-variant/30 bg-surface-dim/70 flex items-center justify-between px-container-margin h-16">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-primary active:scale-95 transition-transform" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
-            <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary tracking-tight">Emanuel Soluções</h1>
+    <!-- TopBar -->
+    <header id="topbar">
+        <div class="brand">
+            <div class="brand-icon-box">⚙️</div>
+            <h1>Emanuel <span>Soluções</span></h1>
         </div>
-        <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
-            <span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
-        </div>
+        <div class="topbar-avatar">💻</div>
     </header>
 
-    <!-- Canvas Principal de Conteúdo -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto space-y-6">
-        
-        <!-- Tela Bancada (Dashboard) -->
-        <div class="space-y-6" id="telaPendentes">
-            <!-- Card de Métricas Principais -->
-            <div class="card-tech cyber-glow flex flex-col items-center justify-center py-8 relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">A Receber Total</span>
-                <span class="font-display-lg text-display-lg text-primary tracking-tighter italic" id="valorPendenteGeral">R$ 0,00</span>
+    <!-- Main -->
+    <main id="main">
+
+        <!-- ===== BANCADA ===== -->
+        <div id="telaPendentes" class="screen active">
+            <div id="metricCard">
+                <div class="bg-glow"></div>
+                <div class="m-bl"></div><div class="m-br"></div>
+                <p class="sys-label">[ SYS.TERMINAL_MAIN ] A RECEBER</p>
+                <span id="valorPendenteGeral">R$ 0,00</span>
+                <p class="sys-status">STATUS: ONLINE</p>
             </div>
 
-            <!-- Header da Lista & Ações em Lote -->
-            <div id="btnLote" class="hidden justify-between items-center bg-surface-container border border-outline-variant/30 rounded-2xl p-4 shadow-xl animate-fade-in">
+            <div id="btnLote">
                 <div>
-                    <p id="txtQtdLote" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">0 MÁQUINAS</p>
-                    <p id="txtTotalLote" class="text-xl font-bold text-green-400">R$ 0,00</p>
+                    <p id="txtQtdLote">0 MÁQUINAS</p>
+                    <p id="txtTotalLote">R$ 0,00</p>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
-                    <button onclick="imprimirLote()" class="bg-zinc-800 text-white p-2.5 rounded-xl font-black text-sm border border-zinc-700 active:scale-95 transition-all">🖨️</button>
-                    <button onclick="copiarLoteRawBT()" class="bg-zinc-800 text-zinc-300 px-3 py-2.5 rounded-xl font-bold text-[10px] uppercase border border-zinc-700 active:scale-95 transition-all">📋 COPIAR</button>
+                <div class="lote-actions">
+                    <button class="btn btn-blue-sm" onclick="prepararPagamentoLote()">💰 PAGAR</button>
+                    <button class="btn btn-zinc-sm" onclick="imprimirLote()">🖨️</button>
+                    <button class="btn btn-zinc-sm" style="font-size:9px;padding:9px 10px;" onclick="copiarLoteRawBT()">📋 CPY</button>
                 </div>
             </div>
 
-            <div class="flex justify-between items-end border-b border-brand-border pb-2">
-                <h2 class="font-headline-md text-headline-md text-on-surface">Serviços Pendentes</h2>
+            <div class="section-header">
+                <h2><span class="dot"></span>[ DATA_STREAM: PENDENTES ]</h2>
             </div>
-
-            <!-- Lista de Ordens Ativas -->
-            <div class="space-y-4" id="listaPendentes"></div>
+            <div id="listaPendentes"></div>
         </div>
 
-        <!-- Tela Nova Entrada -->
-        <div class="hidden space-y-6" id="telaCadastro">
-            <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Nova Ordem de Serviço</h2>
-            <div class="card-tech space-y-5">
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Cliente</label>
-                    <input autocomplete="off" readonly onclick="abrirSeletor('clientes')" class="input-tech cursor-pointer text-left font-semibold" id="inputCliente" placeholder="SELECIONAR CLIENTE..." type="text"/>
+        <!-- ===== NOVA ENTRADA ===== -->
+        <div id="telaCadastro" class="screen">
+            <div class="section-header" style="margin-bottom:16px;">
+                <h2><span class="dot" style="background:var(--cyan);"></span>[ SYS.INPUT: NOVA_OS ]</h2>
+            </div>
+            <div class="card">
+                <div class="corner-bl"></div><div class="corner-br"></div>
+                <div class="field">
+                    <label class="fl">ID_CLIENTE // NOME</label>
+                    <input type="text" id="inputCliente" readonly onclick="abrirSeletor('clientes')" placeholder="> Selecionar cliente..." style="cursor:pointer;font-weight:700;">
                 </div>
-                
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Equipamento / Máquina</label>
-                    <input autocomplete="off" readonly onclick="abrirSeletor('maquinas')" class="input-tech cursor-pointer text-left font-semibold" id="inputEquipamento" placeholder="SELECIONAR MAQUINA..." type="text"/>
+                <div class="field">
+                    <label class="fl">HARDWARE_TYPE // EQUIPAMENTO</label>
+                    <input type="text" id="inputEquipamento" readonly onclick="abrirSeletor('maquinas')" placeholder="> Selecionar máquina..." style="cursor:pointer;font-weight:700;">
                 </div>
-
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Código Manual (Opcional)</label>
-                    <input class="input-tech" id="inputManualCod" placeholder="EX: ABC123" maxlength="6" type="text"/>
+                <div class="field">
+                    <label class="fl">COD_MANUAL // OPCIONAL</label>
+                    <input type="text" id="inputManualCod" placeholder="> EX: ABC123" maxlength="6" autocomplete="off">
                 </div>
-
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Defeito Relatado</label>
-                    <textarea class="input-tech min-h-[100px] font-medium" id="defeito" placeholder="Descreva os problemas relatados pelo cliente..."></textarea>
+                <div class="field">
+                    <label class="fl">DIAGNOSTICS_LOG // DEFEITO</label>
+                    <textarea id="defeito" placeholder="> Insira os logs iniciais..."></textarea>
                 </div>
-
-                <button id="btnGravar" class="btn-primary w-full flex items-center justify-center gap-2 mt-4 cyber-glow" onclick="salvarEntrada()">
-                    <span class="material-symbols-outlined">add_task</span>
-                    Lançar Serviço na Bancada
+                <button class="btn btn-primary" id="btnGravar" onclick="salvarEntrada()">
+                    ✅ [ EXECUTE_INSERT ]
                 </button>
             </div>
         </div>
 
-        <!-- Tela Histórico -->
-        <div class="hidden space-y-6" id="telaHistorico">
-            <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Histórico de Concluídos</h2>
-            <div class="card-tech mb-4 p-3 flex gap-2">
-                <input class="input-tech flex-1" id="inputBuscaCod" placeholder="DIGITE O CÓDIGO DA MÁQUINA..." type="text" maxlength="6"/>
-                <button class="btn-primary px-5 flex items-center justify-center" onclick="buscarHistorico()">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
+        <!-- ===== HISTÓRICO ===== -->
+        <div id="telaHistorico" class="screen">
+            <div class="section-header" style="margin-bottom:16px;">
+                <h2><span class="dot" style="background:var(--green);box-shadow:0 0 8px var(--green);"></span>[ DATA_ARCHIVE: LOGS ]</h2>
             </div>
-            <div class="space-y-4" id="resultadoConsulta"></div>
+            <div class="hist-busca">
+                <input type="text" id="inputBuscaCod" placeholder="> Query: código da máquina..." maxlength="6">
+                <button class="btn btn-success" onclick="buscarHistorico()" style="width:auto;padding:11px 16px;border-radius:var(--radius-sm);">🔍</button>
+            </div>
+            <div id="resultadoConsulta"></div>
         </div>
+
     </main>
 
-    <!-- BottomNavBar Desktop-Hidden -->
-    <nav class="fixed bottom-0 w-full z-50 rounded-t-2xl backdrop-blur-xl border-t border-outline-variant/20 bg-surface-container-low/80 shadow-[0_-4px_20px_0_rgba(59,130,246,0.08)]">
-        <div class="flex justify-around items-center h-20 px-4 pb-safe">
-            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" onclick="mudarAba('entrada', this)">
-                <span class="material-symbols-outlined mb-1">add_circle</span>
-                <span class="font-label-sm text-label-sm">Nova Entrada</span>
+    <!-- BottomNav -->
+    <nav id="bottomnav">
+        <div class="nav-wrap">
+            <button class="nav-btn" onclick="mudarAba('entrada', this)">
+                <span class="nav-icon">➕</span>[IN]
             </button>
-            <button class="nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200" onclick="mudarAba('pendentes', this)">
-                <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">build</span>
-                <span class="font-label-sm text-label-sm">Bancada</span>
+            <button class="nav-btn active" onclick="mudarAba('pendentes', this)">
+                <span class="nav-icon">💻</span>[MAIN]
             </button>
-            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" onclick="mudarAba('consulta', this)">
-                <span class="material-symbols-outlined mb-1">history</span>
-                <span class="font-label-sm text-label-sm">Histórico</span>
+            <button class="nav-btn" onclick="mudarAba('consulta', this)">
+                <span class="nav-icon">📊</span>[LOGS]
             </button>
         </div>
     </nav>
 
-    <!-- Modais do Ecossistema -->
-    
-    <!-- Modal Receber (Single e Lote) -->
-    <div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay" id="modalPagamento">
-        <div class="modal-content w-full max-w-sm p-6 space-y-5">
-            <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2 border-b border-brand-border pb-2">
-                <span class="material-symbols-outlined text-brand-green">payments</span>
-                Liquidar Ordem
-            </h3>
-            <div class="text-center py-2 bg-background rounded-xl border border-outline-variant/20">
-                <p class="font-label-sm text-[10px] text-on-surface-variant uppercase">Valor Líquico</p>
-                <h4 class="text-3xl font-bold text-green-400 tracking-tight mt-1" id="displayValorPagamento">R$ 0,00</h4>
+    <!-- ===== MODAL: PAGAMENTO ===== -->
+    <div id="modalPagamento" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>💵 [ SYS_PAYMENT_INIT ]</h3>
             </div>
-            <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Alterar Desconto (R$)</label>
-                    <input type="number" oninput="atualizarTotalComDescontoPagamento()" placeholder="0,00" class="input-tech text-center text-red-400 font-bold" id="inputDescontoPagamento">
-                </div>
-                <div class="space-y-2">
-                    <p class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Selecione o Meio de Captura</p>
-                    <div id="listaFormasPag" class="max-h-[160px] overflow-y-auto space-y-1.5 pr-1"></div>
-                </div>
+            <div class="pag-display">
+                <p class="pag-lbl">&gt; Valor Líquido</p>
+                <p id="displayValorPagamento">R$ 0,00</p>
             </div>
-            <div class="flex gap-2 pt-3 border-t border-brand-border">
-                <button class="flex-1 input-tech py-2.5 text-center text-xs font-semibold uppercase bg-zinc-800 text-zinc-400 border border-zinc-700 rounded-xl" onclick="document.getElementById('modalPagamento').classList.add('hidden')">Sair</button>
-                <button class="flex-1 btn-success py-2.5 text-xs text-white rounded-xl shadow-lg" onclick="confirmarPagamento()">Confirmar</button>
+            <div class="field">
+                <label class="fl">Alterar Desconto (R$)</label>
+                <input type="number" id="inputDescontoPagamento" oninput="atualizarTotalComDescontoPagamento()" placeholder="0,00" style="text-align:center;color:#f87171;font-weight:700;">
+            </div>
+            <div class="field">
+                <label class="fl">Meio de Captura</label>
+                <div id="listaFormasPag" style="max-height:148px;overflow-y:auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="fecharModal('modalPagamento')">&gt; ABORT</button>
+                <button class="btn btn-success" onclick="confirmarPagamento()">CONFIRMAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Lançar Serviços (Carrinho Estilizado) -->
-    <div id="modalServicos" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay">
-        <div class="modal-content w-full max-w-sm p-6 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center border-b border-brand-border pb-3">
-                <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">gavel</span>
-                    Lançar Serviços
-                </h3>
-                <!-- Botão Adicionado para Criar Novo Tipo de Serviço na Lista -->
-                <button onclick="abrirCriarNovoServico()" class="bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-background transition-colors px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-xs">add</span> Criar Serviço
-                </button>
+    <!-- ===== MODAL: SERVIÇOS (CARRINHO) ===== -->
+    <div id="modalServicos" class="modal-overlay">
+        <div class="modal-box flex-modal" style="max-height:90vh;">
+            <div class="modal-header">
+                <h3>🔨 [ LANÇAR_SERVIÇOS ]</h3>
+                <button onclick="abrirCriarNovoServico()" style="background:rgba(0,210,255,0.07);color:var(--cyan);border:1px solid rgba(0,210,255,0.25);border-radius:2px;padding:5px 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;font-family:inherit;">＋ CRIAR</button>
             </div>
-            
-            <div id="carrinhoServicos" class="bg-black/40 border border-outline-variant/30 p-3 rounded-xl min-h-[60px] max-h-[110px] overflow-y-auto my-3 space-y-1"></div>
-            
-            <div class="flex justify-between px-1 mb-3 border-b border-brand-border/40 pb-2 items-center">
-                <span class="font-label-sm text-[10px] text-on-surface-variant uppercase">Soma Parcial:</span>
-                <span id="totalCarrinho" class="font-bold text-green-400 text-lg">R$ 0,00</span>
+            <div id="carrinhoServicos"></div>
+            <div class="cart-total">
+                <span>SOMA_PARCIAL:</span>
+                <span id="totalCarrinho">R$ 0,00</span>
             </div>
-            <div class="mb-3 space-y-1">
-                <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Aplicar Desconto (R$)</label>
-                <input id="inputDescontoLancamento" type="number" placeholder="0.00" class="input-tech text-center text-red-400 font-bold">
+            <div class="field">
+                <label class="fl">Aplicar Desconto (R$)</label>
+                <input id="inputDescontoLancamento" type="number" placeholder="0.00" style="text-align:center;color:#f87171;font-weight:700;">
             </div>
-            <div id="listaDeServicos" class="overflow-y-auto flex-1 pr-1 space-y-1.5 border-t border-brand-border pt-3"></div>
-            <div class="flex gap-2 mt-4 pt-3 border-t border-brand-border">
-                <button onclick="document.getElementById('modalServicos').classList.add('hidden')" class="flex-1 bg-zinc-800 text-zinc-400 border border-zinc-700 p-3 rounded-xl font-bold text-xs uppercase active:bg-zinc-700">Voltar</button>
-                <button onclick="finalizarAgrupamento()" class="flex-1 btn-primary p-3 rounded-xl text-xs shadow-lg">Salvar O.S</button>
+            <div id="listaDeServicos" style="overflow-y:auto;flex:1;border-top:1px solid var(--border);padding-top:10px;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="fecharModal('modalServicos')">&gt; VOLTAR</button>
+                <button class="btn btn-primary" onclick="finalizarAgrupamento()">SALVAR O.S</button>
             </div>
         </div>
     </div>
 
-    <!-- Seletor Unificado Clientes/Máquinas -->
-    <div id="modalSeletorGeral" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay">
-        <div class="modal-content w-full max-w-sm flex flex-col max-h-[75vh] overflow-hidden">
-            <div class="p-5 border-b border-brand-border bg-background flex justify-between items-center">
-                <h3 id="tituloSeletorGeral" class="font-headline-md text-sm text-white tracking-tight uppercase">Selecionar</h3>
-                <button onclick="abrirNovoCadastro()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase shadow-md active:scale-95 transition-transform flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">add</span> Novo
-                </button>
+    <!-- ===== MODAL: SELETOR ===== -->
+    <div id="modalSeletorGeral" class="modal-overlay">
+        <div class="modal-box" style="padding:0;overflow:hidden;">
+            <div class="seletor-header">
+                <h3 id="tituloSeletorGeral">SELECIONAR</h3>
+                <button class="btn btn-blue-sm" onclick="abrirNovoCadastro()">＋ NOVO</button>
             </div>
-            <div id="listaSeletorGeral" class="overflow-y-auto flex-1 bg-surface-container-lowest/50 divide-y divide-brand-border"></div>
-            <button onclick="document.getElementById('modalSeletorGeral').classList.add('hidden')" class="p-4 bg-background text-on-surface-variant font-bold text-xs uppercase border-t border-brand-border text-center active:bg-zinc-900">Fechar</button>
-        </div>
-    </div>
-
-    <!-- Cadastro de Rápido Clientes/Máquinas -->
-    <div id="modalNovoCadastro" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
-        <div class="modal-content w-full max-w-sm p-6 text-center space-y-4">
-            <h3 id="tituloNovoCadastro" class="font-headline-md text-base text-white uppercase">Novo Registro</h3>
-            <input id="inputNovoCadastro" type="text" class="input-tech text-center uppercase font-semibold" placeholder="Insira a descrição...">
-            <div class="flex gap-2">
-                <button onclick="document.getElementById('modalNovoCadastro').classList.add('hidden')" class="flex-1 bg-zinc-800 text-zinc-400 border border-zinc-700 p-3 rounded-xl font-bold text-xs uppercase">Cancelar</button>
-                <button id="btnSalvarCadastroNovo" onclick="salvarNovoCadastro()" class="flex-1 btn-primary p-3 rounded-xl text-xs shadow-lg">Salvar</button>
+            <div id="listaSeletorGeral"></div>
+            <div class="seletor-footer">
+                <button onclick="fecharModal('modalSeletorGeral')">&gt; FECHAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Adicionado: Cadastro de Serviço + Preço diretamente na tabela -->
-    <div id="modalNovoServicoTabela" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
-        <div class="modal-content w-full max-w-sm p-6 space-y-4">
-            <h3 class="font-headline-md text-base text-white uppercase text-center border-b border-brand-border pb-2">Cadastrar Novo Serviço</h3>
-            <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Nome do Serviço / Peça</label>
-                    <input id="inputNovoServicoNome" type="text" class="input-tech uppercase font-semibold" placeholder="EX: TROCA DE CONECTOR S20">
-                </div>
-                <div class="space-y-1">
-                    <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Preço / Valor de Venda (R$)</label>
-                    <input id="inputNovoServicoPreco" type="number" step="0.01" class="input-tech font-bold text-green-400 text-center animate-none" placeholder="0.00">
-                </div>
+    <!-- ===== MODAL: NOVO CADASTRO ===== -->
+    <div id="modalNovoCadastro" class="modal-overlay">
+        <div class="modal-box" style="text-align:center;">
+            <div class="modal-header">
+                <h3 id="tituloNovoCadastro">NOVO REGISTRO</h3>
             </div>
-            <div class="flex gap-2 pt-2 border-t border-brand-border">
-                <button onclick="document.getElementById('modalNovoServicoTabela').classList.add('hidden')" class="flex-1 bg-zinc-800 text-zinc-400 border border-zinc-700 p-3 rounded-xl font-bold text-xs uppercase">Voltar</button>
-                <button id="btnSalvarServicoTabela" onclick="salvarNovoServicoNaTabela()" class="flex-1 btn-primary p-3 rounded-xl text-xs shadow-lg">Cadastrar</button>
+            <div class="field">
+                <input id="inputNovoCadastro" type="text" placeholder="> Insira a descrição..." style="text-align:center;text-transform:uppercase;font-weight:700;">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="fecharModal('modalNovoCadastro')">&gt; CANCELAR</button>
+                <button class="btn btn-primary" id="btnSalvarCadastroNovo" onclick="salvarNovoCadastro()">SALVAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase App Integrado com Padrões Modulares -->
+    <!-- ===== MODAL: NOVO SERVIÇO ===== -->
+    <div id="modalNovoServicoTabela" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>📝 [ CADASTRAR_SERVIÇO ]</h3>
+            </div>
+            <div class="field">
+                <label class="fl">Nome do Serviço / Peça</label>
+                <input id="inputNovoServicoNome" type="text" placeholder="> EX: TROCA DE CONECTOR S20" style="text-transform:uppercase;font-weight:700;">
+            </div>
+            <div class="field">
+                <label class="fl">Preço / Valor de Venda (R$)</label>
+                <input id="inputNovoServicoPreco" type="number" step="0.01" placeholder="0.00" style="text-align:center;font-weight:800;color:var(--green);">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="fecharModal('modalNovoServicoTabela')">&gt; VOLTAR</button>
+                <button class="btn btn-primary" id="btnSalvarServicoTabela" onclick="salvarNovoServicoNaTabela()">CADASTRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FIREBASE ===== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -382,243 +791,157 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db  = getFirestore(app);
 
+        // ===== STATE =====
         let idAtual = null;
         let itensSelecionadosLote = [];
-        let clienteAtualSelecao = null;
-        let valorBrutoGlobal = 0;
+        let clienteAtualSelecao  = null;
+        let valorBrutoGlobal     = 0;
         let listaServicosTemporaria = [];
-        let ordensBancada = {};
+        let ordensBancada  = {};
         let historicoAtual = [];
-        let modoPagamento = 'SINGLE';
+        let modoPagamento  = 'SINGLE';
         let tipoSeletorAtual = '';
 
-        window.formatarDataBR = (dataStr) => {
-            if (!dataStr) return "---";
-            if (dataStr.includes("-")) {
-                const partes = dataStr.split(" ")[0].split("-");
-                if (partes.length === 3 && partes[0].length === 4) {
-                    return `${partes[2]}/${partes[1]}/${partes[0]}`;
-                }
+        // ===== HELPERS =====
+        window.fecharModal = (id) => document.getElementById(id).classList.remove('open');
+        const abrirModal   = (id) => document.getElementById(id).classList.add('open');
+
+        window.formatarDataBR = (v) => {
+            if (!v) return "---";
+            if (v.includes("-")) {
+                const p = v.split(" ")[0].split("-");
+                if (p.length === 3 && p[0].length === 4) return `${p[2]}/${p[1]}/${p[0]}`;
             }
-            return dataStr;
+            return v;
         };
 
         window.copiarParaRawBT = (texto) => {
-            navigator.clipboard.writeText(texto).then(() => {
-                alert("RECIBO COPIADO! Cole no RawBT.");
-            }).catch(err => alert("Erro: " + err));
+            navigator.clipboard.writeText(texto)
+                .then(() => alert("RECIBO COPIADO! Cole no RawBT."))
+                .catch(e => alert("Erro: " + e));
         };
 
         window.prepararTextoRecibo = (d, tipo = 'OS') => {
-            const div = "--------------------------------";
-            const valTotal = parseFloat(d.valor_servico || 0).toFixed(2);
-            const valBruto = (parseFloat(d.valor_bruto) || (parseFloat(d.valor_servico || 0) + parseFloat(d.desconto || 0))).toFixed(2);
-            const data = window.formatarDataBR(d.data_entrada);
-
+            const div  = "--------------------------------";
+            const valT = parseFloat(d.valor_servico || 0).toFixed(2);
+            const valB = (parseFloat(d.valor_bruto) || (parseFloat(d.valor_servico || 0) + parseFloat(d.desconto || 0))).toFixed(2);
             let t = `EMANUEL SOLUCOES TECNOLOGICAS\n`;
             t += `${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}\n`;
-            t += `${div}\n`;
-            t += `OS: ${d.id} - COD: ${d.codigo_maquina}\n`;
-            t += `${div}\n`;
-            t += `DATA: ${data}\n`;
-            t += `CLIENTE: ${d.cliente}\n`;
-            t += `EQUIP.: ${d.equipamento}\n`;
-            t += `${div}\n`;
+            t += `${div}\nOS: ${d.id} - COD: ${d.codigo_maquina}\n${div}\n`;
+            t += `DATA: ${window.formatarDataBR(d.data_entrada)}\nCLIENTE: ${d.cliente}\nEQUIP.: ${d.equipamento}\n${div}\n`;
             t += `DEFEITO: ${d.defeito}\n`;
             if (d.servico_principal) {
-                t += `${div}\n`;
-                t += `SERVICOS REALIZADOS:\n`;
-                t += `${d.servico_principal.replace(/\+/g, '\n')}\n`;
-                t += `${div}\n`;
-                if (parseFloat(d.desconto) > 0) {
-                    t += `SUBTOTAL: R$ ${valBruto}\n`;
-                    t += `DESCONTO: R$ ${parseFloat(d.desconto).toFixed(2)}\n`;
-                }
-                t += `TOTAL: R$ ${valTotal}\n`;
+                t += `${div}\nSERVICOS REALIZADOS:\n${d.servico_principal.replace(/\+/g,'\n')}\n${div}\n`;
+                if (parseFloat(d.desconto) > 0) t += `SUBTOTAL: R$ ${valB}\nDESCONTO: R$ ${parseFloat(d.desconto).toFixed(2)}\n`;
+                t += `TOTAL: R$ ${valT}\n`;
             }
-            t += `${div}\n`;
-            t += `AGRADECEMOS A PREFERENCIA!\nDEUS E FIEL`;
+            t += `${div}\nAGRADECEMOS A PREFERENCIA!\nDEUS E FIEL`;
             return t.toUpperCase();
         };
 
         window.copiarLoteRawBT = () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
             const div = "--------------------------------";
-            let total = 0;
-            let t = `EMANUEL SOLUCOES TECNOLOGICAS\nFECHAMENTO DE SERVICOS (LOTE)\n${div}\n`;
-            t += `CLIENTE: ${clienteAtualSelecao}\n${div}\n`;
+            let total = 0, t = `EMANUEL SOLUCOES TECNOLOGICAS\nFECHAMENTO DE SERVICOS (LOTE)\n${div}\nCLIENTE: ${clienteAtualSelecao}\n${div}\n`;
             itensSelecionadosLote.forEach(d => {
                 const liq = parseFloat(d.valor_servico || 0);
                 total += liq;
-                t += `OS: ${d.id} - COD: ${d.codigo_maquina}\n`;
-                t += `SERV: ${d.servico_principal || '---'}\n`;
-                t += `VALOR: R$ ${liq.toFixed(2)}\n${div}\n`;
+                t += `OS: ${d.id} - COD: ${d.codigo_maquina}\nSERV: ${d.servico_principal || '---'}\nVALOR: R$ ${liq.toFixed(2)}\n${div}\n`;
             });
             t += `TOTAL A PAGAR: R$ ${total.toFixed(2)}\n${div}\nDEUS E FIEL`;
             window.copiarParaRawBT(t.toUpperCase());
         };
 
-        window.mudarAba = (aba, navElement) => {
-            document.getElementById('telaPendentes').classList.add('hidden');
-            document.getElementById('telaCadastro').classList.add('hidden');
-            document.getElementById('telaHistorico').classList.add('hidden');
-
-            if(navElement) {
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    el.className = "nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200";
-                    let icon = el.querySelector('.material-symbols-outlined');
-                    if(icon) icon.style.fontVariationSettings = "'FILL' 0";
-                });
-                navElement.className = "nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200";
-                let activeIcon = navElement.querySelector('.material-symbols-outlined');
-                if(activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
-            }
-
-            if(aba === 'entrada') document.getElementById('telaCadastro').classList.remove('hidden');
-            if(aba === 'pendentes') {
-                document.getElementById('telaPendentes').classList.remove('hidden');
-                carregarPendentes();
-            }
-            if(aba === 'consulta') document.getElementById('telaHistorico').classList.remove('hidden');
+        // ===== NAVEGAÇÃO =====
+        window.mudarAba = (aba, navEl) => {
+            ['telaPendentes','telaCadastro','telaHistorico'].forEach(id => document.getElementById(id).classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            if (navEl) navEl.classList.add('active');
+            if (aba === 'entrada')   document.getElementById('telaCadastro').classList.add('active');
+            if (aba === 'pendentes') { document.getElementById('telaPendentes').classList.add('active'); carregarPendentes(); }
+            if (aba === 'consulta')  document.getElementById('telaHistorico').classList.add('active');
         };
 
+        // ===== IMPRESSÃO =====
         window.dispararPrint = (html) => {
             const area = document.getElementById('areaImpressao');
-            area.innerHTML = `<div class="cupom-texto">${html}</div>`;
-            setTimeout(() => { window.print(); }, 500);
+            area.style.display = 'block';
+            area.innerHTML = `<div class="ct">${html}</div>`;
+            setTimeout(() => { window.print(); area.style.display = 'none'; }, 500);
         };
 
         window.imprimirCupom = (dados, tipo = 'OS') => {
             const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
-            const desc = parseFloat(dados.desconto || 0);
+            const desc  = parseFloat(dados.desconto || 0);
             const total = parseFloat(dados.valor_servico || 0);
-            const dataArrumada = window.formatarDataBR(dados.data_entrada);
-            
             let layout = `
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}</div>
                 <div class="hr"></div>
                 <div><span class="b">OS:</span> ${dados.id} - <span class="b">COD:</span> ${dados.codigo_maquina}</div>
                 <div class="hr"></div>
-                <div><span class="b">DATA:</span> ${dataArrumada}</div>
+                <div><span class="b">DATA:</span> ${window.formatarDataBR(dados.data_entrada)}</div>
                 <div><span class="b">CLIENTE:</span> ${dados.cliente}</div>
                 <div><span class="b">EQUIP.:</span> ${dados.equipamento}</div>
                 <div class="hr"></div>
-                <div class="b">DEFEITO:</div>
-                <div>${dados.defeito}</div>
-            `;
-
+                <div class="b">DEFEITO:</div><div>${dados.defeito}</div>`;
             if (dados.servico_principal) {
-                layout += `
-                    <div class="hr"></div>
-                    <div class="b">SERVICOS REALIZADOS:</div>
-                    <div>${dados.servico_principal.replace(/\+/g, '<br>')}</div>
-                    <div class="hr"></div>
-                `;
-                if (desc > 0) {
-                    layout += `
-                        <div><span class="b">SUBTOTAL:</span> R$ ${bruto.toFixed(2)}</div>
-                        <div><span class="b">DESCONTO:</span> R$ ${desc.toFixed(2)}</div>
-                    `;
-                }
-                layout += `<div class="c b" style="font-size:14px; margin-top:5px; border:2px solid black; padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
+                layout += `<div class="hr"></div><div class="b">SERVICOS REALIZADOS:</div><div>${dados.servico_principal.replace(/\+/g,'<br>')}</div><div class="hr"></div>`;
+                if (desc > 0) layout += `<div><span class="b">SUBTOTAL:</span> R$ ${bruto.toFixed(2)}</div><div><span class="b">DESCONTO:</span> R$ ${desc.toFixed(2)}</div>`;
+                layout += `<div class="c b" style="font-size:14px;margin-top:5px;border:2px solid black;padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
             } else {
-                layout += `
-                    <div class="hr"></div>
-                    <div style="height:35px; border-bottom:1px solid black; margin-top:15px"></div>
-                    <div class="c b" style="font-size:10px;">ASSINATURA DO CLIENTE</div>
-                `;
+                layout += `<div class="hr"></div><div style="height:35px;border-bottom:1px solid black;margin-top:15px"></div><div class="c b" style="font-size:10px;">ASSINATURA DO CLIENTE</div>`;
             }
-
-            layout += `
-                <div class="hr"></div>
-                <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                <div class="c">DEUS E FIEL</div>
-                <div class="espaco-fim"></div>
-            `;
+            layout += `<div class="hr"></div><div class="c b">AGRADECEMOS A PREFERENCIA!</div><div class="c">DEUS E FIEL</div><div class="ef"></div>`;
             window.dispararPrint(layout);
         };
 
         window.imprimirLote = () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
-            let totalLiquidoLote = 0;
-            let totalDescontoLote = 0;
-            let totalBrutoLote = 0;
-            let itensHTML = "";
-            
+            let totalLiq = 0, itensHTML = "";
             itensSelecionadosLote.forEach(d => {
-                const liquido = parseFloat(d.valor_servico || 0);
-                const desconto = parseFloat(d.desconto || 0);
-                const bruto = parseFloat(d.valor_bruto) || (liquido + desconto);
-                const dataArr = window.formatarDataBR(d.data_entrada);
-
-                totalLiquidoLote += liquido;
-                totalDescontoLote += desconto;
-                totalBrutoLote += bruto;
-                
-                itensHTML += `
-                    <div style="margin-top:6px; text-align: left;">
-                        <div><span class="b">OS:</span> ${d.id} - <span class="b">COD:</span> ${d.codigo_maquina}</div>
-                        <div><span class="b">DATA:</span> ${dataArr}</div>
-                        <div><span class="b">SERV:</span> ${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</div>
-                        <div class="b" style="text-align: right;">VALOR: R$ ${liquido.toFixed(2)}</div>
-                    </div>
-                    <div class="hr"></div>
-                `;
+                const liq = parseFloat(d.valor_servico || 0);
+                totalLiq += liq;
+                itensHTML += `<div style="margin-top:6px;text-align:left;">
+                    <div><span class="b">OS:</span> ${d.id} - <span class="b">COD:</span> ${d.codigo_maquina}</div>
+                    <div><span class="b">DATA:</span> ${window.formatarDataBR(d.data_entrada)}</div>
+                    <div><span class="b">SERV:</span> ${d.servico_principal ? d.servico_principal.replace(/\+/g,'<br>') : '---'}</div>
+                    <div class="b" style="text-align:right;">VALOR: R$ ${liq.toFixed(2)}</div>
+                </div><div class="hr"></div>`;
             });
-            
-            const layout = `
+            window.dispararPrint(`
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">FECHAMENTO DE SERVICOS</div>
-                <div class="hr"></div>
-                <div><span class="b">CLIENTE:</span> ${clienteAtualSelecao}</div>
-                <div class="hr"></div>
+                <div class="hr"></div><div><span class="b">CLIENTE:</span> ${clienteAtualSelecao}</div><div class="hr"></div>
                 ${itensHTML}
-                <div class="c b" style="font-size:14px; border:2px solid black; padding:3px;">TOTAL EM LOTE: R$ ${totalLiquidoLote.toFixed(2)}</div>
-                <div class="hr"></div>
-                <div class="c b">DEUS E FIEL</div>
-                <div class="espaco-fim"></div>
-            `;
-            window.dispararPrint(layout);
+                <div class="c b" style="font-size:14px;border:2px solid black;padding:3px;">TOTAL EM LOTE: R$ ${totalLiq.toFixed(2)}</div>
+                <div class="hr"></div><div class="c b">DEUS E FIEL</div><div class="ef"></div>`);
         };
 
         window.prepararImpressaoHistorico = (cod) => {
-            if (!historicoAtual || historicoAtual.length === 0) return;
-            let itensHTML = "";
-            let totalGeral = 0;
-
-            historicoAtual.forEach((h, index) => {
+            if (!historicoAtual || !historicoAtual.length) return;
+            let itensHTML = "", totalGeral = 0;
+            historicoAtual.forEach((h, i) => {
                 const total = parseFloat(h.valor_servico || 0);
                 totalGeral += total;
-                const dataEntrada = window.formatarDataBR(h.data_entrada);
-                itensHTML += `
-                    <div>
-                        <div><span class="b">DATA:</span> ${dataEntrada} - <span class="b">OS:</span> ${h.id}</div>
-                        <div><span class="b">SERV:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ', ') : '---'}</div>
-                        <div style="text-align: right;" class="b">VALOR: R$ ${total.toFixed(2)}</div>
-                    </div>
-                    ${index < historicoAtual.length - 1 ? '<div class="hr"></div>' : ''}
-                `;
+                itensHTML += `<div>
+                    <div><span class="b">DATA:</span> ${window.formatarDataBR(h.data_entrada)} - <span class="b">OS:</span> ${h.id}</div>
+                    <div><span class="b">SERV:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g,', ') : '---'}</div>
+                    <div style="text-align:right;" class="b">VALOR: R$ ${total.toFixed(2)}</div>
+                </div>${i < historicoAtual.length - 1 ? '<div class="hr"></div>' : ''}`;
             });
-
-            const layout = `
+            window.dispararPrint(`
                 <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
                 <div class="c b">HISTORICO DE MANUTENCOES</div>
-                <div class="hr"></div>
-                <div><span class="b">MAQUINA:</span> ${cod}</div>
-                <div class="hr"></div>
+                <div class="hr"></div><div><span class="b">MAQUINA:</span> ${cod}</div><div class="hr"></div>
                 ${itensHTML}
-                <div class="hr"></div>
-                <div class="b" style="text-align: right;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
-                <div class="hr"></div>
-                <div class="c">DEUS E FIEL</div>
-                <div class="espaco-fim"></div>
-            `;
-            window.dispararPrint(layout);
+                <div class="hr"></div><div class="b" style="text-align:right;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
+                <div class="hr"></div><div class="c">DEUS E FIEL</div><div class="ef"></div>`);
         };
 
+        // ===== EXCLUSÃO =====
         window.excluirOrdemServico = async (idOS) => {
             if (!confirm(`⚠️ EXCLUIR DEFINITIVAMENTE A OS Nº ${idOS}?`)) return;
             try {
@@ -628,507 +951,387 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
+        // ===== SELEÇÃO LOTE =====
         window.toggleSelecao = (idOS) => {
             const d = ordensBancada[idOS];
-            const cliente = d.cliente;
             const index = itensSelecionadosLote.findIndex(i => i.id === d.id);
-            
             if (index > -1) {
                 itensSelecionadosLote.splice(index, 1);
-                if (itensSelecionadosLote.length === 0) clienteAtualSelecao = null;
+                if (!itensSelecionadosLote.length) clienteAtualSelecao = null;
             } else {
-                if (clienteAtualSelecao && clienteAtualSelecao !== cliente) {
+                if (clienteAtualSelecao && clienteAtualSelecao !== d.cliente) {
                     alert("Selecione apenas equipamentos do MESMO CLIENTE!");
                     document.getElementById('chk' + idOS).checked = false;
                     return;
                 }
-                clienteAtualSelecao = cliente;
-                itensSelecionadosLote.push(d); 
+                clienteAtualSelecao = d.cliente;
+                itensSelecionadosLote.push(d);
             }
-            
             const total = itensSelecionadosLote.reduce((a, b) => a + parseFloat(b.valor_servico || 0), 0);
-            const btnLote = document.getElementById('btnLote');
-            
-            if (itensSelecionadosLote.length >= 2) {
-                btnLote.classList.remove('hidden');
-                btnLote.classList.add('flex');
-            } else {
-                btnLote.classList.add('hidden');
-                btnLote.classList.remove('flex');
-            }
-            
+            const btnL = document.getElementById('btnLote');
+            itensSelecionadosLote.length >= 2 ? btnL.classList.add('visible') : btnL.classList.remove('visible');
             document.getElementById('txtTotalLote').innerText = `R$ ${total.toFixed(2)}`;
-            document.getElementById('txtQtdLote').innerText = `${itensSelecionadosLote.length} MÁQS`;
+            document.getElementById('txtQtdLote').innerText   = `${itensSelecionadosLote.length} MÁQS`;
         };
 
+        // ===== CARREGAR PENDENTES (com filtro Firestore) =====
         async function carregarPendentes() {
-            itensSelecionadosLote = []; 
-            clienteAtualSelecao = null;
-            ordensBancada = {}; 
-            document.getElementById('btnLote').classList.add('hidden');
-            
+            itensSelecionadosLote = []; clienteAtualSelecao = null; ordensBancada = {};
+            document.getElementById('btnLote').classList.remove('visible');
             const lista = document.getElementById('listaPendentes');
-            lista.innerHTML = "<p class='p-10 text-center animate-pulse text-xs text-primary/70 font-semibold'>Buscando ordens ativas...</p>";
-            
-            try {
-                const snap = await getDocs(collection(db, "ordens"));
-                lista.innerHTML = ""; 
-                let totalA = 0;
-                
-                snap.forEach(dDoc => {
-                    const d = dDoc.data(); 
-                    const status = (d.status || "").toUpperCase().trim();
-                    
-                    if (status === "PENDENTE" || status === "AGUARDANDO PAGAMENTO") {
-                        ordensBancada[d.id] = d; 
-                        const valFinal = parseFloat(d.valor_servico || 0); 
-                        const valBruto = parseFloat(d.valor_bruto) || (valFinal + parseFloat(d.desconto || 0));
-                        totalA += valFinal;
-                        
-                        let badgeClass = status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-                        let borderLeftColor = status === 'PENDENTE' ? 'border-l-amber-500' : 'border-l-emerald-500';
-                        let servicoTexto = d.servico_principal ? `<div class="bg-black/30 text-on-surface-variant p-3 rounded-xl text-xs font-semibold border border-outline-variant/30">🛠 ${d.servico_principal.replace(/\+/g, ' | ')}</div>` : '';
+            lista.innerHTML = "<p class='loading-msg'>&gt; Buscando ordens ativas...</p>";
 
-                        lista.innerHTML += `
-                            <div class="card-tech flex flex-col gap-3 relative overflow-hidden group border-l-[6px] ${borderLeftColor}">
-                                <div class="absolute right-5 top-5">
-                                    <input type="checkbox" id="chk${d.id}" onchange="toggleSelecao('${d.id}')" class="w-6 h-6 rounded-md bg-zinc-900 border-outline-variant text-primary focus:ring-0 focus:ring-offset-0 cursor-pointer">
-                                </div>
-                                <div class="flex items-center gap-2 pr-8">
-                                    <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md border ${badgeClass}">${status}</span>
-                                    <span class="text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-0.5 rounded-md border border-primary/20">#${d.codigo_maquina}</span>
-                                    <button onclick="window.excluirOrdemServico('${d.id}')" class="text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all">🗑️ Apagar</button>
-                                </div>
-                                <div class="flex justify-between items-start mt-1">
-                                    <div>
-                                        <h3 class="font-headline-md text-base text-white uppercase">${d.equipamento}</h3>
-                                        <p class="text-xs text-on-surface-variant font-medium mt-0.5">👤 CLIENTE: ${d.cliente}</p>
-                                        <p class="text-[11px] font-semibold text-primary/70 mt-0.5">📅 ENTRADA: ${window.formatarDataBR(d.data_entrada)}</p>
-                                    </div>
-                                    <span class="text-lg font-bold text-primary italic">R$ ${valFinal.toFixed(2)}</span>
-                                </div>
-                                <div class="bg-black/20 p-3 rounded-xl border border-outline-variant/10">
-                                    <p class="text-[10px] font-bold text-zinc-500 uppercase mb-0.5">Relato do Defeito:</p>
-                                    <p class="text-xs text-zinc-300 font-medium uppercase leading-tight">${d.defeito || 'NÃO INFORMADO'}</p>
-                                </div>
-                                ${servicoTexto}
-                                <div class="flex gap-2 pt-2 border-t border-brand-border/60">
-                                    ${status === 'PENDENTE' ? 
-                                        `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">LANÇAR MÃO DE OBRA</button>` : 
-                                        `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">BAIXAR PAGAMENTO</button>`}
-                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3">🖨️</button>
-                                    <button onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${JSON.stringify(d)}, "OS"))' class="btn-icon px-3">📋</button>
-                                </div>
+            try {
+                // ✅ Filtro no Firestore — não baixa ordens pagas/antigas
+                const q = query(
+                    collection(db, "ordens"),
+                    where("status", "in", ["PENDENTE", "AGUARDANDO PAGAMENTO"])
+                );
+                const snap = await getDocs(q);
+
+                let buf = "", totalA = 0;
+
+                snap.forEach(dDoc => {
+                    const d = dDoc.data();
+                    const status = (d.status || "").toUpperCase().trim();
+                    ordensBancada[d.id] = d;
+
+                    const valFinal = parseFloat(d.valor_servico || 0);
+                    totalA += valFinal;
+
+                    const isAg = status === 'AGUARDANDO PAGAMENTO';
+                    const badgeCls  = isAg ? 'b-green' : 'b-orange';
+                    const cardCls   = isAg ? 'os-card aguardando' : 'os-card';
+                    const servicoHtml = d.servico_principal
+                        ? `<div class="os-servico">🛠 ${d.servico_principal.replace(/\+/g,' | ')}</div>` : '';
+                    const btnAcao = isAg
+                        ? `<button class="btn-baixar" onclick="prepararFinalizacao('${d.id}')">[ RECV_PAYMENT ]</button>`
+                        : `<button class="btn-lancar" onclick="abrirLancamento('${d.id}')">[ LANÇAR_SERVIÇO ]</button>`;
+
+                    const dj = JSON.stringify(d).replace(/'/g,"\\'");
+
+                    buf += `<div class="${cardCls}">
+                        <div class="c-bl"></div><div class="c-br"></div>
+                        <div class="os-top">
+                            <span class="badge ${badgeCls}">${status}</span>
+                            <span class="badge b-cyan">#${d.codigo_maquina}</span>
+                            <span class="badge b-red" onclick="window.excluirOrdemServico('${d.id}')">🗑 DEL</span>
+                            <input type="checkbox" class="os-chk" id="chk${d.id}" onchange="toggleSelecao('${d.id}')">
+                        </div>
+                        <div class="os-body">
+                            <div>
+                                <h3>${d.equipamento}</h3>
+                                <p class="os-meta">👤 <span class="highlight">CLIENTE:</span> ${d.cliente}</p>
+                                <p class="os-meta">📅 <span class="highlight">ENTRADA:</span> ${window.formatarDataBR(d.data_entrada)}</p>
                             </div>
-                        `;
-                    }
+                            <span class="os-valor">R$ ${valFinal.toFixed(2)}</span>
+                        </div>
+                        <div class="os-defeito">
+                            <p class="lbl">&gt; LOG_DESC:</p>
+                            <p>${d.defeito || 'NÃO INFORMADO'}</p>
+                        </div>
+                        ${servicoHtml}
+                        <div class="os-actions">
+                            ${btnAcao}
+                            <button class="btn-icon-sm" onclick='window.imprimirCupom(${dj},"OS")'>🖨️</button>
+                            <button class="btn-icon-sm" onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${dj},"OS"))'>📋</button>
+                        </div>
+                    </div>`;
                 });
+
+                // ✅ Uma única atribuição ao DOM
+                lista.innerHTML = buf || "<p class='empty-msg'>&gt; Nenhuma ordem ativa no momento.</p>";
                 document.getElementById('valorPendenteGeral').innerText = `R$ ${totalA.toFixed(2)}`;
             } catch (e) { alert(e.message); }
         }
 
+        // ===== LANÇAMENTO DE SERVIÇOS =====
         window.abrirLancamento = async (id) => {
-            idAtual = id; 
-            listaServicosTemporaria = []; 
+            idAtual = id; listaServicosTemporaria = [];
             atualizarListaCarrinho();
             document.getElementById('inputDescontoLancamento').value = "";
-            document.getElementById('modalServicos').classList.remove('hidden'); 
-            
+            abrirModal('modalServicos');
             const listaTabela = document.getElementById('listaDeServicos');
-            listaTabela.innerHTML = "<p class='p-4 text-center font-medium animate-pulse text-primary/80'>Buscando tabela...</p>";
-            
+            listaTabela.innerHTML = "<p class='loading-msg'>&gt; Buscando tabela...</p>";
             try {
                 const snap = await getDocs(collection(db, "servicos_lista"));
-                listaTabela.innerHTML = "";
+                let buf = "";
                 snap.forEach(dDoc => {
-                    const s = dDoc.data(); 
-                    const nomeTabela = s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id; 
-                    const valorTabela = s.valor || s.preco || 0;
-                    listaTabela.innerHTML += `
-                        <button onclick="adicionarAoCarrinho('${nomeTabela}', ${valorTabela})" class="w-full p-3 mb-1.5 bg-background border border-outline-variant/30 rounded-xl text-left active:border-primary flex justify-between items-center transition-all">
-                            <span class="font-bold text-white uppercase text-xs">${nomeTabela}</span>
-                            <span class="text-green-400 font-bold text-xs">R$ ${parseFloat(valorTabela).toFixed(2)}</span>
-                        </button>
-                    `;
+                    const s = dDoc.data();
+                    const nome  = s.descricao || s.nome || dDoc.id;
+                    const valor = s.valor || s.preco || 0;
+                    buf += `<button class="servico-btn" onclick="adicionarAoCarrinho('${nome.replace(/'/g,"\\'")}', ${valor})">
+                        <span class="s-nome">${nome}</span>
+                        <span class="s-val">R$ ${parseFloat(valor).toFixed(2)}</span>
+                    </button>`;
                 });
+                listaTabela.innerHTML = buf || "<p class='empty-msg'>&gt; Nenhum serviço cadastrado.</p>";
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- FUNÇÕES DE CADASTRO DE SERVIÇOS DIRETAMENTE NA TABELA (servicos_lista) ---
         window.abrirCriarNovoServico = () => {
             document.getElementById('inputNovoServicoNome').value = "";
             document.getElementById('inputNovoServicoPreco').value = "";
-            document.getElementById('modalNovoServicoTabela').classList.remove('hidden');
+            abrirModal('modalNovoServicoTabela');
         };
 
         window.salvarNovoServicoNaTabela = async () => {
-            const nomeServ = document.getElementById('inputNovoServicoNome').value.toUpperCase().trim();
-            const precoServ = parseFloat(document.getElementById('inputNovoServicoPreco').value || 0);
-
-            if (!nomeServ || precoServ <= 0) {
-                return alert("Preencha o Nome do Serviço e um Preço Maior que Zero!");
-            }
-
+            const nome  = document.getElementById('inputNovoServicoNome').value.toUpperCase().trim();
+            const preco = parseFloat(document.getElementById('inputNovoServicoPreco').value || 0);
+            if (!nome || preco <= 0) return alert("Preencha o Nome e um Preço maior que zero!");
             const btn = document.getElementById('btnSalvarServicoTabela');
-            btn.innerText = "GRAVANDO...";
-            btn.disabled = true;
-
+            btn.innerText = "GRAVANDO..."; btn.disabled = true;
             try {
-                // Cria uma referência de documento com ID baseado no próprio nome para evitar duplicados
-                const docRef = doc(collection(db, "servicos_lista"));
-                await setDoc(docRef, {
-                    nome: nomeServ,
-                    descricao: nomeServ,
-                    valor: precoServ
-                });
-
-                document.getElementById('modalNovoServicoTabela').classList.add('hidden');
-                
-                // Recarrega automaticamente a lista de seleção por trás do carrinho
-                if (idAtual) {
-                    window.abrirLancamento(idAtual);
-                }
-            } catch (e) {
-                alert("Erro ao cadastrar serviço: " + e.message);
-            } finally {
-                btn.innerText = "CADASTRAR";
-                btn.disabled = false;
-            }
+                await setDoc(doc(collection(db, "servicos_lista")), { nome, descricao: nome, valor: preco });
+                fecharModal('modalNovoServicoTabela');
+                if (idAtual) window.abrirLancamento(idAtual);
+            } catch (e) { alert("Erro: " + e.message); }
+            finally { btn.innerText = "CADASTRAR"; btn.disabled = false; }
         };
 
-        window.adicionarAoCarrinho = (nome, preco) => {
-            listaServicosTemporaria.push({nome: nome, preco: preco}); 
-            atualizarListaCarrinho();
-        };
-
-        window.removerDoCarrinho = (index) => {
-            listaServicosTemporaria.splice(index, 1); 
-            atualizarListaCarrinho();
-        };
+        window.adicionarAoCarrinho = (nome, preco) => { listaServicosTemporaria.push({ nome, preco }); atualizarListaCarrinho(); };
+        window.removerDoCarrinho   = (i) => { listaServicosTemporaria.splice(i, 1); atualizarListaCarrinho(); };
 
         window.atualizarListaCarrinho = () => {
-            const divCarrinho = document.getElementById('carrinhoServicos');
-            const totalDisplay = document.getElementById('totalCarrinho');
-            divCarrinho.innerHTML = ""; 
-            let soma = 0;
-            
+            let soma = 0, buf = "";
             listaServicosTemporaria.forEach((s, i) => {
                 soma += s.preco;
-                divCarrinho.innerHTML += `
-                    <div class="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-2 rounded-lg">
-                        <span class="text-[11px] font-semibold uppercase text-zinc-300">${s.nome}</span>
-                        <button onclick="removerDoCarrinho(${i})" class="text-red-400 font-bold px-2 text-base">×</button>
-                    </div>
-                `;
+                buf += `<div class="cart-item"><span>${s.nome}</span><button onclick="removerDoCarrinho(${i})">×</button></div>`;
             });
-            totalDisplay.innerText = "R$ " + soma.toFixed(2);
+            document.getElementById('carrinhoServicos').innerHTML = buf;
+            document.getElementById('totalCarrinho').innerText = "R$ " + soma.toFixed(2);
         };
 
         window.finalizarAgrupamento = async () => {
-            if(listaServicosTemporaria.length === 0) return alert("Insira um serviço!");
-            const nomesCompilados = listaServicosTemporaria.map(s => s.nome).join(' + ');
+            if (!listaServicosTemporaria.length) return alert("Insira um serviço!");
+            const nomes      = listaServicosTemporaria.map(s => s.nome).join(' + ');
             const valorBruto = listaServicosTemporaria.reduce((a, b) => a + b.preco, 0);
-            const descLanc = parseFloat(document.getElementById('inputDescontoLancamento').value || 0);
-            const valorLiquido = valorBruto - descLanc;
-
+            const desc       = parseFloat(document.getElementById('inputDescontoLancamento').value || 0);
             try {
-                await updateDoc(doc(db, "ordens", idAtual.toString()), { 
-                    servico_principal: nomesCompilados.toUpperCase(), 
-                    valor_bruto: valorBruto, 
-                    valor_servico: valorLiquido, 
-                    desconto: descLanc, 
-                    status: "AGUARDANDO PAGAMENTO" 
+                await updateDoc(doc(db, "ordens", idAtual.toString()), {
+                    servico_principal: nomes.toUpperCase(),
+                    valor_bruto: valorBruto,
+                    valor_servico: valorBruto - desc,
+                    desconto: desc,
+                    status: "AGUARDANDO PAGAMENTO"
                 });
-                document.getElementById('modalServicos').classList.add('hidden'); 
-                carregarPendentes(); 
+                fecharModal('modalServicos'); carregarPendentes();
             } catch (e) { alert("Erro: " + e.message); }
         };
 
+        // ===== PAGAMENTO =====
         window.carregarFormasPagamentoModal = async () => {
-            const snapP = await getDocs(collection(db, "formas_pagamento"));
-            const listaP = document.getElementById('listaFormasPag'); 
-            listaP.innerHTML = "";
-            snapP.forEach(dDoc => {
+            const snap = await getDocs(collection(db, "formas_pagamento"));
+            let buf = "";
+            snap.forEach(dDoc => {
                 const f = dDoc.data();
-                const nomeF = f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
-                listaP.innerHTML += `
-                    <label class="flex items-center p-3 bg-background border border-outline-variant/20 rounded-xl has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-all cursor-pointer">
-                        <input type="radio" name="pag" value="${nomeF}" class="w-5 h-5 bg-zinc-900 border-zinc-700 text-primary focus:ring-0 cursor-pointer">
-                        <span class="ml-3 font-bold text-white text-xs uppercase">${nomeF}</span>
-                    </label>
-                `;
+                const nome = f.descricao || f.nome || dDoc.id;
+                buf += `<label><input type="radio" name="pag" value="${nome}"> ${nome}</label>`;
             });
+            document.getElementById('listaFormasPag').innerHTML = buf;
         };
 
         window.prepararFinalizacao = async (id) => {
-            idAtual = id; 
-            modoPagamento = 'SINGLE'; 
-            document.getElementById('modalPagamento').classList.remove('hidden');
+            idAtual = id; modoPagamento = 'SINGLE';
+            abrirModal('modalPagamento');
             try {
-                const dSnap = await getDoc(doc(db, "ordens", id.toString())); 
-                const dados = dSnap.data();
+                const dados = (await getDoc(doc(db, "ordens", id.toString()))).data();
                 valorBrutoGlobal = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
-                const descGravado = parseFloat(dados.desconto || 0);
-                document.getElementById('inputDescontoPagamento').value = descGravado > 0 ? descGravado : "";
+                const desc = parseFloat(dados.desconto || 0);
+                document.getElementById('inputDescontoPagamento').value = desc > 0 ? desc : "";
                 atualizarTotalComDescontoPagamento();
                 await carregarFormasPagamentoModal();
-            } catch(e) { alert("Erro: " + e.message); }
+            } catch (e) { alert("Erro: " + e.message); }
         };
 
         window.prepararPagamentoLote = async () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
-            modoPagamento = 'LOTE'; 
-            let brutoTotalLote = 0;
-            let descGravadoTotal = 0;
+            modoPagamento = 'LOTE';
+            let brutoTotal = 0, descTotal = 0;
             itensSelecionadosLote.forEach(d => {
-                const liq = parseFloat(d.valor_servico || 0);
-                const desc = parseFloat(d.desconto || 0);
-                brutoTotalLote += parseFloat(d.valor_bruto) || (liq + desc);
-                descGravadoTotal += desc;
+                brutoTotal += parseFloat(d.valor_bruto) || (parseFloat(d.valor_servico || 0) + parseFloat(d.desconto || 0));
+                descTotal  += parseFloat(d.desconto || 0);
             });
-            valorBrutoGlobal = brutoTotalLote;
-            document.getElementById('inputDescontoPagamento').value = descGravadoTotal > 0 ? descGravadoTotal : "";
+            valorBrutoGlobal = brutoTotal;
+            document.getElementById('inputDescontoPagamento').value = descTotal > 0 ? descTotal : "";
             atualizarTotalComDescontoPagamento();
             await carregarFormasPagamentoModal();
-            document.getElementById('modalPagamento').classList.remove('hidden');
+            abrirModal('modalPagamento');
         };
 
         window.atualizarTotalComDescontoPagamento = () => {
             const desc = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
-            const total = valorBrutoGlobal - desc;
-            document.getElementById('displayValorPagamento').innerText = "R$ " + total.toFixed(2);
+            document.getElementById('displayValorPagamento').innerText = "R$ " + (valorBrutoGlobal - desc).toFixed(2);
         };
 
         window.confirmarPagamento = async () => {
             const radio = document.querySelector('input[name="pag"]:checked');
-            if(!radio) return alert("Selecione o Meio de Pagamento!");
-            
-            const novoDescTotal = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
-            const novoLiquidoTotal = valorBrutoGlobal - novoDescTotal;
-            const formaPag = radio.value.toUpperCase();
-            const dataHoje = new Date().toLocaleDateString('pt-BR');
-            
+            if (!radio) return alert("Selecione o Meio de Pagamento!");
+            const novoDesc    = parseFloat(document.getElementById('inputDescontoPagamento').value || 0);
+            const novoLiquido = valorBrutoGlobal - novoDesc;
+            const formaPag    = radio.value.toUpperCase();
+            const dataHoje    = new Date().toLocaleDateString('pt-BR');
             try {
-                document.getElementById('modalPagamento').classList.add('hidden'); 
-
+                fecharModal('modalPagamento');
                 if (modoPagamento === 'SINGLE') {
-                    const docRef = doc(db, "ordens", idAtual.toString()); 
-                    const dSnap = await getDoc(docRef); 
-                    const dados = dSnap.data();
-                    
-                    dados.status = "PAGO"; 
-                    dados.forma_pagamento = formaPag; 
-                    dados.data_pagamento = dataHoje;
-                    dados.desconto = novoDescTotal;
-                    dados.valor_servico = novoLiquidoTotal;
-                    dados.valor_bruto = valorBrutoGlobal;
-                    await updateDoc(docRef, dados); 
-
-                } else if (modoPagamento === 'LOTE') {
-                    const promessasAtualizacao = itensSelecionadosLote.map(async (itemAtual) => {
-                        const docRef = doc(db, "ordens", itemAtual.id.toString());
-                        const dSnap = await getDoc(docRef);
-                        const dados = dSnap.data();
-                        const brutoItem = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
-
-                        const proporcaoDesconto = valorBrutoGlobal > 0 ? (brutoItem / valorBrutoGlobal) : 0;
-                        const descontoDoItem = novoDescTotal * proporcaoDesconto;
-                        const liquidoDoItem = brutoItem - descontoDoItem;
-
-                        dados.status = "PAGO";
-                        dados.forma_pagamento = formaPag;
-                        dados.data_pagamento = dataHoje;
-                        dados.desconto = descontoDoItem;
-                        dados.valor_servico = liquidoDoItem;
-                        dados.valor_bruto = brutoItem;
-                        return updateDoc(docRef, dados);
-                    });
-                    await Promise.all(promessasAtualizacao);
+                    // ✅ Usa dados em memória, sem reler o Firestore
+                    const dados = { ...ordensBancada[idAtual], status: "PAGO", forma_pagamento: formaPag, data_pagamento: dataHoje, desconto: novoDesc, valor_servico: novoLiquido, valor_bruto: valorBrutoGlobal };
+                    await updateDoc(doc(db, "ordens", idAtual.toString()), dados);
+                } else {
+                    await Promise.all(itensSelecionadosLote.map(item => {
+                        const brutoItem = parseFloat(item.valor_bruto) || (parseFloat(item.valor_servico || 0) + parseFloat(item.desconto || 0));
+                        const proporcao = valorBrutoGlobal > 0 ? (brutoItem / valorBrutoGlobal) : 0;
+                        const descItem  = novoDesc * proporcao;
+                        return updateDoc(doc(db, "ordens", item.id.toString()), {
+                            status: "PAGO", forma_pagamento: formaPag, data_pagamento: dataHoje,
+                            desconto: descItem, valor_servico: brutoItem - descItem, valor_bruto: brutoItem
+                        });
+                    }));
                 }
-                carregarPendentes(); 
+                carregarPendentes();
             } catch (e) { alert("Erro: " + e.message); }
         };
 
+        // ===== SELETOR CLIENTES/MAQUINAS =====
         window.abrirSeletor = async (tipo) => {
-            tipoSeletorAtual = tipo; 
-            const modal = document.getElementById('modalSeletorGeral'); 
+            tipoSeletorAtual = tipo;
+            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? '> ID_CLIENTE' : '> HARDWARE_TYPE';
+            abrirModal('modalSeletorGeral');
             const lista = document.getElementById('listaSeletorGeral');
-            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? 'Selecionar Cliente' : 'Selecionar Máquina';
-            modal.classList.remove('hidden'); 
-            lista.innerHTML = "<p class='p-8 text-center animate-pulse text-xs text-primary/70 font-semibold'>Carregando registros...</p>";
-            
+            lista.innerHTML = "<p class='loading-msg'>&gt; Carregando registros...</p>";
             try {
-                const snap = await getDocs(collection(db, tipo)); 
-                lista.innerHTML = "";
-                snap.forEach(dDoc => { 
-                    const d = dDoc.data(); 
-                    const n = d.descricao || d.peca || d.nome || d.equipamento || dDoc.id;
-                    lista.innerHTML += `
-                        <button onclick="definirItem('${tipo}', '${n}')" class="w-full p-4 text-left font-bold uppercase text-white hover:bg-zinc-900 text-xs transition-colors">
-                            ${n}
-                        </button>
-                    `; 
+                const snap = await getDocs(collection(db, tipo));
+                let buf = "";
+                snap.forEach(dDoc => {
+                    const d = dDoc.data();
+                    const n = d.descricao || d.nome || d.equipamento || dDoc.id;
+                    buf += `<button onclick="definirItem('${tipo}','${n.replace(/'/g,"\\'")}')"> ${n}</button>`;
                 });
+                lista.innerHTML = buf;
             } catch (e) { alert("Erro: " + e.message); }
         };
 
         window.definirItem = (tipo, valor) => {
-            if(tipo === 'clientes') document.getElementById('inputCliente').value = valor;
+            if (tipo === 'clientes') document.getElementById('inputCliente').value = valor;
             else document.getElementById('inputEquipamento').value = valor;
-            document.getElementById('modalSeletorGeral').classList.add('hidden');
+            fecharModal('modalSeletorGeral');
         };
 
         window.abrirNovoCadastro = () => {
-            const titulo = tipoSeletorAtual === 'clientes' ? 'NOVO CLIENTE' : 'NOVA MÁQUINA';
-            document.getElementById('tituloNovoCadastro').innerText = titulo;
+            document.getElementById('tituloNovoCadastro').innerText = tipoSeletorAtual === 'clientes' ? '[ NOVO_CLIENTE ]' : '[ NOVA_MÁQUINA ]';
             document.getElementById('inputNovoCadastro').value = '';
-            document.getElementById('modalNovoCadastro').classList.remove('hidden');
+            abrirModal('modalNovoCadastro');
         };
 
         window.salvarNovoCadastro = async () => {
-            const nomeDigitado = document.getElementById('inputNovoCadastro').value.toUpperCase().trim();
-            if(!nomeDigitado) return alert("Campo obrigatório!");
+            const nome = document.getElementById('inputNovoCadastro').value.toUpperCase().trim();
+            if (!nome) return alert("Campo obrigatório!");
             const btn = document.getElementById('btnSalvarCadastroNovo');
-            btn.innerText = "...";
-            btn.disabled = true;
-
+            btn.innerText = "..."; btn.disabled = true;
             try {
-                const novaRef = doc(collection(db, tipoSeletorAtual)); 
-                await setDoc(novaRef, { nome: nomeDigitado, descricao: nomeDigitado });
-                document.getElementById('modalNovoCadastro').classList.add('hidden');
-                window.definirItem(tipoSeletorAtual, nomeDigitado);
-            } catch(e) { alert("Erro: " + e.message); }
-            finally {
-                btn.innerText = "Salvar";
-                btn.disabled = false;
-            }
+                await setDoc(doc(collection(db, tipoSeletorAtual)), { nome, descricao: nome });
+                fecharModal('modalNovoCadastro');
+                window.definirItem(tipoSeletorAtual, nome);
+            } catch (e) { alert("Erro: " + e.message); }
+            finally { btn.innerText = "SALVAR"; btn.disabled = false; }
         };
 
+        // ===== NOVA OS =====
         function gerarCodigoOficina() {
-            const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             let txt = '';
-            for (let i = 0; i < 3; i++) txt += letras.charAt(Math.floor(Math.random() * letras.length));
-            const num = Math.floor(100 + Math.random() * 900);
-            return txt + num;
+            for (let i = 0; i < 3; i++) txt += L[Math.floor(Math.random() * L.length)];
+            return txt + (100 + Math.floor(Math.random() * 900));
         }
 
         window.salvarEntrada = async () => {
-            const c = document.getElementById('inputCliente').value.toUpperCase().trim(); 
-            const e = document.getElementById('inputEquipamento').value.toUpperCase().trim(); 
+            const c = document.getElementById('inputCliente').value.toUpperCase().trim();
+            const e = document.getElementById('inputEquipamento').value.toUpperCase().trim();
             const d = document.getElementById('defeito').value.toUpperCase().trim();
-            const manualCod = document.getElementById('inputManualCod').value.toUpperCase().trim();
-            
-            if(!c || !e) return alert("Selecione Cliente e Máquina!");
-            
-            const btnGravar = document.getElementById('btnGravar');
-            btnGravar.innerText = "SALVANDO NO BANCO...";
-            btnGravar.disabled = true; 
-            
+            const m = document.getElementById('inputManualCod').value.toUpperCase().trim();
+            if (!c || !e) return alert("SYS_ERR: Selecione Cliente e Máquina!");
+            const btn = document.getElementById('btnGravar');
+            btn.innerText = "[ GRAVANDO... ]"; btn.disabled = true;
             try {
-                const snapID = await getDocs(collection(db, "ordens")); 
+                const snapID = await getDocs(collection(db, "ordens"));
                 let maior = 0;
-                snapID.forEach(docS => { const idN = parseInt(docS.id); if(!isNaN(idN) && idN > maior) maior = idN; });
+                snapID.forEach(docS => { const n = parseInt(docS.id); if (!isNaN(n) && n > maior) maior = n; });
                 const novoID = (maior + 1).toString();
-                
-                let codF = manualCod;
-                if (codF === "") {
-                    let codigoUnico = false;
-                    while (!codigoUnico) {
+                let codF = m;
+                if (!codF) {
+                    while (true) {
                         codF = gerarCodigoOficina();
-                        const q = query(collection(db, "ordens"), where("codigo_maquina", "==", codF));
-                        const snapVerificacao = await getDocs(q);
-                        if (snapVerificacao.empty) codigoUnico = true; 
+                        const qCod = query(collection(db, "ordens"), where("codigo_maquina", "==", codF));
+                        if ((await getDocs(qCod)).empty) break;
                     }
                 }
-                
-                const dados = { 
-                    id: parseInt(novoID), codigo_maquina: codF, cliente: c, equipamento: e, defeito: d, 
-                    status: "PENDENTE", data_entrada: new Date().toLocaleDateString('pt-BR'), timestamp: Date.now(), 
-                    servico_principal: "", valor_servico: 0, forma_pagamento: "", data_pagamento: "", desconto: 0, valor_bruto: 0 
+                const dados = {
+                    id: parseInt(novoID), codigo_maquina: codF, cliente: c, equipamento: e, defeito: d,
+                    status: "PENDENTE", data_entrada: new Date().toLocaleDateString('pt-BR'),
+                    timestamp: Date.now(), servico_principal: "", valor_servico: 0,
+                    forma_pagamento: "", data_pagamento: "", desconto: 0, valor_bruto: 0
                 };
-                
-                await setDoc(doc(db, "ordens", novoID), dados); 
-                alert(`OS REGISTRADA COM SUCESSO!\n\nID: ${novoID}\nCÓDIGO: ${codF}`);
-                
-                document.getElementById('inputCliente').value = ""; 
-                document.getElementById('inputEquipamento').value = ""; 
-                document.getElementById('defeito').value = ""; 
-                document.getElementById('inputManualCod').value = "";
-                
-                window.mudarAba('pendentes', document.querySelectorAll('.nav-item')[1]); 
-            } catch (err) { alert("Erro: " + err.message); } 
-            finally {
-                btnGravar.innerText = "Lançar Serviço na Bancada";
-                btnGravar.disabled = false;
-            }
+                await setDoc(doc(db, "ordens", novoID), dados);
+                alert(`[ SYS_OK ] OS REGISTRADA!\n\nID: ${novoID}\nCÓDIGO: ${codF}`);
+                document.getElementById('inputCliente').value    = "";
+                document.getElementById('inputEquipamento').value = "";
+                document.getElementById('defeito').value         = "";
+                document.getElementById('inputManualCod').value  = "";
+                window.mudarAba('pendentes', document.querySelectorAll('.nav-btn')[1]);
+            } catch (err) { alert("Erro: " + err.message); }
+            finally { btn.innerText = "✅ [ EXECUTE_INSERT ]"; btn.disabled = false; }
         };
 
+        // ===== HISTÓRICO =====
         window.buscarHistorico = async () => {
             const cod = document.getElementById('inputBuscaCod').value.toUpperCase().trim();
             const resultado = document.getElementById('resultadoConsulta');
-            
-            if(cod.length < 3) return alert("Digite um termo ou código válido!");
-            resultado.innerHTML = "<p class='p-8 text-center animate-pulse text-xs text-primary/70 font-semibold'>Processando consulta...</p>";
-            
+            if (cod.length < 3) return alert("SYS_ERR: Digite um código válido!");
+            resultado.innerHTML = "<p class='loading-msg'>&gt; Processando query...</p>";
             try {
-                const q = query(collection(db, "ordens"), where("codigo_maquina", "==", cod));
-                const snap = await getDocs(q);
-                
-                if(snap.empty) { 
-                    resultado.innerHTML = "<p class='p-8 text-center text-red-400 font-bold text-xs uppercase'>Nenhum registro localizado para este código!</p>"; 
-                    historicoAtual = [];
-                    return; 
-                }
-                
-                let listaH = []; 
-                snap.forEach(d => listaH.push(d.data())); 
-                listaH.sort((a,b) => b.timestamp - a.timestamp); 
-                historicoAtual = listaH; 
+                const snap = await getDocs(query(collection(db, "ordens"), where("codigo_maquina", "==", cod)));
+                if (snap.empty) { resultado.innerHTML = "<p class='empty-msg'>&gt; Nenhum registro localizado para este código.</p>"; historicoAtual = []; return; }
+                let listaH = [];
+                snap.forEach(d => listaH.push(d.data()));
+                listaH.sort((a, b) => b.timestamp - a.timestamp);
+                historicoAtual = listaH;
 
-                resultado.innerHTML = `
-                    <div class="flex justify-between items-center mb-2 px-1">
-                        <h3 class="text-zinc-400 font-bold text-xs uppercase tracking-wider">Histórico de Eventos: ${cod}</h3>
-                        <button onclick="window.prepararImpressaoHistorico('${cod}')" class="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase shadow-md">
-                            🖨️ Emitir Relatório
-                        </button>
-                    </div>
-                `;
-                
+                let buf = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 2px;">
+                    <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:rgba(0,210,255,0.6);">&gt; LOGS: ${cod}</span>
+                    <button class="hist-rel-btn" onclick="window.prepararImpressaoHistorico('${cod}')">🖨️ EMITIR</button>
+                </div>`;
+
                 listaH.forEach(h => {
-                    const total = parseFloat(h.valor_servico || 0);
-                    const desconto = parseFloat(h.desconto || 0);
-                    const bruto = parseFloat(h.valor_bruto) || (total + desconto);
-                    const badgeColor = h.status === 'PAGO' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-                    const colorBorder = h.status === 'PAGO' ? 'border-l-emerald-500' : 'border-l-amber-500';
-
-                    resultado.innerHTML += `
-                        <div class="card-tech border-l-[6px] ${colorBorder} opacity-90">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[10px] font-bold uppercase bg-background border border-outline-variant/30 px-2 py-0.5 rounded-md">OS: #${h.id}</span>
-                                <span class="text-[10px] font-bold uppercase border px-2 py-0.5 rounded-md ${badgeColor}">${h.status}</span>
-                            </div>
-                            <h4 class="text-base font-bold text-white uppercase">${h.equipamento}</h4>
-                            <p class="text-xs text-blue-400 font-semibold mb-3">👤 PROP: ${h.cliente}</p>
-                            
-                            <div class="text-[11px] bg-black/30 border border-outline-variant/10 p-3 rounded-xl space-y-1.5 font-medium text-zinc-300">
-                                <p><span class="text-zinc-500 font-bold">ENTRADA:</span> ${window.formatarDataBR(h.data_entrada)}</p>
-                                <p><span class="text-zinc-500 font-bold">DEFEITO:</span> ${h.defeito}</p>
-                                <div class="h-px bg-brand-border my-1"></div>
-                                <p><span class="text-zinc-500 font-bold">SERVIÇOS:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ' | ') : '---'}</p>
-                                <p><span class="text-zinc-500 font-bold">LIQUIDAÇÃO:</span> ${window.formatarDataBR(h.data_pagamento) || '---'} (${h.forma_pagamento || '---'})</p>
-                            </div>
-                            
-                            <div class="flex flex-col gap-0.5 text-[10px] font-bold text-right pt-2 border-t border-brand-border/60">
-                                <p class="text-zinc-500">VALOR BRUTO: R$ ${bruto.toFixed(2)}</p>
-                                <p class="text-red-400">DESCONTO: R$ ${desconto.toFixed(2)}</p>
-                                <p class="text-emerald-400 text-sm mt-0.5 font-bold">TOTAL PAGO: R$ ${total.toFixed(2)}</p>
-                            </div>
+                    const total  = parseFloat(h.valor_servico || 0);
+                    const desc   = parseFloat(h.desconto || 0);
+                    const bruto  = parseFloat(h.valor_bruto) || (total + desc);
+                    const pago   = h.status === 'PAGO';
+                    buf += `<div class="hist-card ${pago ? '' : 'pendente'}">
+                        <div class="hist-top">
+                            <span class="badge b-cyan" style="font-size:9px;">OS: #${h.id}</span>
+                            <span class="badge ${pago ? 'b-green' : 'b-amber'}">${h.status}</span>
                         </div>
-                    `;
+                        <h4>${h.equipamento}</h4>
+                        <p class="hist-prop">👤 ${h.cliente}</p>
+                        <div class="hist-info">
+                            <p><strong>ENTRADA:</strong> ${window.formatarDataBR(h.data_entrada)}</p>
+                            <p><strong>DEFEITO:</strong> ${h.defeito}</p>
+                            <div class="hist-div"></div>
+                            <p><strong>SERVIÇOS:</strong> ${h.servico_principal ? h.servico_principal.replace(/\+/g,' | ') : '---'}</p>
+                            <p><strong>LIQUIDAÇÃO:</strong> ${window.formatarDataBR(h.data_pagamento)} (${h.forma_pagamento || '---'})</p>
+                        </div>
+                        <div class="hist-totais">
+                            <p style="color:var(--text-muted);">BRUTO: R$ ${bruto.toFixed(2)}</p>
+                            <p style="color:var(--red);">DESCONTO: R$ ${desc.toFixed(2)}</p>
+                            <p style="color:var(--green);font-size:13px;margin-top:2px;">TOTAL PAGO: R$ ${total.toFixed(2)}</p>
+                        </div>
+                    </div>`;
                 });
+                resultado.innerHTML = buf;
             } catch (e) { alert("Erro: " + e.message); }
         };
 
+        // ===== INIT =====
         window.onload = () => carregarPendentes();
     </script>
 </body>
