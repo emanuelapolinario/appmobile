@@ -108,7 +108,7 @@
         }
     </script>
     <style>
-        body { font-family: 'Geist', sans-serif; background-color: #0b0e14; color: #e1e2ec; }
+        body { font-family: 'Geist', sans-serif; background-color: #0b0e14; color: #e1e2ec; overflow: hidden; }
         .cyber-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
         .input-tech { background-color: #09090b; border: 1px solid #27272a; color: #e1e2ec; border-radius: 0.75rem; padding: 0.85rem 1.25rem; width: 100%; transition: all 0.2s; font-size: 15px; }
         .input-tech:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
@@ -129,138 +129,149 @@
         ::-webkit-scrollbar-track { background: #0b0e14; }
         ::-webkit-scrollbar-thumb { background: #272a31; border-radius: 10px; }
 
+        /* REESTRUTURAÇÃO DO CSS DE IMPRESSÃO: Isola 100% a tela do sistema do layout do papel */
+        #areaImpressao { display: none; }
         @media print {
-            body * { visibility: hidden; }
-            #areaImpressao, #areaImpressao * { visibility: visible; }
+            body { background: white !important; color: black !important; overflow: visible !important; }
+            header, main, nav, .modal-overlay, div[id^="modal"] { display: none !important; }
             #areaImpressao { 
                 display: block !important;
                 position: absolute; left: 0; top: 0; 
-                width: 52mm; margin: 0; padding: 0; 
-                background: white; color: black;
+                width: 100%; margin: 0; padding: 0 1mm; 
+                background: white !important; color: black !important;
             }
+            #areaImpressao * { visibility: visible !important; color: black !important; }
             @page { size: 58mm auto; margin: 0; }
-            .cupom-texto { font-family: monospace; font-size: 12px; line-height: 1.3; text-transform: uppercase; color: #000; }
-            .hr { border-bottom: 1px dashed black; margin: 5px 0; width: 100%; }
+            .cupom-texto { font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.4; text-transform: uppercase; color: #000 !important; }
+            .hr { border-bottom: 1px dashed black !important; margin: 6px 0; width: 100%; }
             .c { text-align: center; } 
             .b { font-weight: bold; }
             .espaco-fim { height: 45px; } 
         }
     </style>
 </head>
-<body class="pb-24 pt-16 h-screen flex flex-col bg-surface-container-lowest">
+<body class="h-screen flex flex-col bg-surface-container-lowest">
 
     <!-- Área Oculta de Impressão -->
     <div id="areaImpressao"></div>
 
     <!-- TopAppBar -->
-    <header class="fixed top-0 w-full z-50 backdrop-blur-md border-b border-outline-variant/30 bg-surface-dim/70 flex items-center justify-between px-container-margin h-16">
+    <header class="fixed top-0 w-full z-50 backdrop-blur-md border-b border-outline-variant/30 bg-surface-dim/70 flex items-center justify-between px-container-margin h-16 md:left-64 md:w-[calc(100%-16px)]">
         <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-primary active:scale-95 transition-transform" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
             <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary tracking-tight">Emanuel Soluções</h1>
         </div>
-        <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
+        <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant mr-4 md:mr-68">
             <span class="material-symbols-outlined text-sm text-on-surface-variant">person</span>
         </div>
     </header>
 
-    <!-- Canvas Principal de Conteúdo -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-3xl mx-auto space-y-6">
+    <!-- Menu Lateral Esquerdo Fixo e Otimizado no PC / Inferior Estilizado no Mobile -->
+    <nav class="fixed bottom-0 left-0 w-full z-50 rounded-t-2xl backdrop-blur-xl border-t border-outline-variant/20 bg-surface-container-low/80 shadow-[0_-4px_20px_0_rgba(59,130,246,0.08)] md:top-0 md:w-64 md:h-screen md:border-r md:border-t-0 md:rounded-none flex flex-col">
+        <!-- Logo/Título no Menu Lateral no PC -->
+        <div class="hidden md:flex items-center gap-2 p-6 border-b border-outline-variant/20 h-16">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
+            <span class="font-bold text-white text-sm uppercase tracking-wider">Emanuel Soluções</span>
+        </div>
         
-        <!-- Tela Bancada (Dashboard) -->
-        <div class="space-y-6" id="telaPendentes">
-            <!-- Card de Métricas Principais -->
-            <div class="card-tech cyber-glow flex flex-col items-center justify-center py-8 relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
-                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">A Receber Total</span>
-                <span class="font-display-lg text-display-lg text-primary tracking-tighter italic" id="valorPendenteGeral">R$ 0,00</span>
-            </div>
-
-            <!-- Header da Lista & Ações em Lote -->
-            <div id="btnLote" class="hidden justify-between items-center bg-surface-container border border-outline-variant/30 rounded-2xl p-4 shadow-xl animate-fade-in">
-                <div>
-                    <p id="txtQtdLote" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">0 MÁQUINAS</p>
-                    <p id="txtTotalLote" class="text-xl font-bold text-green-400">R$ 0,00</p>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
-                    <button onclick="imprimirLote()" class="bg-zinc-800 text-white p-2.5 rounded-xl font-black text-sm border border-zinc-700 active:scale-95 transition-all">🖨️</button>
-                    <button onclick="copiarLoteRawBT()" class="bg-zinc-800 text-zinc-300 px-3 py-2.5 rounded-xl font-bold text-[10px] uppercase border border-zinc-700 active:scale-95 transition-all">📋 COPIAR</button>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-end border-b border-brand-border pb-2">
-                <h2 class="font-headline-md text-headline-md text-on-surface">Serviços Pendentes</h2>
-            </div>
-
-            <!-- Lista de Ordens Ativas -->
-            <div class="space-y-4" id="listaPendentes"></div>
-        </div>
-
-        <!-- Tela Nova Entrada -->
-        <div class="hidden space-y-6" id="telaCadastro">
-            <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Nova Ordem de Serviço</h2>
-            <div class="card-tech space-y-5">
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Cliente</label>
-                    <input autocomplete="off" readonly onclick="abrirSeletor('clientes')" class="input-tech cursor-pointer text-left font-semibold" id="inputCliente" placeholder="SELECIONAR CLIENTE..." type="text"/>
-                </div>
-                
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Equipamento / Máquina</label>
-                    <input autocomplete="off" readonly onclick="abrirSeletor('maquinas')" class="input-tech cursor-pointer text-left font-semibold" id="inputEquipamento" placeholder="SELECIONAR MAQUINA..." type="text"/>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Código Manual (Opcional)</label>
-                    <input class="input-tech" id="inputManualCod" placeholder="EX: ABC123" maxlength="6" type="text"/>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Defeito Relatado</label>
-                    <textarea class="input-tech min-h-[100px] font-medium" id="defeito" placeholder="Descreva os problemas relatados pelo cliente..."></textarea>
-                </div>
-
-                <button id="btnGravar" class="btn-primary w-full flex items-center justify-center gap-2 mt-4 cyber-glow" onclick="salvarEntrada()">
-                    <span class="material-symbols-outlined">add_task</span>
-                    Lançar Serviço na Bancada
-                </button>
-            </div>
-        </div>
-
-        <!-- Tela Histórico -->
-        <div class="hidden space-y-6" id="telaHistorico">
-            <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Histórico de Concluídos</h2>
-            <div class="card-tech mb-4 p-3 flex gap-2">
-                <input class="input-tech flex-1" id="inputBuscaCod" placeholder="DIGITE O CÓDIGO DA MÁQUINA..." type="text" maxlength="6"/>
-                <button class="btn-primary px-5 flex items-center justify-center" onclick="buscarHistorico()">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-            </div>
-            <div class="space-y-4" id="resultadoConsulta"></div>
-        </div>
-    </main>
-
-    <!-- BottomNavBar Desktop-Hidden -->
-    <nav class="fixed bottom-0 w-full z-50 rounded-t-2xl backdrop-blur-xl border-t border-outline-variant/20 bg-surface-container-low/80 shadow-[0_-4px_20px_0_rgba(59,130,246,0.08)]">
-        <div class="flex justify-around items-center h-20 px-4 pb-safe">
-            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" onclick="mudarAba('entrada', this)">
-                <span class="material-symbols-outlined mb-1">add_circle</span>
-                <span class="font-label-sm text-label-sm">Nova Entrada</span>
+        <div class="flex justify-around items-center h-20 px-4 pb-safe md:flex-col md:h-auto md:flex-1 md:justify-start md:pt-8 md:gap-3 md:px-3 w-full">
+            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 md:w-full md:py-3.5 md:rounded-xl md:flex-row md:gap-3 md:px-4 md:justify-start" onclick="mudarAba('entrada', this)">
+                <span class="material-symbols-outlined mb-1 md:mb-0">add_circle</span>
+                <span class="font-label-sm text-label-sm font-semibold">Nova Entrada</span>
             </button>
-            <button class="nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200" onclick="mudarAba('pendentes', this)">
-                <span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">build</span>
-                <span class="font-label-sm text-label-sm">Bancada</span>
+            <button class="nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200 md:w-full md:py-3.5 md:flex-row md:gap-3 md:px-4 md:justify-start" onclick="mudarAba('pendentes', this)">
+                <span class="material-symbols-outlined mb-1 md:mb-0" style="font-variation-settings: 'FILL' 1;">build</span>
+                <span class="font-label-sm text-label-sm font-semibold">Bancada</span>
             </button>
-            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200" onclick="mudarAba('consulta', this)">
-                <span class="material-symbols-outlined mb-1">history</span>
-                <span class="font-label-sm text-label-sm">Histórico</span>
+            <button class="nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 md:w-full md:py-3.5 md:rounded-xl md:flex-row md:gap-3 md:px-4 md:justify-start" onclick="mudarAba('consulta', this)">
+                <span class="material-symbols-outlined mb-1 md:mb-0">history</span>
+                <span class="font-label-sm text-label-sm font-semibold">Histórico</span>
             </button>
         </div>
     </nav>
 
-    <!-- Modais do Ecossistema -->
-    
-    <!-- Modal Receber (Single e Lote) -->
+    <!-- Canvas Central de Conteúdo Totalmente Alinhado e Centralizado no Monitor -->
+    <main class="flex-1 overflow-y-auto pb-24 pt-20 px-4 w-full md:pl-72 md:pr-8 md:pt-24 md:pb-8 flex justify-center">
+        <div class="w-full max-w-3xl space-y-6">
+            
+            <!-- Tela Bancada (Dashboard) -->
+            <div class="space-y-6" id="telaPendentes">
+                <!-- Card de Métricas Principais -->
+                <div class="card-tech cyber-glow flex flex-col items-center justify-center py-8 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"></div>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">A Receber Total</span>
+                    <span class="font-display-lg text-display-lg text-primary tracking-tighter italic" id="valorPendenteGeral">R$ 0,00</span>
+                </div>
+
+                <!-- Header da Lista & Ações em Lote -->
+                <div id="btnLote" class="hidden justify-between items-center bg-surface-container border border-outline-variant/30 rounded-2xl p-4 shadow-xl animate-fade-in">
+                    <div>
+                        <p id="txtQtdLote" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">0 MÁQUINAS</p>
+                        <p id="txtTotalLote" class="text-xl font-bold text-green-400">R$ 0,00</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
+                        <button onclick="imprimirLote()" class="bg-zinc-800 text-white p-2.5 rounded-xl font-black text-sm border border-zinc-700 active:scale-95 transition-all">🖨️</button>
+                        <button onclick="copiarLoteRawBT()" class="bg-zinc-800 text-zinc-300 px-3 py-2.5 rounded-xl font-bold text-[10px] uppercase border border-zinc-700 active:scale-95 transition-all">📋 COPIAR</button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end border-b border-brand-border pb-2">
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Serviços Pendentes</h2>
+                </div>
+
+                <!-- Lista de Ordens Ativas -->
+                <div class="space-y-4" id="listaPendentes"></div>
+            </div>
+
+            <!-- Tela Nova Entrada -->
+            <div class="hidden space-y-6" id="telaCadastro">
+                <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Nova Ordem de Serviço</h2>
+                <div class="card-tech space-y-5">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Cliente</label>
+                        <input autocomplete="off" readonly onclick="abrirSeletor('clientes')" class="input-tech cursor-pointer text-left font-semibold" id="inputCliente" placeholder="SELECIONAR CLIENTE..." type="text"/>
+                    </div>
+                    
+                    <div class="flex flex-col gap-1">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Equipamento / Máquina</label>
+                        <input autocomplete="off" readonly onclick="abrirSeletor('maquinas')" class="input-tech cursor-pointer text-left font-semibold" id="inputEquipamento" placeholder="SELECIONAR MAQUINA..." type="text"/>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Código Manual (Opcional)</label>
+                        <input class="input-tech" id="inputManualCod" placeholder="EX: ABC123" maxlength="6" type="text"/>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Defeito Relatado</label>
+                        <textarea class="input-tech min-h-[100px] font-medium" id="defeito" placeholder="Descreva os problemas relatados pelo cliente..."></textarea>
+                    </div>
+
+                    <button id="btnGravar" class="btn-primary w-full flex items-center justify-center gap-2 mt-4 cyber-glow" onclick="salvarEntrada()">
+                        <span class="material-symbols-outlined">add_task</span>
+                        Lançar Serviço na Bancada
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tela Histórico -->
+            <div class="hidden space-y-6" id="telaHistorico">
+                <h2 class="font-headline-md text-headline-md text-on-surface border-b border-brand-border pb-2">Histórico de Concluídos</h2>
+                <div class="card-tech mb-4 p-3 flex gap-2">
+                    <input class="input-tech flex-1" id="inputBuscaCod" placeholder="DIGITE O CÓDIGO DA MÁQUINA..." type="text" maxlength="6"/>
+                    <button class="btn-primary px-5 flex items-center justify-center" onclick="buscarHistorico()">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                </div>
+                <div class="space-y-4" id="resultadoConsulta"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modais Básicos -->
+    <!-- Modal Receber -->
     <div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay" id="modalPagamento">
         <div class="modal-content w-full max-w-sm p-6 space-y-5">
             <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2 border-b border-brand-border pb-2">
@@ -268,7 +279,7 @@
                 Liquidar Ordem
             </h3>
             <div class="text-center py-2 bg-background rounded-xl border border-outline-variant/20">
-                <p class="font-label-sm text-[10px] text-on-surface-variant uppercase">Valor Líquico</p>
+                <p class="font-label-sm text-[10px] text-on-surface-variant uppercase">Valor Líquido</p>
                 <h4 class="text-3xl font-bold text-green-400 tracking-tight mt-1" id="displayValorPagamento">R$ 0,00</h4>
             </div>
             <div class="space-y-3">
@@ -288,7 +299,7 @@
         </div>
     </div>
 
-    <!-- Modal Lançar Serviços (Carrinho Estilizado) -->
+    <!-- Modal Lançar Serviços -->
     <div id="modalServicos" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay">
         <div class="modal-content w-full max-w-sm p-6 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center border-b border-brand-border pb-3">
@@ -296,7 +307,6 @@
                     <span class="material-symbols-outlined text-primary">gavel</span>
                     Lançar Serviços
                 </h3>
-                <!-- Botão Adicionado para Criar Novo Tipo de Serviço na Lista -->
                 <button onclick="abrirCriarNovoServico()" class="bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-background transition-colors px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-0.5">
                     <span class="material-symbols-outlined text-xs">add</span> Criar Serviço
                 </button>
@@ -346,7 +356,7 @@
         </div>
     </div>
 
-    <!-- Modal Adicionado: Cadastro de Serviço + Preço diretamente na tabela -->
+    <!-- Modal Novo Atributo de Serviço -->
     <div id="modalNovoServicoTabela" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
         <div class="modal-content w-full max-w-sm p-6 space-y-4">
             <h3 class="font-headline-md text-base text-white uppercase text-center border-b border-brand-border pb-2">Cadastrar Novo Serviço</h3>
@@ -357,7 +367,7 @@
                 </div>
                 <div class="space-y-1">
                     <label class="font-label-sm text-[10px] text-on-surface-variant uppercase px-1">Preço / Valor de Venda (R$)</label>
-                    <input id="inputNovoServicoPreco" type="number" step="0.01" class="input-tech font-bold text-green-400 text-center animate-none" placeholder="0.00">
+                    <input id="inputNovoServicoPreco" type="number" step="0.01" class="input-tech font-bold text-green-400 text-center" placeholder="0.00">
                 </div>
             </div>
             <div class="flex gap-2 pt-2 border-t border-brand-border">
@@ -367,7 +377,7 @@
         </div>
     </div>
 
-    <!-- Firebase App Integrado com Padrões Modulares -->
+    <!-- Firebase App Integrado -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -417,14 +427,14 @@
             const valBruto = (parseFloat(d.valor_bruto) || (parseFloat(d.valor_servico || 0) + parseFloat(d.desconto || 0))).toFixed(2);
             const data = window.formatarDataBR(d.data_entrada);
 
-            let t = `EMANUEL SOLUCOES TECNOLOGICAS\n`;
+            let t = `EMANUEL SOLUCOES\n`;
             t += `${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}\n`;
             t += `${div}\n`;
             t += `OS: ${d.id} - COD: ${d.codigo_maquina}\n`;
             t += `${div}\n`;
             t += `DATA: ${data}\n`;
             t += `CLIENTE: ${d.cliente}\n`;
-            t += `EQUIP.: ${d.equipamento}\n`;
+            t += `EQUIP.: ${d.equipmento || d.equipamento}\n`;
             t += `${div}\n`;
             t += `DEFEITO: ${d.defeito}\n`;
             if (d.servico_principal) {
@@ -439,7 +449,7 @@
                 t += `TOTAL: R$ ${valTotal}\n`;
             }
             t += `${div}\n`;
-            t += `AGRADECEMOS A PREFERENCIA!\nDEUS E FIEL`;
+            t += `AGRADECEMOS A PREFERENCIA!\n`;
             return t.toUpperCase();
         };
 
@@ -447,7 +457,7 @@
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
             const div = "--------------------------------";
             let total = 0;
-            let t = `EMANUEL SOLUCOES TECNOLOGICAS\nFECHAMENTO DE SERVICOS (LOTE)\n${div}\n`;
+            let t = `EMANUEL SOLUCOES\nFECHAMENTO EM LOTE\n${div}\n`;
             t += `CLIENTE: ${clienteAtualSelecao}\n${div}\n`;
             itensSelecionadosLote.forEach(d => {
                 const liq = parseFloat(d.valor_servico || 0);
@@ -456,7 +466,7 @@
                 t += `SERV: ${d.servico_principal || '---'}\n`;
                 t += `VALOR: R$ ${liq.toFixed(2)}\n${div}\n`;
             });
-            t += `TOTAL A PAGAR: R$ ${total.toFixed(2)}\n${div}\nDEUS E FIEL`;
+            t += `TOTAL A PAGAR: R$ ${total.toFixed(2)}\n${div}\n`;
             window.copiarParaRawBT(t.toUpperCase());
         };
 
@@ -467,11 +477,11 @@
 
             if(navElement) {
                 document.querySelectorAll('.nav-item').forEach(el => {
-                    el.className = "nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200";
+                    el.className = "nav-item flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200 md:w-full md:py-3.5 md:rounded-xl md:flex-row md:gap-3 md:px-4 md:justify-start";
                     let icon = el.querySelector('.material-symbols-outlined');
                     if(icon) icon.style.fontVariationSettings = "'FILL' 0";
                 });
-                navElement.className = "nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200";
+                navElement.className = "nav-item flex flex-col items-center justify-center bg-primary-container/20 text-primary rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-200 md:w-full md:py-3.5 md:flex-row md:gap-3 md:px-4 md:justify-start";
                 let activeIcon = navElement.querySelector('.material-symbols-outlined');
                 if(activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
             }
@@ -487,7 +497,7 @@
         window.dispararPrint = (html) => {
             const area = document.getElementById('areaImpressao');
             area.innerHTML = `<div class="cupom-texto">${html}</div>`;
-            setTimeout(() => { window.print(); }, 500);
+            setTimeout(() => { window.print(); }, 300);
         };
 
         window.imprimirCupom = (dados, tipo = 'OS') => {
@@ -497,45 +507,62 @@
             const dataArrumada = window.formatarDataBR(dados.data_entrada);
             
             let layout = `
-                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
-                <div class="c b">${tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'}</div>
+                <div class="c b" style="font-size: 13px;">EMANUEL SOLUÇÕES</div>
+                <div class="c" style="font-size: 9px; margin-top: 2px;">ASSISTÊNCIA E TECNOLOGIA</div>
+                <div class="c b" style="margin-top: 4px; border: 1px solid black; padding: 2px;">${tipo === 'OS' ? 'ORDEM DE SERVIÇO' : 'RECIBO DE PAGAMENTO'}</div>
+                
                 <div class="hr"></div>
-                <div><span class="b">OS:</span> ${dados.id} - <span class="b">COD:</span> ${dados.codigo_maquina}</div>
+                <div><span class="b">OS NÚMERO:</span> ${dados.id}</div>
+                <div><span class="b">CÓD. MÁQ:</span> ${dados.codigo_maquina}</div>
+                <div><span class="b">DATA INGRESSO:</span> ${dataArrumada}</div>
                 <div class="hr"></div>
-                <div><span class="b">DATA:</span> ${dataArrumada}</div>
-                <div><span class="b">CLIENTE:</span> ${dados.cliente}</div>
-                <div><span class="b">EQUIP.:</span> ${dados.equipamento}</div>
+                
+                <div class="b">DADOS DO CLIENTE</div>
+                <div><span class="b">NOME:</span> ${dados.cliente}</div>
+                
                 <div class="hr"></div>
-                <div class="b">DEFEITO:</div>
-                <div>${dados.defeito}</div>
+                <div class="b">ESPECIFICAÇÕES DO ATENDIMENTO</div>
+                <div><span class="b">EQUIPAMENTO:</span> ${dados.equipamento}</div>
+                <div style="margin-top: 3px;"><span class="b">DEFEITO RELATADO:</span></div>
+                <div style="padding-left: 5px; font-style: italic;">${dados.defeito || 'NÃO INFORMADO'}</div>
+                
+                <div class="hr"></div>
+                <div class="b">SERVIÇOS & PEÇAS TROCADAS</div>
             `;
 
             if (dados.servico_principal) {
+                const servicosLinhas = dados.servico_principal.split('+').map(s => `• ${s.trim()}`).join('<br>');
                 layout += `
-                    <div class="hr"></div>
-                    <div class="b">SERVICOS REALIZADOS:</div>
-                    <div>${dados.servico_principal.replace(/\+/g, '<br>')}</div>
+                    <div style="margin-top: 4px; line-height: 1.5;">${servicosLinhas}</div>
                     <div class="hr"></div>
                 `;
+                
                 if (desc > 0) {
                     layout += `
-                        <div><span class="b">SUBTOTAL:</span> R$ ${bruto.toFixed(2)}</div>
-                        <div><span class="b">DESCONTO:</span> R$ ${desc.toFixed(2)}</div>
+                        <div style="display: flex; justify-content: space-between;"><span>SUBTOTAL:</span> <span>R$ ${bruto.toFixed(2)}</span></div>
+                        <div style="display: flex; justify-content: space-between; color: red;"><span>DESCONTO:</span> <span>R$ ${desc.toFixed(2)}</span></div>
                     `;
                 }
-                layout += `<div class="c b" style="font-size:14px; margin-top:5px; border:2px solid black; padding:3px">TOTAL: R$ ${total.toFixed(2)}</div>`;
+                
+                layout += `
+                    <div class="c b" style="font-size: 14px; margin-top: 6px; border: 2px solid black; padding: 5px; background-color: #f0f0f0;">
+                        TOTAL GERAL: R$ ${total.toFixed(2)}
+                    </div>
+                    ${dados.forma_pagamento ? `<div class="c b" style="font-size: 9px; margin-top: 4px;">PAGO VIA: ${dados.forma_pagamento}</div>` : ''}
+                `;
             } else {
                 layout += `
+                    <div class="c" style="color: #555; font-size: 10px; margin: 10px 0;">(DIAGNÓSTICO TÉCNICO EM ANDAMENTO)</div>
                     <div class="hr"></div>
-                    <div style="height:35px; border-bottom:1px solid black; margin-top:15px"></div>
-                    <div class="c b" style="font-size:10px;">ASSINATURA DO CLIENTE</div>
+                    <div style="height: 40px; border-bottom: 1px solid black; margin-top: 20px;"></div>
+                    <div class="c b" style="font-size: 9px; margin-top: 5px;">ASSINATURA DO CLIENTE</div>
                 `;
             }
 
             layout += `
                 <div class="hr"></div>
-                <div class="c b">AGRADECEMOS A PREFERENCIA!</div>
-                <div class="c">DEUS E FIEL</div>
+                <div class="c b" style="font-size: 10px;">OBRIGADO PELA PREFERÊNCIA!</div>
+                <div class="c" style="font-size: 10px; font-weight: bold; margin-top: 2px;">DEUS É FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
@@ -543,44 +570,92 @@
 
         window.imprimirLote = () => {
             if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
+            
             let totalLiquidoLote = 0;
             let totalDescontoLote = 0;
             let totalBrutoLote = 0;
             let itensHTML = "";
+            let formaPagamentoIdentificada = "";
             
             itensSelecionadosLote.forEach(d => {
                 const liquido = parseFloat(d.valor_servico || 0);
                 const desconto = parseFloat(d.desconto || 0);
                 const bruto = parseFloat(d.valor_bruto) || (liquido + desconto);
                 const dataArr = window.formatarDataBR(d.data_entrada);
-
+                
                 totalLiquidoLote += liquido;
                 totalDescontoLote += desconto;
                 totalBrutoLote += bruto;
                 
+                if (d.forma_pagamento && !formaPagamentoIdentificada) {
+                    formaPagamentoIdentificada = d.forma_pagamento;
+                }
+
+                // Formata os múltiplos serviços de cada máquina em tópicos (linhas separadas)
+                let servicosFormatados = '---';
+                if (d.servico_principal) {
+                    servicosFormatados = d.servico_principal.split('+').map(s => `  • ${s.trim()}`).join('<br>');
+                }
+
                 itensHTML += `
-                    <div style="margin-top:6px; text-align: left;">
-                        <div><span class="b">OS:</span> ${d.id} - <span class="b">COD:</span> ${d.codigo_maquina}</div>
-                        <div><span class="b">DATA:</span> ${dataArr}</div>
-                        <div><span class="b">SERV:</span> ${d.servico_principal ? d.servico_principal.replace(/\+/g, '<br>') : '---'}</div>
-                        <div class="b" style="text-align: right;">VALOR: R$ ${liquido.toFixed(2)}</div>
+                    <div style="margin-top: 4px; padding: 2px 0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span class="b">OS: #${d.id}</span>
+                            <span class="b">COD: ${d.codigo_maquina}</span>
+                        </div>
+                        <div><span class="b">MÁQ/EQUIP:</span> ${d.equipamento}</div>
+                        <div><span class="b">DATA ENTRADA:</span> ${dataArr}</div>
+                        
+                        <div style="margin-top: 2px;"><span class="b">DEFEITO RELATADO:</span></div>
+                        <div style="padding-left: 4px; font-style: italic; color: #333;">${d.defeito || 'NÃO INFORMADO'}</div>
+                        
+                        <div style="margin-top: 2px;"><span class="b">MANUTENÇÃO REALIZADA:</span></div>
+                        <div style="line-height: 1.3;">${servicosFormatados}</div>
+                        
+                        ${desconto > 0 ? `<div style="text-align: right; font-size: 10px;">BRUTO: R$ ${bruto.toFixed(2)} | DESC: -R$ ${desconto.toFixed(2)}</div>` : ''}
+                        <div class="b" style="text-align: right; margin-top: 1px;">SUBTOTAL ITEM: R$ ${liquido.toFixed(2)}</div>
                     </div>
                     <div class="hr"></div>
                 `;
             });
             
+            // Layout principal do cupom de lote reestruturado
             const layout = `
-                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
-                <div class="c b">FECHAMENTO DE SERVICOS</div>
+                <div class="c b" style="font-size: 13px;">EMANUEL SOLUÇÕES</div>
+                <div class="c" style="font-size: 9px; margin-top: 2px;">ASSISTÊNCIA E TECNOLOGIA</div>
+                <div class="c b" style="margin-top: 4px; border: 1px solid black; padding: 2px;">FECHAMENTO DE SERVIÇOS (LOTE)</div>
+                
                 <div class="hr"></div>
                 <div><span class="b">CLIENTE:</span> ${clienteAtualSelecao}</div>
+                <div><span class="b">QTD. EQUIPAMENTOS:</span> ${itensSelecionadosLote.length} MÁQUINAS</div>
+                <div><span class="b">DATA EMISSÃO:</span> ${new Date().toLocaleDateString('pt-BR')}</div>
                 <div class="hr"></div>
+                
+                <div class="c b" style="font-size: 10px; letter-spacing: 1px;">RELAÇÃO DE ITENS ATENDIDOS</div>
+                <div class="hr"></div>
+                
                 ${itensHTML}
-                <div class="c b" style="font-size:14px; border:2px solid black; padding:3px;">TOTAL EM LOTE: R$ ${totalLiquidoLote.toFixed(2)}</div>
+                
+                <div class="b" style="margin-top: 4px;">RESUMO FINANCEIRO DO LOTE</div>
+                <div style="display: flex; justify-content: space-between; margin-top: 2px;">
+                    <span>VALOR BRUTO TOTAL:</span> <span>R$ ${totalBrutoLote.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: red;">
+                    <span>DESCONTO TOTAL:</span> <span>-R$ ${totalDescontoLote.toFixed(2)}</span>
+                </div>
+                
+                <div class="c b" style="font-size: 14px; margin-top: 6px; border: 2px solid black; padding: 5px; background-color: #f0f0f0;">
+                    TOTAL A PAGAR: R$ ${totalLiquidoLote.toFixed(2)}
+                </div>
+                
+                ${formaPagamentoIdentificada ? `<div class="c b" style="font-size: 9px; margin-top: 4px;">FORMA DE PAGAMENTO: ${formaPagamentoIdentificada}</div>` : ''}
+                
                 <div class="hr"></div>
-                <div class="c b">DEUS E FIEL</div>
+                <div class="c b" style="font-size: 10px;">AGRADECEMOS A PREFERÊNCIA!</div>
+                <div class="c" style="font-size: 10px; font-weight: bold; margin-top: 2px;">DEUS É FIEL</div>
                 <div class="espaco-fim"></div>
             `;
+            
             window.dispararPrint(layout);
         };
 
@@ -596,6 +671,7 @@
                 itensHTML += `
                     <div>
                         <div><span class="b">DATA:</span> ${dataEntrada} - <span class="b">OS:</span> ${h.id}</div>
+                        <div><span class="b">MÁQ:</span> ${h.equipamento}</div>
                         <div><span class="b">SERV:</span> ${h.servico_principal ? h.servico_principal.replace(/\+/g, ', ') : '---'}</div>
                         <div style="text-align: right;" class="b">VALOR: R$ ${total.toFixed(2)}</div>
                     </div>
@@ -604,16 +680,16 @@
             });
 
             const layout = `
-                <div class="c b">EMANUEL SOLUCOES TECNOLOGICAS</div>
-                <div class="c b">HISTORICO DE MANUTENCOES</div>
+                <div class="c b" style="font-size: 13px;">EMANUEL SOLUÇÕES</div>
+                <div class="c b">HISTÓRICO DE MANUTENÇÕES</div>
                 <div class="hr"></div>
-                <div><span class="b">MAQUINA:</span> ${cod}</div>
+                <div><span class="b">CÓDIGO MÁQUINA:</span> ${cod}</div>
                 <div class="hr"></div>
                 ${itensHTML}
                 <div class="hr"></div>
-                <div class="b" style="text-align: right;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
+                <div class="b" style="text-align: right; font-size: 12px;">TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}</div>
                 <div class="hr"></div>
-                <div class="c">DEUS E FIEL</div>
+                <div class="c b">DEUS É FIEL</div>
                 <div class="espaco-fim"></div>
             `;
             window.dispararPrint(layout);
@@ -682,7 +758,6 @@
                     if (status === "PENDENTE" || status === "AGUARDANDO PAGAMENTO") {
                         ordensBancada[d.id] = d; 
                         const valFinal = parseFloat(d.valor_servico || 0); 
-                        const valBruto = parseFloat(d.valor_bruto) || (valFinal + parseFloat(d.desconto || 0));
                         totalA += valFinal;
                         
                         let badgeClass = status === 'PENDENTE' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
@@ -754,7 +829,6 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        // --- FUNÇÕES DE CADASTRO DE SERVIÇOS DIRETAMENTE NA TABELA (servicos_lista) ---
         window.abrirCriarNovoServico = () => {
             document.getElementById('inputNovoServicoNome').value = "";
             document.getElementById('inputNovoServicoPreco').value = "";
@@ -774,20 +848,14 @@
             btn.disabled = true;
 
             try {
-                // Cria uma referência de documento com ID baseado no próprio nome para evitar duplicados
                 const docRef = doc(collection(db, "servicos_lista"));
                 await setDoc(docRef, {
                     nome: nomeServ,
                     descricao: nomeServ,
                     valor: precoServ
                 });
-
                 document.getElementById('modalNovoServicoTabela').classList.add('hidden');
-                
-                // Recarrega automaticamente a lista de seleção por trás do carrinho
-                if (idAtual) {
-                    window.abrirLancamento(idAtual);
-                }
+                if (idAtual) window.abrirLancamento(idAtual);
             } catch (e) {
                 alert("Erro ao cadastrar serviço: " + e.message);
             } finally {
