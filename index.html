@@ -164,7 +164,7 @@
     <div id="areaImpressao"></div>
 
     <!-- TopAppBar -->
-    <header class="fixed top-0 w-full z-40 bg-surface shadow-sm flex items-center justify-between px-inset-container h-16 md:left-64 md:w-[calc(100%-16px)]">
+    <header class="fixed top-0 w-full z-40 bg-surface shadow-sm flex items-center justify-between px-inset-container pt-[env(safe-area-inset-top)] h-[calc(4rem+env(safe-area-inset-top))] md:left-64 md:w-[calc(100%-16px)] md:pt-0 md:h-16">
         <div class="flex items-center gap-stack-md">
             <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">precision_manufacturing</span>
             <h1 class="font-headline-md text-headline-md font-semibold text-primary tracking-tight">Emanuel Soluções</h1>
@@ -199,7 +199,7 @@
     </nav>
 
     <!-- Canvas Central -->
-    <main class="flex-1 overflow-y-auto pb-40 pt-20 px-gutter-mobile w-full md:pl-72 md:pr-8 md:pt-24 md:pb-8 flex justify-center">
+    <main class="flex-1 overflow-y-auto pb-40 pt-[calc(5rem+env(safe-area-inset-top))] px-gutter-mobile w-full md:pl-72 md:pr-8 md:pt-24 md:pb-8 flex justify-center">
         <div class="w-full max-w-5xl space-y-stack-xl">
 
             <!-- Tela Bancada (Dashboard) -->
@@ -230,10 +230,21 @@
                     </div>
                     <div class="card p-5 flex flex-col justify-between">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="font-body-md text-[11px] md:text-body-md text-on-surface-variant uppercase tracking-wider font-semibold">Faturamento (mês passado)</span>
+                            <span class="font-body-md text-[11px] md:text-body-md text-on-surface-variant uppercase tracking-wider font-semibold">Faturamento (consultar mês)</span>
                             <span class="material-symbols-outlined text-on-surface-variant">calendar_month</span>
                         </div>
-                        <div class="font-display text-[20px] md:text-display text-on-surface-variant mt-stack-xs truncate" id="faturamentoPassado">R$ 0,00</div>
+                        <div class="flex items-center justify-between mt-stack-xs">
+                            <button onclick="mudarMesConsulta(-1)" class="btn-icon !p-1" title="Mês anterior">
+                                <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                            </button>
+                            <div class="text-center">
+                                <div class="font-display text-[20px] md:text-display text-on-surface-variant truncate" id="faturamentoPassado">R$ 0,00</div>
+                                <div class="font-label-md text-label-md text-on-surface-variant uppercase mt-0.5" id="labelMesConsulta">---</div>
+                            </div>
+                            <button onclick="mudarMesConsulta(1)" class="btn-icon !p-1" title="Próximo mês">
+                                <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                            </button>
+                        </div>
                     </div>
                 </section>
 
@@ -984,7 +995,11 @@
         };
         // ================== FIM GERAÇÃO DE PDF ==================
 
-        // ================== FATURAMENTO (MÊS ATUAL x MÊS PASSADO) ==================
+        // ================== FATURAMENTO (MÊS ATUAL x MÊS CONSULTADO) ==================
+        const nomesMeses = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+        let mapaFaturamentoMensal = {}; // chave "mes-ano" -> total pago naquele mês
+        let mesConsulta, anoConsulta; // mês/ano exibidos no card "consultar mês"
+
         window.calcularFaturamento = async () => {
             try {
                 // Busca só as ordens já pagas (não traz pendentes, que não entram no faturamento)
@@ -994,12 +1009,9 @@
                 const hoje = new Date();
                 const mesAtual = hoje.getMonth();       // 0-11
                 const anoAtual = hoje.getFullYear();
-                let mesPassado = mesAtual - 1;
-                let anoMesPassado = anoAtual;
-                if (mesPassado < 0) { mesPassado = 11; anoMesPassado = anoAtual - 1; }
 
+                mapaFaturamentoMensal = {};
                 let totalAtual = 0;
-                let totalPassado = 0;
 
                 snap.forEach(dDoc => {
                     const d = dDoc.data();
@@ -1014,20 +1026,42 @@
                     if (isNaN(mes) || isNaN(ano)) return;
 
                     const valor = parseFloat(d.valor_servico || 0);
+                    const chave = `${mes}-${ano}`;
+                    mapaFaturamentoMensal[chave] = (mapaFaturamentoMensal[chave] || 0) + valor;
 
                     if (mes === mesAtual && ano === anoAtual) {
                         totalAtual += valor;
-                    } else if (mes === mesPassado && ano === anoMesPassado) {
-                        totalPassado += valor;
                     }
                 });
 
                 document.getElementById('faturamentoAtual').innerText = `R$ ${totalAtual.toFixed(2)}`;
-                document.getElementById('faturamentoPassado').innerText = `R$ ${totalPassado.toFixed(2)}`;
+
+                // Na primeira carga, inicia a consulta no mês passado
+                if (mesConsulta === undefined) {
+                    mesConsulta = mesAtual - 1;
+                    anoConsulta = anoAtual;
+                    if (mesConsulta < 0) { mesConsulta = 11; anoConsulta = anoAtual - 1; }
+                }
+
+                atualizarDisplayMesConsulta();
             } catch (e) {
                 console.error("Erro ao calcular faturamento:", e);
             }
         };
+
+        window.mudarMesConsulta = (direcao) => {
+            mesConsulta += direcao;
+            if (mesConsulta > 11) { mesConsulta = 0; anoConsulta++; }
+            if (mesConsulta < 0) { mesConsulta = 11; anoConsulta--; }
+            atualizarDisplayMesConsulta();
+        };
+
+        function atualizarDisplayMesConsulta() {
+            const chave = `${mesConsulta}-${anoConsulta}`;
+            const total = mapaFaturamentoMensal[chave] || 0;
+            document.getElementById('faturamentoPassado').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('labelMesConsulta').innerText = `${nomesMeses[mesConsulta]}/${anoConsulta}`;
+        }
         // ================== FIM FATURAMENTO ==================
 
         window.excluirOrdemServico = async (idOS) => {
