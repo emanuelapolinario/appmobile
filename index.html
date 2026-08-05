@@ -129,6 +129,9 @@
         ::-webkit-scrollbar-track { background: #0b0e14; }
         ::-webkit-scrollbar-thumb { background: #272a31; border-radius: 10px; }
 
+        /* Garante que o menu inferior respeite a área segura em celulares com notch/gesture bar (iOS) */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
         /* REESTRUTURAÇÃO DO CSS DE IMPRESSÃO: Isola 100% a tela do sistema do layout do papel */
         #areaImpressao { display: none; }
         @media print {
@@ -191,7 +194,7 @@
     </nav>
 
     <!-- Canvas Central de Conteúdo Totalmente Alinhado e Centralizado no Monitor -->
-    <main class="flex-1 overflow-y-auto pb-24 pt-20 px-4 w-full md:pl-72 md:pr-8 md:pt-24 md:pb-8 flex justify-center">
+    <main class="flex-1 overflow-y-auto pb-40 pt-20 px-4 w-full md:pl-72 md:pr-8 md:pt-24 md:pb-8 flex justify-center">
         <div class="w-full max-w-3xl space-y-6">
             
             <!-- Tela Bancada (Dashboard) -->
@@ -223,6 +226,8 @@
 
                 <!-- Lista de Ordens Ativas -->
                 <div class="space-y-4" id="listaPendentes"></div>
+                <!-- Respiro final para o último card nunca ficar atrás do menu inferior fixo no mobile -->
+                <div class="h-24 md:hidden" aria-hidden="true"></div>
             </div>
 
             <!-- Tela Nova Entrada -->
@@ -407,6 +412,9 @@
         let historicoAtual = [];
         let modoPagamento = 'SINGLE';
         let tipoSeletorAtual = '';
+        // Cache em memória: evita rebuscar no Firestore o que muda pouco
+        let cacheServicos = null;
+        let cacheFormasPagamento = null;
 
         window.formatarDataBR = (dataStr) => {
             if (!dataStr) return "---";
@@ -993,7 +1001,10 @@
             lista.innerHTML = "<p class='p-10 text-center animate-pulse text-xs text-primary/70 font-semibold'>Buscando ordens ativas...</p>";
             
             try {
-                const snap = await getDocs(collection(db, "ordens"));
+                // Busca só as ordens em aberto (PENDENTE / AGUARDANDO PAGAMENTO) em vez da coleção inteira,
+                // isso evita baixar todo o histórico de ordens já pagas toda vez que a aba é aberta.
+                const q = query(collection(db, "ordens"), where("status", "in", ["PENDENTE", "AGUARDANDO PAGAMENTO"]));
+                const snap = await getDocs(q);
                 lista.innerHTML = ""; 
                 let totalA = 0;
                 
@@ -1033,13 +1044,13 @@
                                     <p class="text-xs text-zinc-300 font-medium uppercase leading-tight">${d.defeito || 'NÃO INFORMADO'}</p>
                                 </div>
                                 ${servicoTexto}
-                                <div class="flex gap-2 pt-2 border-t border-brand-border/60">
+                                <div class="flex flex-wrap gap-2 pt-2 border-t border-brand-border/60">
                                     ${status === 'PENDENTE' ? 
-                                        `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">LANÇAR MÃO DE OBRA</button>` : 
-                                        `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">BAIXAR PAGAMENTO</button>`}
-                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3">🖨️</button>
-                                    <button onclick='window.gerarPDFCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3">📄</button>
-                                    <button onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${JSON.stringify(d)}, "OS"))' class="btn-icon px-3">📋</button>
+                                        `<button onclick="abrirLancamento('${d.id}')" class="flex-1 min-w-[140px] bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">LANÇAR MÃO DE OBRA</button>` : 
+                                        `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 min-w-[140px] bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">BAIXAR PAGAMENTO</button>`}
+                                    <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3 shrink-0">🖨️</button>
+                                    <button onclick='window.gerarPDFCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3 shrink-0">📄</button>
+                                    <button onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${JSON.stringify(d)}, "OS"))' class="btn-icon px-3 shrink-0">📋</button>
                                 </div>
                             </div>
                         `;
@@ -1057,24 +1068,42 @@
             document.getElementById('modalServicos').classList.remove('hidden'); 
             
             const listaTabela = document.getElementById('listaDeServicos');
+
+            // Usa cache em memória se já foi carregado antes nesta sessão — evita nova viagem ao Firestore
+            if (cacheServicos) {
+                renderizarTabelaServicos(cacheServicos);
+                return;
+            }
+
             listaTabela.innerHTML = "<p class='p-4 text-center font-medium animate-pulse text-primary/80'>Buscando tabela...</p>";
             
             try {
                 const snap = await getDocs(collection(db, "servicos_lista"));
-                listaTabela.innerHTML = "";
+                const itens = [];
                 snap.forEach(dDoc => {
                     const s = dDoc.data(); 
-                    const nomeTabela = s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id; 
-                    const valorTabela = s.valor || s.preco || 0;
-                    listaTabela.innerHTML += `
-                        <button onclick="adicionarAoCarrinho('${nomeTabela}', ${valorTabela})" class="w-full p-3 mb-1.5 bg-background border border-outline-variant/30 rounded-xl text-left active:border-primary flex justify-between items-center transition-all">
-                            <span class="font-bold text-white uppercase text-xs">${nomeTabela}</span>
-                            <span class="text-green-400 font-bold text-xs">R$ ${parseFloat(valorTabela).toFixed(2)}</span>
-                        </button>
-                    `;
+                    itens.push({
+                        nome: s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id,
+                        valor: s.valor || s.preco || 0
+                    });
                 });
+                cacheServicos = itens;
+                renderizarTabelaServicos(itens);
             } catch (e) { alert("Erro: " + e.message); }
         };
+
+        function renderizarTabelaServicos(itens) {
+            const listaTabela = document.getElementById('listaDeServicos');
+            listaTabela.innerHTML = "";
+            itens.forEach(s => {
+                listaTabela.innerHTML += `
+                    <button onclick="adicionarAoCarrinho('${s.nome}', ${s.valor})" class="w-full p-3 mb-1.5 bg-background border border-outline-variant/30 rounded-xl text-left active:border-primary flex justify-between items-center transition-all">
+                        <span class="font-bold text-white uppercase text-xs">${s.nome}</span>
+                        <span class="text-green-400 font-bold text-xs">R$ ${parseFloat(s.valor).toFixed(2)}</span>
+                    </button>
+                `;
+            });
+        }
 
         window.abrirCriarNovoServico = () => {
             document.getElementById('inputNovoServicoNome').value = "";
@@ -1101,8 +1130,14 @@
                     descricao: nomeServ,
                     valor: precoServ
                 });
+                // Atualiza o cache em memória em vez de rebuscar tudo do Firestore
+                if (cacheServicos) {
+                    cacheServicos.push({ nome: nomeServ, valor: precoServ });
+                } else {
+                    cacheServicos = [{ nome: nomeServ, valor: precoServ }];
+                }
                 document.getElementById('modalNovoServicoTabela').classList.add('hidden');
-                if (idAtual) window.abrirLancamento(idAtual);
+                if (idAtual) renderizarTabelaServicos(cacheServicos);
             } catch (e) {
                 alert("Erro ao cadastrar serviço: " + e.message);
             } finally {
@@ -1160,12 +1195,25 @@
         };
 
         window.carregarFormasPagamentoModal = async () => {
-            const snapP = await getDocs(collection(db, "formas_pagamento"));
             const listaP = document.getElementById('listaFormasPag'); 
-            listaP.innerHTML = "";
+            if (cacheFormasPagamento) {
+                renderizarFormasPagamento(cacheFormasPagamento);
+                return;
+            }
+            const snapP = await getDocs(collection(db, "formas_pagamento"));
+            const itens = [];
             snapP.forEach(dDoc => {
                 const f = dDoc.data();
-                const nomeF = f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id;
+                itens.push(f.descricao || f.formas_pagamento || f.forma_pagamento || f.nome || dDoc.id);
+            });
+            cacheFormasPagamento = itens;
+            renderizarFormasPagamento(itens);
+        };
+
+        function renderizarFormasPagamento(itens) {
+            const listaP = document.getElementById('listaFormasPag');
+            listaP.innerHTML = "";
+            itens.forEach(nomeF => {
                 listaP.innerHTML += `
                     <label class="flex items-center p-3 bg-background border border-outline-variant/20 rounded-xl has-[:checked]:border-primary has-[:checked]:bg-primary/5 transition-all cursor-pointer">
                         <input type="radio" name="pag" value="${nomeF}" class="w-5 h-5 bg-zinc-900 border-zinc-700 text-primary focus:ring-0 cursor-pointer">
@@ -1173,7 +1221,7 @@
                     </label>
                 `;
             });
-        };
+        }
 
         window.prepararFinalizacao = async (id) => {
             idAtual = id; 
