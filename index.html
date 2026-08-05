@@ -212,6 +212,7 @@
                     <div class="flex gap-2">
                         <button onclick="prepararPagamentoLote()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase shadow-md active:scale-95 transition-all">💰 PAGAR</button>
                         <button onclick="imprimirLote()" class="bg-zinc-800 text-white p-2.5 rounded-xl font-black text-sm border border-zinc-700 active:scale-95 transition-all">🖨️</button>
+                        <button onclick="gerarPDFLote()" class="bg-zinc-800 text-white p-2.5 rounded-xl font-black text-sm border border-zinc-700 active:scale-95 transition-all">📄</button>
                         <button onclick="copiarLoteRawBT()" class="bg-zinc-800 text-zinc-300 px-3 py-2.5 rounded-xl font-bold text-[10px] uppercase border border-zinc-700 active:scale-95 transition-all">📋 COPIAR</button>
                     </div>
                 </div>
@@ -376,6 +377,9 @@
             </div>
         </div>
     </div>
+
+    <!-- jsPDF (geração de PDF real, client-side) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <!-- Firebase App Integrado -->
     <script type="module">
@@ -695,6 +699,248 @@
             window.dispararPrint(layout);
         };
 
+        // ================== GERAÇÃO DE PDF (jsPDF) ==================
+        // Helper: desenha o cabeçalho padrão da empresa e devolve o Y atual
+        function pdfCabecalho(doc, subtitulo) {
+            const largura = doc.internal.pageSize.getWidth();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("EMANUEL SOLUÇÕES", largura / 2, 18, { align: "center" });
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text("ASSISTÊNCIA E TECNOLOGIA", largura / 2, 24, { align: "center" });
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.line(14, 29, largura - 14, 29);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text(subtitulo, largura / 2, 37, { align: "center" });
+            doc.setLineWidth(0.2);
+            doc.line(14, 41, largura - 14, 41);
+            return 49;
+        }
+
+        // Helper: rodapé padrão
+        function pdfRodape(doc, y) {
+            const largura = doc.internal.pageSize.getWidth();
+            doc.setLineWidth(0.2);
+            doc.line(14, y, largura - 14, y);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("AGRADECEMOS A PREFERÊNCIA!", largura / 2, y + 7, { align: "center" });
+            doc.setFontSize(9);
+            doc.text("DEUS É FIEL", largura / 2, y + 13, { align: "center" });
+        }
+
+        // Helper: escreve um bloco de texto com quebra automática de linha, devolve novo Y
+        function pdfTextoComQuebra(doc, texto, x, y, largMax, tamanhoFonte = 10) {
+            doc.setFontSize(tamanhoFonte);
+            const linhas = doc.splitTextToSize(String(texto || "---"), largMax);
+            doc.text(linhas, x, y);
+            return y + (linhas.length * (tamanhoFonte * 0.42)) + 3;
+        }
+
+        // Recibo / Ordem de Serviço individual em PDF
+        window.gerarPDFCupom = (dados, tipo = 'OS') => {
+            if (!window.jspdf) return alert("Biblioteca de PDF ainda carregando, tente novamente em instantes.");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: "mm", format: "a4" });
+            const largura = doc.internal.pageSize.getWidth();
+            const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
+            const desc = parseFloat(dados.desconto || 0);
+            const total = parseFloat(dados.valor_servico || 0);
+
+            let y = pdfCabecalho(doc, tipo === 'OS' ? 'ORDEM DE SERVIÇO' : 'RECIBO DE PAGAMENTO');
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`OS Nº: ${dados.id}`, 14, y);
+            doc.text(`Código Máquina: ${dados.codigo_maquina}`, largura - 14, y, { align: "right" });
+            y += 6;
+            doc.text(`Data Entrada: ${window.formatarDataBR(dados.data_entrada)}`, 14, y);
+            y += 8;
+
+            doc.setFont("helvetica", "bold");
+            doc.text("DADOS DO CLIENTE", 14, y); y += 5;
+            doc.setFont("helvetica", "normal");
+            doc.text(`Cliente: ${dados.cliente}`, 14, y); y += 8;
+
+            doc.setFont("helvetica", "bold");
+            doc.text("EQUIPAMENTO", 14, y); y += 5;
+            doc.setFont("helvetica", "normal");
+            doc.text(`${dados.equipamento || dados.equipmento || '---'}`, 14, y); y += 8;
+
+            doc.setFont("helvetica", "bold");
+            doc.text("DEFEITO RELATADO", 14, y); y += 5;
+            doc.setFont("helvetica", "normal");
+            y = pdfTextoComQuebra(doc, dados.defeito || 'NÃO INFORMADO', 14, y, largura - 28);
+            y += 3;
+
+            if (dados.servico_principal) {
+                doc.setFont("helvetica", "bold");
+                doc.text("SERVIÇOS & PEÇAS TROCADAS", 14, y); y += 6;
+                doc.setFont("helvetica", "normal");
+                dados.servico_principal.split('+').forEach(s => {
+                    doc.text(`• ${s.trim()}`, 16, y);
+                    y += 5;
+                });
+                y += 2;
+                doc.line(14, y, largura - 14, y); y += 7;
+
+                if (desc > 0) {
+                    doc.text(`Subtotal: R$ ${bruto.toFixed(2)}`, largura - 14, y, { align: "right" }); y += 5;
+                    doc.setTextColor(200, 0, 0);
+                    doc.text(`Desconto: R$ ${desc.toFixed(2)}`, largura - 14, y, { align: "right" });
+                    doc.setTextColor(0, 0, 0);
+                    y += 7;
+                }
+
+                doc.setFillColor(240, 240, 240);
+                doc.rect(14, y - 5, largura - 28, 12, "F");
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(13);
+                doc.text(`TOTAL GERAL: R$ ${total.toFixed(2)}`, largura / 2, y + 3, { align: "center" });
+                y += 14;
+
+                if (dados.forma_pagamento) {
+                    doc.setFontSize(9);
+                    doc.text(`Pago via: ${dados.forma_pagamento}`, largura / 2, y, { align: "center" });
+                    y += 8;
+                }
+            } else {
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(9);
+                doc.text("(Diagnóstico técnico em andamento)", largura / 2, y, { align: "center" });
+                y += 20;
+                doc.line(largura / 2 - 40, y, largura / 2 + 40, y);
+                doc.setFontSize(8);
+                doc.text("ASSINATURA DO CLIENTE", largura / 2, y + 5, { align: "center" });
+                y += 15;
+            }
+
+            pdfRodape(doc, y + 5);
+            doc.save(`OS_${dados.id}_${dados.codigo_maquina || ''}.pdf`);
+        };
+
+        // Fechamento em lote em PDF
+        window.gerarPDFLote = () => {
+            if (itensSelecionadosLote.length < 2) return alert("Selecione 2 ou mais OS!");
+            if (!window.jspdf) return alert("Biblioteca de PDF ainda carregando, tente novamente em instantes.");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: "mm", format: "a4" });
+            const largura = doc.internal.pageSize.getWidth();
+            const alturaPagina = doc.internal.pageSize.getHeight();
+
+            let y = pdfCabecalho(doc, "FECHAMENTO DE SERVIÇOS (LOTE)");
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Cliente: ${clienteAtualSelecao}`, 14, y);
+            doc.text(`${itensSelecionadosLote.length} Máquinas`, largura - 14, y, { align: "right" });
+            y += 6;
+            doc.text(`Data Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 14, y);
+            y += 9;
+
+            let totalBruto = 0, totalDesc = 0, totalLiquido = 0, formaPag = "";
+
+            itensSelecionadosLote.forEach((d, idx) => {
+                const liquido = parseFloat(d.valor_servico || 0);
+                const desconto = parseFloat(d.desconto || 0);
+                const bruto = parseFloat(d.valor_bruto) || (liquido + desconto);
+                totalBruto += bruto; totalDesc += desconto; totalLiquido += liquido;
+                if (d.forma_pagamento && !formaPag) formaPag = d.forma_pagamento;
+
+                if (y > alturaPagina - 40) { doc.addPage(); y = 20; }
+
+                doc.setFont("helvetica", "bold");
+                doc.text(`OS #${d.id}  -  COD: ${d.codigo_maquina}`, 14, y); y += 5;
+                doc.setFont("helvetica", "normal");
+                doc.text(`Equip.: ${d.equipamento || '---'}   |   Entrada: ${window.formatarDataBR(d.data_entrada)}`, 14, y); y += 5;
+                y = pdfTextoComQuebra(doc, `Serviços: ${(d.servico_principal || '---').replace(/\+/g, ', ')}`, 14, y, largura - 28, 9);
+                doc.setFont("helvetica", "bold");
+                doc.text(`Subtotal item: R$ ${liquido.toFixed(2)}`, largura - 14, y, { align: "right" });
+                y += 4;
+                doc.line(14, y, largura - 14, y);
+                y += 6;
+            });
+
+            if (y > alturaPagina - 45) { doc.addPage(); y = 20; }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("RESUMO FINANCEIRO DO LOTE", 14, y); y += 7;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Valor Bruto Total: R$ ${totalBruto.toFixed(2)}`, 14, y); y += 6;
+            doc.setTextColor(200, 0, 0);
+            doc.text(`Desconto Total: -R$ ${totalDesc.toFixed(2)}`, 14, y);
+            doc.setTextColor(0, 0, 0);
+            y += 9;
+
+            doc.setFillColor(240, 240, 240);
+            doc.rect(14, y - 6, largura - 28, 13, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.text(`TOTAL A PAGAR: R$ ${totalLiquido.toFixed(2)}`, largura / 2, y + 2, { align: "center" });
+            y += 16;
+
+            if (formaPag) {
+                doc.setFontSize(9);
+                doc.text(`Forma de Pagamento: ${formaPag}`, largura / 2, y, { align: "center" });
+                y += 8;
+            }
+
+            pdfRodape(doc, y + 4);
+            doc.save(`Fechamento_Lote_${(clienteAtualSelecao || 'cliente').replace(/\s+/g, '_')}.pdf`);
+        };
+
+        // Histórico de manutenções de uma máquina em PDF
+        window.gerarPDFHistorico = (cod) => {
+            if (!historicoAtual || historicoAtual.length === 0) return alert("Nenhum histórico carregado.");
+            if (!window.jspdf) return alert("Biblioteca de PDF ainda carregando, tente novamente em instantes.");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: "mm", format: "a4" });
+            const largura = doc.internal.pageSize.getWidth();
+            const alturaPagina = doc.internal.pageSize.getHeight();
+
+            let y = pdfCabecalho(doc, "HISTÓRICO DE MANUTENÇÕES");
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Código da Máquina: ${cod}`, 14, y);
+            y += 9;
+
+            let totalGeral = 0;
+
+            historicoAtual.forEach((h) => {
+                const total = parseFloat(h.valor_servico || 0);
+                totalGeral += total;
+
+                if (y > alturaPagina - 40) { doc.addPage(); y = 20; }
+
+                doc.setFont("helvetica", "bold");
+                doc.text(`OS #${h.id}  -  ${window.formatarDataBR(h.data_entrada)}  -  ${h.status}`, 14, y); y += 5;
+                doc.setFont("helvetica", "normal");
+                doc.text(`Equipamento: ${h.equipamento || '---'}`, 14, y); y += 5;
+                y = pdfTextoComQuebra(doc, `Serviços: ${h.servico_principal ? h.servico_principal.replace(/\+/g, ', ') : '---'}`, 14, y, largura - 28, 9);
+                doc.setFont("helvetica", "bold");
+                doc.text(`Valor: R$ ${total.toFixed(2)}`, largura - 14, y, { align: "right" });
+                y += 4;
+                doc.line(14, y, largura - 14, y);
+                y += 6;
+            });
+
+            if (y > alturaPagina - 30) { doc.addPage(); y = 20; }
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text(`TOTAL INVESTIDO: R$ ${totalGeral.toFixed(2)}`, largura - 14, y, { align: "right" });
+            y += 10;
+
+            pdfRodape(doc, y);
+            doc.save(`Historico_${cod}.pdf`);
+        };
+        // ================== FIM GERAÇÃO DE PDF ==================
+
         window.excluirOrdemServico = async (idOS) => {
             if (!confirm(`⚠️ EXCLUIR DEFINITIVAMENTE A OS Nº ${idOS}?`)) return;
             try {
@@ -792,6 +1038,7 @@
                                         `<button onclick="abrirLancamento('${d.id}')" class="flex-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">LANÇAR MÃO DE OBRA</button>` : 
                                         `<button onclick="prepararFinalizacao('${d.id}')" class="flex-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white py-2.5 rounded-xl font-bold text-xs uppercase transition-all">BAIXAR PAGAMENTO</button>`}
                                     <button onclick='window.imprimirCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3">🖨️</button>
+                                    <button onclick='window.gerarPDFCupom(${JSON.stringify(d)}, "OS")' class="btn-icon px-3">📄</button>
                                     <button onclick='window.copiarParaRawBT(window.prepararTextoRecibo(${JSON.stringify(d)}, "OS"))' class="btn-icon px-3">📋</button>
                                 </div>
                             </div>
@@ -1156,9 +1403,14 @@
                 resultado.innerHTML = `
                     <div class="flex justify-between items-center mb-2 px-1">
                         <h3 class="text-zinc-400 font-bold text-xs uppercase tracking-wider">Histórico de Eventos: ${cod}</h3>
-                        <button onclick="window.prepararImpressaoHistorico('${cod}')" class="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase shadow-md">
-                            🖨️ Emitir Relatório
-                        </button>
+                        <div class="flex gap-1.5">
+                            <button onclick="window.prepararImpressaoHistorico('${cod}')" class="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase shadow-md">
+                                🖨️ Imprimir
+                            </button>
+                            <button onclick="window.gerarPDFHistorico('${cod}')" class="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase shadow-md">
+                                📄 PDF
+                            </button>
+                        </div>
                     </div>
                 `;
                 
