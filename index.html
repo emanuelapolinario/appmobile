@@ -191,6 +191,10 @@
                 <span class="material-symbols-outlined mb-1 md:mb-0" style="font-variation-settings: 'FILL' 1;">dashboard</span>
                 <span class="font-label-md text-label-md font-semibold">Bancada</span>
             </button>
+            <button class="nav-item flex flex-col items-center justify-center text-on-secondary-container hover:bg-surface-container-low transition-colors active:scale-[0.98] p-2 rounded-xl md:w-full md:flex-row md:gap-3 md:px-4 md:py-3 md:justify-start" onclick="mudarAba('venda', this)">
+                <span class="material-symbols-outlined mb-1 md:mb-0">sell</span>
+                <span class="font-label-md text-label-md font-semibold">Venda Rápida</span>
+            </button>
             <button class="nav-item flex flex-col items-center justify-center text-on-secondary-container hover:bg-surface-container-low transition-colors active:scale-[0.98] p-2 rounded-xl md:w-full md:flex-row md:gap-3 md:px-4 md:py-3 md:justify-start" onclick="mudarAba('consulta', this)">
                 <span class="material-symbols-outlined mb-1 md:mb-0">history</span>
                 <span class="font-label-md text-label-md font-semibold">Histórico</span>
@@ -315,6 +319,38 @@
                 </div>
             </div>
 
+            <!-- Tela Venda Rápida (produtos avulsos, ex: carregador) -->
+            <div class="hidden space-y-stack-lg" id="telaVenda">
+                <h2 class="font-headline-md text-headline-md font-semibold text-on-background border-b border-outline-variant/40 pb-2">Venda Rápida</h2>
+                <div class="card p-5 space-y-4">
+                    <div class="flex flex-col gap-1">
+                        <label class="font-label-md text-label-md text-on-surface-variant uppercase">Cliente (Opcional)</label>
+                        <input autocomplete="off" readonly onclick="abrirSeletor('clientes', 'venda')" class="input-field cursor-pointer text-left font-semibold" id="inputClienteVenda" placeholder="CONSUMIDOR / SELECIONAR..." type="text"/>
+                    </div>
+
+                    <div id="carrinhoVenda" class="bg-surface-container-low border border-outline-variant/40 p-3 rounded-xl min-h-[60px] max-h-[160px] overflow-y-auto space-y-1"></div>
+
+                    <div class="flex justify-between px-1 border-b border-outline-variant/30 pb-2 items-center">
+                        <span class="font-label-md text-[10px] text-on-surface-variant uppercase">Total da Venda:</span>
+                        <span id="totalCarrinhoVenda" class="font-bold text-emerald-600 text-lg">R$ 0,00</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="abrirSeletorProdutoVenda()" class="btn-outline flex-1 flex items-center justify-center gap-2 text-label-md font-label-md uppercase font-semibold">
+                            <span class="material-symbols-outlined text-[18px]">inventory_2</span> Item da Tabela
+                        </button>
+                        <button onclick="abrirValorPersonalizado('venda')" class="btn-outline flex-1 flex items-center justify-center gap-2 text-label-md font-label-md uppercase font-semibold">
+                            <span class="material-symbols-outlined text-[18px]">edit</span> Valor Personalizado
+                        </button>
+                    </div>
+
+                    <button id="btnFinalizarVenda" class="btn-primary w-full flex items-center justify-center gap-2 mt-2" onclick="finalizarVenda()">
+                        <span class="material-symbols-outlined">point_of_sale</span>
+                        Finalizar Venda e Receber
+                    </button>
+                </div>
+            </div>
+
             <!-- Tela Histórico -->
             <div class="hidden space-y-stack-lg" id="telaHistorico">
                 <h2 class="font-headline-md text-headline-md font-semibold text-on-background border-b border-outline-variant/40 pb-2">Histórico de Concluídos</h2>
@@ -366,9 +402,14 @@
                     <span class="material-symbols-outlined text-primary">gavel</span>
                     Lançar Serviços
                 </h3>
-                <button onclick="abrirCriarNovoServico()" class="bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-colors px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-xs">add</span> Criar Serviço
-                </button>
+                <div class="flex items-center gap-1">
+                    <button onclick="abrirValorPersonalizado('os')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-xs">edit</span> Personalizado
+                    </button>
+                    <button onclick="abrirCriarNovoServico()" class="bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-colors px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-xs">add</span> Criar Serviço
+                    </button>
+                </div>
             </div>
 
             <div id="carrinhoServicos" class="bg-surface-container-low border border-outline-variant/40 p-3 rounded-xl min-h-[60px] max-h-[110px] overflow-y-auto my-3 space-y-1"></div>
@@ -389,7 +430,7 @@
         </div>
     </div>
 
-    <!-- Seletor Unificado Clientes/Máquinas -->
+    <!-- Seletor Unificado Clientes/Máquinas/Produtos -->
     <div id="modalSeletorGeral" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay">
         <div class="modal-content w-full max-w-sm flex flex-col max-h-[75vh] overflow-hidden">
             <div class="p-5 border-b border-outline-variant/40 bg-surface-container-low flex justify-between items-center rounded-t-2xl">
@@ -436,6 +477,27 @@
         </div>
     </div>
 
+    <!-- Modal Valor Personalizado (item avulso sem tabela) -->
+    <div id="modalValorPersonalizado" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-sm p-6 space-y-4">
+            <h3 class="font-headline-md text-base text-on-background uppercase text-center border-b border-outline-variant/40 pb-2">Item com Valor Personalizado</h3>
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label class="font-label-md text-[10px] text-on-surface-variant uppercase px-1">Descrição</label>
+                    <input id="inputPersonalizadoNome" type="text" class="input-field uppercase font-semibold" placeholder="EX: DEPÓSITO TRÁFEGO PAGO">
+                </div>
+                <div class="space-y-1">
+                    <label class="font-label-md text-[10px] text-on-surface-variant uppercase px-1">Valor (R$)</label>
+                    <input id="inputPersonalizadoValor" type="number" step="0.01" class="input-field font-bold text-emerald-600 text-center" placeholder="0.00">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-outline-variant/40">
+                <button onclick="document.getElementById('modalValorPersonalizado').classList.add('hidden')" class="flex-1 bg-surface-container-low text-on-surface-variant border border-outline-variant/60 p-3 rounded-xl font-bold text-xs uppercase">Voltar</button>
+                <button onclick="salvarValorPersonalizado()" class="flex-1 btn-primary p-3 rounded-xl text-xs">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- jsPDF (geração de PDF real, client-side) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -461,10 +523,13 @@
         let clienteAtualSelecao = null;
         let valorBrutoGlobal = 0;
         let listaServicosTemporaria = [];
+        let carrinhoVendaTemp = [];
         let ordensBancada = {};
         let historicoAtual = [];
         let modoPagamento = 'SINGLE';
         let tipoSeletorAtual = '';
+        let contextoSeletorAtual = 'padrao'; // 'padrao' | 'venda'
+        let contextoValorPersonalizado = 'os'; // 'os' | 'venda'
         // Cache em memória: evita rebuscar no Firestore o que muda pouco
         let cacheServicos = null;
         let cacheFormasPagamento = null;
@@ -538,6 +603,7 @@
         window.mudarAba = (aba, navElement) => {
             document.getElementById('telaPendentes').classList.add('hidden');
             document.getElementById('telaCadastro').classList.add('hidden');
+            document.getElementById('telaVenda').classList.add('hidden');
             document.getElementById('telaHistorico').classList.add('hidden');
 
             if(navElement) {
@@ -556,6 +622,12 @@
                 document.getElementById('telaPendentes').classList.remove('hidden');
                 carregarPendentes();
                 calcularFaturamento();
+            }
+            if(aba === 'venda') {
+                document.getElementById('telaVenda').classList.remove('hidden');
+                carrinhoVendaTemp = [];
+                document.getElementById('inputClienteVenda').value = "";
+                atualizarCarrinhoVenda();
             }
             if(aba === 'consulta') document.getElementById('telaHistorico').classList.remove('hidden');
         };
@@ -1228,6 +1300,7 @@
                 snap.forEach(dDoc => {
                     const s = dDoc.data();
                     itens.push({
+                        id: dDoc.id,
                         nome: s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id,
                         valor: s.valor || s.preco || 0
                     });
@@ -1242,13 +1315,29 @@
             listaTabela.innerHTML = "";
             itens.forEach(s => {
                 listaTabela.innerHTML += `
-                    <button onclick="adicionarAoCarrinho('${s.nome}', ${s.valor})" class="w-full p-3 mb-1.5 bg-surface-container-low border border-outline-variant/40 rounded-xl text-left active:border-primary flex justify-between items-center transition-all">
-                        <span class="font-bold text-on-background uppercase text-xs">${s.nome}</span>
-                        <span class="text-emerald-600 font-bold text-xs">R$ ${parseFloat(s.valor).toFixed(2)}</span>
-                    </button>
+                    <div class="w-full p-3 mb-1.5 bg-surface-container-low border border-outline-variant/40 rounded-xl flex justify-between items-center transition-all gap-2">
+                        <button onclick="adicionarAoCarrinho('${s.nome.replace(/'/g, "\\'")}', ${s.valor})" class="flex-1 text-left flex justify-between items-center">
+                            <span class="font-bold text-on-background uppercase text-xs">${s.nome}</span>
+                            <span class="text-emerald-600 font-bold text-xs ml-2">R$ ${parseFloat(s.valor).toFixed(2)}</span>
+                        </button>
+                        <button onclick="excluirServicoTabela('${s.id}')" class="text-red-500 hover:text-red-700 transition-colors p-1 shrink-0" title="Excluir serviço da tabela">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                    </div>
                 `;
             });
         }
+
+        window.excluirServicoTabela = async (id) => {
+            if (!confirm("⚠️ EXCLUIR ESTE SERVIÇO DA TABELA DE PREÇOS?\n\nIsso não afeta ordens já lançadas.")) return;
+            try {
+                await deleteDoc(doc(db, "servicos_lista", id));
+                if (cacheServicos) {
+                    cacheServicos = cacheServicos.filter(s => s.id !== id);
+                    renderizarTabelaServicos(cacheServicos);
+                }
+            } catch (e) { alert("Erro: " + e.message); }
+        };
 
         window.abrirCriarNovoServico = () => {
             document.getElementById('inputNovoServicoNome').value = "";
@@ -1276,9 +1365,9 @@
                     valor: precoServ
                 });
                 if (cacheServicos) {
-                    cacheServicos.push({ nome: nomeServ, valor: precoServ });
+                    cacheServicos.push({ id: docRef.id, nome: nomeServ, valor: precoServ });
                 } else {
-                    cacheServicos = [{ nome: nomeServ, valor: precoServ }];
+                    cacheServicos = [{ id: docRef.id, nome: nomeServ, valor: precoServ }];
                 }
                 document.getElementById('modalNovoServicoTabela').classList.add('hidden');
                 if (idAtual) renderizarTabelaServicos(cacheServicos);
@@ -1289,6 +1378,29 @@
                 btn.disabled = false;
             }
         };
+
+        // ================== VALOR PERSONALIZADO (item avulso sem tabela) ==================
+        window.abrirValorPersonalizado = (contexto) => {
+            contextoValorPersonalizado = contexto; // 'os' ou 'venda'
+            document.getElementById('inputPersonalizadoNome').value = "";
+            document.getElementById('inputPersonalizadoValor').value = "";
+            document.getElementById('modalValorPersonalizado').classList.remove('hidden');
+        };
+
+        window.salvarValorPersonalizado = () => {
+            const nome = document.getElementById('inputPersonalizadoNome').value.toUpperCase().trim();
+            const valor = parseFloat(document.getElementById('inputPersonalizadoValor').value || 0);
+
+            if (!nome || valor <= 0) return alert("Preencha a Descrição e um Valor Maior que Zero!");
+
+            if (contextoValorPersonalizado === 'venda') {
+                adicionarAoCarrinhoVenda(nome, valor);
+            } else {
+                adicionarAoCarrinho(nome, valor);
+            }
+            document.getElementById('modalValorPersonalizado').classList.add('hidden');
+        };
+        // ================== FIM VALOR PERSONALIZADO ==================
 
         window.adicionarAoCarrinho = (nome, preco) => {
             listaServicosTemporaria.push({nome: nome, preco: preco});
@@ -1456,32 +1568,56 @@
             } catch (e) { alert("Erro: " + e.message); }
         };
 
-        window.abrirSeletor = async (tipo) => {
+        window.abrirSeletor = async (tipo, contexto = 'padrao') => {
             tipoSeletorAtual = tipo;
+            contextoSeletorAtual = contexto;
             const modal = document.getElementById('modalSeletorGeral');
             const lista = document.getElementById('listaSeletorGeral');
-            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? 'Selecionar Cliente' : 'Selecionar Máquina';
+            document.getElementById('tituloSeletorGeral').innerText = tipo === 'clientes' ? 'Selecionar Cliente' : (tipo === 'maquinas' ? 'Selecionar Máquina' : 'Selecionar Item');
             modal.classList.remove('hidden');
             lista.innerHTML = "<p class='p-8 text-center animate-pulse text-xs text-primary/70 font-semibold'>Carregando registros...</p>";
 
             try {
                 const snap = await getDocs(collection(db, tipo));
                 lista.innerHTML = "";
+                if (snap.empty) {
+                    lista.innerHTML = "<p class='p-8 text-center text-on-surface-variant text-xs font-semibold'>Nenhum registro cadastrado.</p>";
+                    return;
+                }
                 snap.forEach(dDoc => {
                     const d = dDoc.data();
                     const n = d.descricao || d.peca || d.nome || d.equipamento || dDoc.id;
+                    const nEsc = n.replace(/'/g, "\\'");
                     lista.innerHTML += `
-                        <button onclick="definirItem('${tipo}', '${n}')" class="w-full p-4 text-left font-bold uppercase text-on-background hover:bg-surface-container-low text-xs transition-colors">
-                            ${n}
-                        </button>
+                        <div class="w-full flex items-center justify-between hover:bg-surface-container-low transition-colors">
+                            <button onclick="definirItem('${tipo}', '${nEsc}')" class="flex-1 p-4 text-left font-bold uppercase text-on-background text-xs">
+                                ${n}
+                            </button>
+                            <button onclick="excluirItemSeletor('${tipo}', '${dDoc.id}', '${nEsc}')" class="text-red-500 hover:text-red-700 transition-colors p-2 mr-2 shrink-0" title="Excluir">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
                     `;
                 });
             } catch (e) { alert("Erro: " + e.message); }
         };
 
+        window.excluirItemSeletor = async (tipo, id, nome) => {
+            const rotulo = tipo === 'clientes' ? 'CLIENTE' : 'MÁQUINA';
+            if (!confirm(`⚠️ EXCLUIR ${rotulo} "${nome}"?\n\nIsso não apaga ordens de serviço já registradas para ele(a).`)) return;
+            try {
+                await deleteDoc(doc(db, tipo, id));
+                window.abrirSeletor(tipo, contextoSeletorAtual);
+            } catch (e) { alert("Erro: " + e.message); }
+        };
+
         window.definirItem = (tipo, valor) => {
-            if(tipo === 'clientes') document.getElementById('inputCliente').value = valor;
-            else document.getElementById('inputEquipamento').value = valor;
+            if(tipo === 'clientes') {
+                if (contextoSeletorAtual === 'venda') document.getElementById('inputClienteVenda').value = valor;
+                else document.getElementById('inputCliente').value = valor;
+            } else {
+                document.getElementById('inputEquipamento').value = valor;
+            }
             document.getElementById('modalSeletorGeral').classList.add('hidden');
         };
 
@@ -1569,6 +1705,129 @@
                 btnGravar.disabled = false;
             }
         };
+
+        // ================== VENDA RÁPIDA (produtos avulsos, ex: carregador) ==================
+        window.abrirSeletorProdutoVenda = async () => {
+            const modal = document.getElementById('modalSeletorGeral');
+            const lista = document.getElementById('listaSeletorGeral');
+            document.getElementById('tituloSeletorGeral').innerText = 'Selecionar Produto/Serviço';
+            modal.classList.remove('hidden');
+            lista.innerHTML = "<p class='p-8 text-center animate-pulse text-xs text-primary/70 font-semibold'>Buscando tabela...</p>";
+
+            let itens = cacheServicos;
+            if (!itens) {
+                try {
+                    const snap = await getDocs(collection(db, "servicos_lista"));
+                    itens = [];
+                    snap.forEach(dDoc => {
+                        const s = dDoc.data();
+                        itens.push({
+                            id: dDoc.id,
+                            nome: s.descricao || s.servicos_lista || s.servico || s.nome || dDoc.id,
+                            valor: s.valor || s.preco || 0
+                        });
+                    });
+                    cacheServicos = itens;
+                } catch (e) { alert("Erro: " + e.message); return; }
+            }
+
+            lista.innerHTML = "";
+            if (itens.length === 0) {
+                lista.innerHTML = "<p class='p-8 text-center text-on-surface-variant text-xs font-semibold'>Nenhum item cadastrado na tabela.</p>";
+                return;
+            }
+            itens.forEach(s => {
+                const nEsc = s.nome.replace(/'/g, "\\'");
+                lista.innerHTML += `
+                    <div class="w-full flex items-center justify-between hover:bg-surface-container-low transition-colors">
+                        <button onclick="adicionarAoCarrinhoVenda('${nEsc}', ${s.valor}); document.getElementById('modalSeletorGeral').classList.add('hidden');" class="flex-1 p-4 text-left flex justify-between items-center">
+                            <span class="font-bold text-on-background uppercase text-xs">${s.nome}</span>
+                            <span class="text-emerald-600 font-bold text-xs ml-2">R$ ${parseFloat(s.valor).toFixed(2)}</span>
+                        </button>
+                        <button onclick="excluirServicoTabela('${s.id}')" class="text-red-500 hover:text-red-700 transition-colors p-2 mr-2 shrink-0" title="Excluir da tabela">
+                            <span class="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                    </div>
+                `;
+            });
+
+            // Reaproveita o rodapé de fechar padrão do modal (não abre cadastro rápido aqui)
+        };
+
+        window.adicionarAoCarrinhoVenda = (nome, preco) => {
+            carrinhoVendaTemp.push({ nome: nome, preco: preco });
+            atualizarCarrinhoVenda();
+        };
+
+        window.removerDoCarrinhoVenda = (index) => {
+            carrinhoVendaTemp.splice(index, 1);
+            atualizarCarrinhoVenda();
+        };
+
+        window.atualizarCarrinhoVenda = () => {
+            const div = document.getElementById('carrinhoVenda');
+            const totalDisplay = document.getElementById('totalCarrinhoVenda');
+            div.innerHTML = "";
+            let soma = 0;
+
+            if (carrinhoVendaTemp.length === 0) {
+                div.innerHTML = "<p class='text-center text-[11px] text-on-surface-variant py-3'>Nenhum item adicionado ainda.</p>";
+            }
+
+            carrinhoVendaTemp.forEach((s, i) => {
+                soma += s.preco;
+                div.innerHTML += `
+                    <div class="flex justify-between items-center bg-surface-container-lowest border border-outline-variant/40 p-2 rounded-lg">
+                        <span class="text-[11px] font-semibold uppercase text-on-surface-variant">${s.nome} <span class="text-emerald-600">R$ ${s.preco.toFixed(2)}</span></span>
+                        <button onclick="removerDoCarrinhoVenda(${i})" class="text-red-500 font-bold px-2 text-base">×</button>
+                    </div>
+                `;
+            });
+            totalDisplay.innerText = "R$ " + soma.toFixed(2);
+        };
+
+        window.finalizarVenda = async () => {
+            if (carrinhoVendaTemp.length === 0) return alert("Adicione ao menos um item na venda!");
+
+            const cliente = document.getElementById('inputClienteVenda').value.toUpperCase().trim() || "CONSUMIDOR";
+            const nomesCompilados = carrinhoVendaTemp.map(s => s.nome).join(' + ');
+            const valorTotal = carrinhoVendaTemp.reduce((a, b) => a + b.preco, 0);
+
+            const btn = document.getElementById('btnFinalizarVenda');
+            btn.innerText = "SALVANDO VENDA...";
+            btn.disabled = true;
+
+            try {
+                const snapID = await getDocs(collection(db, "ordens"));
+                let maior = 0;
+                snapID.forEach(docS => { const idN = parseInt(docS.id); if(!isNaN(idN) && idN > maior) maior = idN; });
+                const novoID = (maior + 1).toString();
+
+                // Venda avulsa: não precisa de código de máquina - fica PENDENTE de pagamento (fluxo de recebimento reaproveitado)
+                const dados = {
+                    id: parseInt(novoID), codigo_maquina: "VENDA", tipo_registro: "VENDA",
+                    cliente: cliente, equipamento: "VENDA AVULSA", defeito: "",
+                    status: "AGUARDANDO PAGAMENTO", data_entrada: new Date().toLocaleDateString('pt-BR'), timestamp: Date.now(),
+                    servico_principal: nomesCompilados.toUpperCase(), valor_servico: valorTotal,
+                    forma_pagamento: "", data_pagamento: "", desconto: 0, valor_bruto: valorTotal
+                };
+
+                await setDoc(doc(db, "ordens", novoID), dados);
+
+                carrinhoVendaTemp = [];
+                document.getElementById('inputClienteVenda').value = "";
+                atualizarCarrinhoVenda();
+
+                // Abre direto a cobrança dessa venda recém-criada
+                window.prepararFinalizacao(novoID);
+                window.mudarAba('pendentes', document.querySelectorAll('.nav-item')[1]);
+            } catch (err) { alert("Erro: " + err.message); }
+            finally {
+                btn.innerText = "Finalizar Venda e Receber";
+                btn.disabled = false;
+            }
+        };
+        // ================== FIM VENDA RÁPIDA ==================
 
         window.buscarHistorico = async () => {
             const cod = document.getElementById('inputBuscaCod').value.toUpperCase().trim();
