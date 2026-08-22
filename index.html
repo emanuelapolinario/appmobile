@@ -365,6 +365,46 @@
         </div>
     </main>
 
+    <!-- Modal Adicionar Item com Quantidade na Venda Rápida -->
+    <div id="modalItemVendaQtd" class="hidden fixed inset-0 z-[75] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-sm p-6 space-y-4">
+            <h3 class="font-headline-md text-base text-on-background uppercase text-center border-b border-outline-variant/40 pb-2">
+                Adicionar à Venda
+            </h3>
+            
+            <div class="bg-surface-container-low p-3 rounded-xl border border-outline-variant/40 text-center">
+                <span class="font-label-md text-[10px] text-on-surface-variant uppercase block">Produto Selecionado</span>
+                <span id="labelNomeItemVenda" class="font-bold text-sm text-on-background uppercase mt-0.5 block">---</span>
+            </div>
+
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label class="font-label-md text-[10px] text-on-surface-variant uppercase px-1">Quantidade</label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="alterarQtdItemVenda(-1)" class="w-12 h-12 bg-surface-container-low border border-outline-variant rounded-xl font-bold text-xl active:scale-95 flex items-center justify-center text-on-background">-</button>
+                        <input id="inputItemVendaQtd" type="number" min="1" value="1" oninput="calcularTotalModalItemVenda()" class="input-field text-center font-bold text-lg flex-1">
+                        <button type="button" onclick="alterarQtdItemVenda(1)" class="w-12 h-12 bg-surface-container-low border border-outline-variant rounded-xl font-bold text-xl active:scale-95 flex items-center justify-center text-on-background">+</button>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="font-label-md text-[10px] text-on-surface-variant uppercase px-1">Valor Unitário (R$)</label>
+                    <input id="inputItemVendaUnitario" type="number" step="0.01" oninput="calcularTotalModalItemVenda()" class="input-field text-center font-bold text-emerald-600 text-lg">
+                </div>
+
+                <div class="flex justify-between items-center bg-surface-container-high p-3 rounded-xl">
+                    <span class="font-label-md text-xs text-on-surface-variant uppercase font-semibold">Subtotal:</span>
+                    <span id="labelItemVendaSubtotal" class="font-bold text-emerald-700 text-lg">R$ 0,00</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t border-outline-variant/40">
+                <button onclick="document.getElementById('modalItemVendaQtd').classList.add('hidden')" class="flex-1 bg-surface-container-low text-on-surface-variant border border-outline-variant/60 p-3 rounded-xl font-bold text-xs uppercase">Cancelar</button>
+                <button onclick="confirmarInclusaoItemVenda()" class="flex-1 btn-primary p-3 rounded-xl text-xs">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Receber -->
     <div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay" id="modalPagamento">
         <div class="modal-content w-full max-w-sm p-6 space-y-5">
@@ -492,7 +532,7 @@
             </div>
             <div class="flex gap-2 pt-2 border-t border-outline-variant/40">
                 <button onclick="document.getElementById('modalValorPersonalizado').classList.add('hidden')" class="flex-1 bg-surface-container-low text-on-surface-variant border border-outline-variant/60 p-3 rounded-xl font-bold text-xs uppercase">Voltar</button>
-                <button onclick="salvarValorPersonalizado()" class="flex-1 btn-primary p-3 rounded-xl text-xs">Adicionar</button>
+                <button onclick="salvarValorPersonalizado()" class="flex-1 btn-primary p-3 rounded-xl text-xs">Prosseguir</button>
             </div>
         </div>
     </div>
@@ -500,7 +540,7 @@
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Firebase App -->
+    <!-- Firebase App Integrado -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDocs, getDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -531,6 +571,7 @@
         let contextoValorPersonalizado = 'os';
         let cacheServicos = null;
         let cacheFormasPagamento = null;
+        let itemEmConfiguracaoVenda = { nome: '', unitario: 0 };
 
         window.formatarDataBR = (dataStr) => {
             if (!dataStr) return "---";
@@ -1411,12 +1452,13 @@
 
             if (!nome || valor <= 0) return alert("Preencha a Descrição e um Valor Maior que Zero!");
 
+            document.getElementById('modalValorPersonalizado').classList.add('hidden');
+
             if (contextoValorPersonalizado === 'venda') {
-                window.solicitarQuantidadeVenda(nome, valor);
+                window.abrirModalItemVendaQtd(nome, valor);
             } else {
                 adicionarAoCarrinho(nome, valor);
             }
-            document.getElementById('modalValorPersonalizado').classList.add('hidden');
         };
 
         window.adicionarAoCarrinho = (nome, preco) => {
@@ -1723,6 +1765,7 @@
             }
         };
 
+        // ================== VENDA RÁPIDA (COM QUANTIDADE E MODAL NATIVO) ==================
         window.abrirSeletorProdutoVenda = async () => {
             const modal = document.getElementById('modalSeletorGeral');
             const lista = document.getElementById('listaSeletorGeral');
@@ -1756,7 +1799,7 @@
                 const nEsc = s.nome.replace(/'/g, "\\'");
                 lista.innerHTML += `
                     <div class="w-full flex items-center justify-between hover:bg-surface-container-low transition-colors">
-                        <button onclick="solicitarQuantidadeVenda('${nEsc}', ${s.valor}); document.getElementById('modalSeletorGeral').classList.add('hidden');" class="flex-1 p-4 text-left flex justify-between items-center">
+                        <button onclick="abrirModalItemVendaQtd('${nEsc}', ${s.valor}); document.getElementById('modalSeletorGeral').classList.add('hidden');" class="flex-1 p-4 text-left flex justify-between items-center">
                             <span class="font-bold text-on-background uppercase text-xs">${s.nome}</span>
                             <span class="text-emerald-600 font-bold text-xs ml-2">R$ ${parseFloat(s.valor).toFixed(2)}</span>
                         </button>
@@ -1768,27 +1811,46 @@
             });
         };
 
-        window.solicitarQuantidadeVenda = (nome, precoUnitario) => {
-            let qtdStr = prompt(`Quantidade para "${nome}":`, "1");
-            if (qtdStr === null) return;
-            let qtd = parseInt(qtdStr, 10);
-            if (isNaN(qtd) || qtd <= 0) return alert("Quantidade inválida!");
-
-            let precoStr = prompt(`Valor unitário de "${nome}":`, precoUnitario);
-            if (precoStr === null) return;
-            let unit = parseFloat(precoStr.toString().replace(',', '.'));
-            if (isNaN(unit) || unit < 0) return alert("Valor inválido!");
-
-            window.adicionarAoCarrinhoVenda(nome, unit, qtd);
+        window.abrirModalItemVendaQtd = (nome, precoUnitario) => {
+            itemEmConfiguracaoVenda = { nome: nome, unitario: parseFloat(precoUnitario || 0) };
+            document.getElementById('labelNomeItemVenda').innerText = nome;
+            document.getElementById('inputItemVendaQtd').value = 1;
+            document.getElementById('inputItemVendaUnitario').value = itemEmConfiguracaoVenda.unitario.toFixed(2);
+            calcularTotalModalItemVenda();
+            document.getElementById('modalItemVendaQtd').classList.remove('hidden');
         };
 
-        window.adicionarAoCarrinhoVenda = (nome, unit, qtd = 1) => {
-            carrinhoVendaTemp.push({ 
-                nome: nome, 
-                unitario: unit, 
-                quantidade: qtd, 
-                preco: unit * qtd 
+        window.alterarQtdItemVenda = (delta) => {
+            const inputQtd = document.getElementById('inputItemVendaQtd');
+            let atual = parseInt(inputQtd.value || 1, 10);
+            atual += delta;
+            if (atual < 1) atual = 1;
+            inputQtd.value = atual;
+            calcularTotalModalItemVenda();
+        };
+
+        window.calcularTotalModalItemVenda = () => {
+            const qtd = parseInt(document.getElementById('inputItemVendaQtd').value || 1, 10);
+            const unit = parseFloat(document.getElementById('inputItemVendaUnitario').value || 0);
+            const subtotal = (qtd > 0 ? qtd : 1) * (unit >= 0 ? unit : 0);
+            document.getElementById('labelItemVendaSubtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
+        };
+
+        window.confirmarInclusaoItemVenda = () => {
+            const qtd = parseInt(document.getElementById('inputItemVendaQtd').value || 1, 10);
+            const unit = parseFloat(document.getElementById('inputItemVendaUnitario').value || 0);
+
+            if (isNaN(qtd) || qtd <= 0) return alert("Insira uma quantidade válida!");
+            if (isNaN(unit) || unit <= 0) return alert("Insira um valor unitário válido!");
+
+            carrinhoVendaTemp.push({
+                nome: itemEmConfiguracaoVenda.nome,
+                unitario: unit,
+                quantidade: qtd,
+                preco: unit * qtd
             });
+
+            document.getElementById('modalItemVendaQtd').classList.add('hidden');
             atualizarCarrinhoVenda();
         };
 
@@ -1812,7 +1874,7 @@
                 div.innerHTML += `
                     <div class="flex justify-between items-center bg-surface-container-lowest border border-outline-variant/40 p-2 rounded-lg">
                         <span class="text-[11px] font-semibold uppercase text-on-surface-variant">
-                            ${s.quantidade}x ${s.nome} (R$ ${s.unitario.toFixed(2)} un) = <span class="text-emerald-600 font-bold">R$ ${s.preco.toFixed(2)}</span>
+                            <span class="text-primary font-bold">${s.quantidade}x</span> ${s.nome} <span class="text-xs text-on-surface-variant font-normal">(R$ ${s.unitario.toFixed(2)} un)</span> = <span class="text-emerald-600 font-bold">R$ ${s.preco.toFixed(2)}</span>
                         </span>
                         <button onclick="removerDoCarrinhoVenda(${i})" class="text-red-500 font-bold px-2 text-base">×</button>
                     </div>
