@@ -344,8 +344,8 @@
                     </div>
 
                     <button id="btnFinalizarVenda" class="btn-primary w-full flex items-center justify-center gap-2 mt-2" onclick="finalizarVenda()">
-                        <span class="material-symbols-outlined">point_of_sale</span>
-                        Finalizar Venda e Receber
+                        <span class="material-symbols-outlined">save</span>
+                        Salvar
                     </button>
                 </div>
             </div>
@@ -1892,7 +1892,7 @@
             const valorTotal = carrinhoVendaTemp.reduce((a, b) => a + b.preco, 0);
 
             const btn = document.getElementById('btnFinalizarVenda');
-            btn.innerText = "SALVANDO VENDA...";
+            btn.innerText = "SALVANDO...";
             btn.disabled = true;
 
             try {
@@ -1926,11 +1926,10 @@
                 document.getElementById('inputClienteVenda').value = "";
                 atualizarCarrinhoVenda();
 
-                window.prepararFinalizacao(novoID);
                 window.mudarAba('pendentes', document.querySelectorAll('.nav-item')[1]);
             } catch (err) { alert("Erro: " + err.message); }
             finally {
-                btn.innerText = "Finalizar Venda e Receber";
+                btn.innerText = "Salvar";
                 btn.disabled = false;
             }
         };
