@@ -1436,6 +1436,73 @@
         </div>
     </div>
 
+    <!-- Modal de Protocolo de Entrada de O.S. (Apple Glass Style) -->
+    <div id="modalProtocoloEntrada" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-overlay">
+        <div class="modal-content w-full max-w-md p-6 flex flex-col space-y-4">
+            <!-- Cabeçalho de Sucesso -->
+            <div class="flex items-center gap-3 border-b border-[var(--apple-cell-divider)] pb-3">
+                <div class="apple-icon-squircle bg-gradient-to-tr from-[#34c759] to-[#30d158] shadow-md shadow-[#34c759]/20 !w-10 !h-10 text-white flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[22px]">check_circle</span>
+                </div>
+                <div>
+                    <h3 class="text-base md:text-lg font-bold text-[var(--apple-text-main)] tracking-tight">OS Registrada com Sucesso!</h3>
+                    <p class="text-xs font-semibold text-[#34c759] uppercase tracking-wider">Protocolo de Entrada Emitido</p>
+                </div>
+            </div>
+
+            <!-- Card de Resumo do Protocolo -->
+            <div class="inner-box p-4 space-y-2 text-xs">
+                <div class="flex justify-between items-center border-b border-[var(--apple-cell-divider)] pb-2">
+                    <span class="text-[var(--apple-text-sub)] uppercase font-bold text-[10px] tracking-wider">Número da OS</span>
+                    <span id="protoModalId" class="font-bold text-[#0071e3] text-sm">#000</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-[var(--apple-cell-divider)] pb-2">
+                    <span class="text-[var(--apple-text-sub)] uppercase font-bold text-[10px] tracking-wider">Código Máquina</span>
+                    <span id="protoModalCod" class="font-bold text-[var(--apple-text-main)] text-sm tracking-wider">ABC000</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-[var(--apple-cell-divider)] pb-2">
+                    <span class="text-[var(--apple-text-sub)] uppercase font-bold text-[10px] tracking-wider">Cliente</span>
+                    <span id="protoModalCliente" class="font-bold text-[var(--apple-text-main)] uppercase">---</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-[var(--apple-cell-divider)] pb-2">
+                    <span class="text-[var(--apple-text-sub)] uppercase font-bold text-[10px] tracking-wider">Equipamento</span>
+                    <span id="protoModalEquipamento" class="font-semibold text-[var(--apple-text-main)] uppercase">---</span>
+                </div>
+                <div>
+                    <span class="text-[var(--apple-text-sub)] uppercase font-bold text-[10px] tracking-wider block mb-0.5">Defeito Relatado</span>
+                    <p id="protoModalDefeito" class="text-[var(--apple-text-main)] italic">---</p>
+                </div>
+            </div>
+
+            <!-- Botões de Ação do Protocolo (Imprimir, PDF, Copiar) -->
+            <div class="grid grid-cols-3 gap-2 pt-1">
+                <button onclick="window.imprimirProtocoloRecente()"
+                    class="btn-primary !py-2.5 flex flex-col items-center justify-center gap-1 text-[11px] font-bold uppercase shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">print</span>
+                    <span>Imprimir</span>
+                </button>
+                <button onclick="window.gerarPDFProtocoloRecente()"
+                    class="btn-outline !py-2.5 flex flex-col items-center justify-center gap-1 text-[11px] font-bold uppercase text-[#0071e3] hover:bg-[#0071e3]/10">
+                    <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                    <span>Gerar PDF</span>
+                </button>
+                <button onclick="window.copiarProtocoloRecente()"
+                    class="btn-outline !py-2.5 flex flex-col items-center justify-center gap-1 text-[11px] font-bold uppercase text-[#34c759] hover:bg-[#34c759]/10">
+                    <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                    <span>Copiar</span>
+                </button>
+            </div>
+
+            <!-- Ações de Navegação -->
+            <div class="flex gap-2 pt-2 border-t border-[var(--apple-cell-divider)]">
+                <button onclick="window.fecharModalProtocolo(false)"
+                    class="flex-1 bg-[var(--apple-badge-bg)] text-[var(--apple-text-sub)] hover:text-[var(--apple-text-main)] p-3 rounded-xl font-bold text-xs uppercase transition-colors">Nova OS</button>
+                <button onclick="window.fecharModalProtocolo(true)"
+                    class="flex-1 btn-outline !py-3 text-xs uppercase font-bold">Ir p/ Bancada</button>
+            </div>
+        </div>
+    </div>
+
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -1525,28 +1592,59 @@
         };
 
         window.copiarParaRawBT = (texto) => {
-            navigator.clipboard.writeText(texto).then(() => {
-                alert("RECIBO COPIADO! Cole no RawBT.");
-            }).catch(err => alert("Erro: " + err));
+            if (!texto) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(texto).then(() => {
+                    alert("COPIADO COM SUCESSO!\nCole no RawBT ou WhatsApp.");
+                }).catch(() => {
+                    fallbackCopiarTexto(texto);
+                });
+            } else {
+                fallbackCopiarTexto(texto);
+            }
         };
 
+        function fallbackCopiarTexto(texto) {
+            try {
+                const ta = document.createElement("textarea");
+                ta.value = texto;
+                ta.style.position = "fixed";
+                ta.style.left = "-9999px";
+                ta.style.top = "-9999px";
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                const sucesso = document.execCommand("copy");
+                document.body.removeChild(ta);
+                if (sucesso) {
+                    alert("COPIADO COM SUCESSO!\nCole no RawBT ou WhatsApp.");
+                } else {
+                    prompt("Copie o texto manualmente abaixo:", texto);
+                }
+            } catch (err) {
+                prompt("Copie o texto manualmente abaixo:", texto);
+            }
+        }
+
         window.prepararTextoRecibo = (d, tipo = 'OS') => {
+            if (!d) return "";
             const isVenda = d.tipo_registro === 'VENDA' || d.codigo_maquina === 'VENDA';
+            const isPendente = d.status === 'PENDENTE' || (!d.servico_principal && !isVenda);
             const div = "--------------------------------";
             const valTotal = parseFloat(d.valor_servico || 0).toFixed(2);
             const valBruto = (parseFloat(d.valor_bruto) || (parseFloat(d.valor_servico || 0) + parseFloat(d.desconto || 0))).toFixed(2);
             const data = window.formatarDataBR(d.data_entrada);
 
             let t = `EMANUEL SOLUCOES\n`;
-            t += `${isVenda ? 'VENDA RAPIDA' : (tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO')}\n`;
+            t += `${isVenda ? 'VENDA RAPIDA' : (isPendente ? 'PROTOCOLO DE ENTRADA (OS)' : (tipo === 'OS' ? 'ORDEM DE SERVICO' : 'RECIBO DE PAGAMENTO'))}\n`;
             t += `${div}\n`;
-            t += `${isVenda ? 'VENDA' : 'OS'}: ${d.id}${!isVenda ? ' - COD: ' + d.codigo_maquina : ''}\n`;
+            t += `${isVenda ? 'VENDA' : 'OS'}: ${d.id}${!isVenda ? ' - COD: ' + (d.codigo_maquina || '---') : ''}\n`;
             t += `${div}\n`;
             t += `DATA: ${data}\n`;
-            t += `CLIENTE: ${d.cliente}\n`;
+            t += `CLIENTE: ${d.cliente || 'NAO INFORMADO'}\n`;
 
             if (!isVenda) {
-                t += `EQUIP.: ${d.equipmento || d.equipamento}\n`;
+                t += `EQUIP.: ${d.equipmento || d.equipamento || '---'}\n`;
                 t += `${div}\n`;
                 t += `DEFEITO: ${d.defeito || 'NAO INFORMADO'}\n`;
             }
@@ -1564,10 +1662,76 @@
                 if (d.forma_pagamento) {
                     t += `PAGO VIA: ${d.forma_pagamento}\n`;
                 }
+            } else if (!isVenda) {
+                t += `${div}\n`;
+                t += `STATUS: AGUARDANDO AVALIACAO TECNICA\n`;
+                t += `(EQUIPAMENTO RECEBIDO NA BANCADA)\n`;
             }
             t += `${div}\n`;
             t += `AGRADECEMOS A PREFERENCIA!\n`;
             return t.toUpperCase();
+        };
+
+        // Acesso seguro e unificado aos dados das ordens por ID
+        window.obterDadosOrdemPorId = (idOS) => {
+            if (!idOS) return null;
+            if (ordensBancada && ordensBancada[idOS]) return ordensBancada[idOS];
+            if (window.ordensBancada && window.ordensBancada[idOS]) return window.ordensBancada[idOS];
+            if (window.ultimaOrdemCadastrada && (window.ultimaOrdemCadastrada.id == idOS)) return window.ultimaOrdemCadastrada;
+            return null;
+        };
+
+        window.imprimirOrdemPorId = (idOS, tipo = 'OS') => {
+            const d = window.obterDadosOrdemPorId(idOS);
+            if (!d) return alert("Ordem não encontrada para impressão.");
+            window.imprimirCupom(d, tipo);
+        };
+
+        window.gerarPDFOrdemPorId = (idOS, tipo = 'OS') => {
+            const d = window.obterDadosOrdemPorId(idOS);
+            if (!d) return alert("Ordem não encontrada para gerar PDF.");
+            window.gerarPDFCupom(d, tipo);
+        };
+
+        window.copiarOrdemPorId = (idOS, tipo = 'OS') => {
+            const d = window.obterDadosOrdemPorId(idOS);
+            if (!d) return alert("Ordem não encontrada para copiar.");
+            window.copiarParaRawBT(window.prepararTextoRecibo(d, tipo));
+        };
+
+        // Funções do Modal de Protocolo de Entrada
+        window.ultimaOrdemCadastrada = null;
+
+        window.abrirModalProtocolo = (dados) => {
+            window.ultimaOrdemCadastrada = dados;
+            document.getElementById('protoModalId').innerText = `#${dados.id}`;
+            document.getElementById('protoModalCod').innerText = dados.codigo_maquina || '---';
+            document.getElementById('protoModalCliente').innerText = dados.cliente || '---';
+            document.getElementById('protoModalEquipamento').innerText = dados.equipamento || '---';
+            document.getElementById('protoModalDefeito').innerText = dados.defeito || 'Não informado';
+            document.getElementById('modalProtocoloEntrada').classList.remove('hidden');
+        };
+
+        window.fecharModalProtocolo = (irParaBancada = true) => {
+            document.getElementById('modalProtocoloEntrada').classList.add('hidden');
+            if (irParaBancada) {
+                window.mudarAba('pendentes', document.querySelectorAll('.nav-item')[1]);
+            }
+        };
+
+        window.imprimirProtocoloRecente = () => {
+            if (!window.ultimaOrdemCadastrada) return alert("Nenhum protocolo disponível.");
+            window.imprimirCupom(window.ultimaOrdemCadastrada, 'OS');
+        };
+
+        window.gerarPDFProtocoloRecente = () => {
+            if (!window.ultimaOrdemCadastrada) return alert("Nenhum protocolo disponível.");
+            window.gerarPDFCupom(window.ultimaOrdemCadastrada, 'OS');
+        };
+
+        window.copiarProtocoloRecente = () => {
+            if (!window.ultimaOrdemCadastrada) return alert("Nenhum protocolo disponível.");
+            window.copiarParaRawBT(window.prepararTextoRecibo(window.ultimaOrdemCadastrada, 'OS'));
         };
 
         window.copiarLoteRawBT = () => {
@@ -1626,13 +1790,15 @@
         };
 
         window.imprimirCupom = (dados, tipo = 'OS') => {
+            if (!dados) return alert("Dados da ordem não encontrados.");
             const isVenda = dados.tipo_registro === 'VENDA' || dados.codigo_maquina === 'VENDA';
+            const isPendente = dados.status === 'PENDENTE' || (!dados.servico_principal && !isVenda);
             const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
             const desc = parseFloat(dados.desconto || 0);
             const total = parseFloat(dados.valor_servico || 0);
             const dataArrumada = window.formatarDataBR(dados.data_entrada);
 
-            let tituloRecibo = isVenda ? 'VENDA RÁPIDA' : (tipo === 'OS' ? 'ORDEM DE SERVIÇO' : 'RECIBO DE PAGAMENTO');
+            let tituloRecibo = isVenda ? 'VENDA RÁPIDA' : (isPendente ? 'PROTOCOLO DE ENTRADA' : (tipo === 'OS' ? 'ORDEM DE SERVIÇO' : 'RECIBO DE PAGAMENTO'));
 
             let layout = `
                 <div class="c b" style="font-size: 13px;">EMANUEL SOLUÇÕES</div>
@@ -1641,12 +1807,12 @@
 
                 <div class="hr"></div>
                 <div><span class="b">${isVenda ? 'VENDA Nº:' : 'OS NÚMERO:'}</span> ${dados.id}</div>
-                ${!isVenda ? `<div><span class="b">CÓD. MÁQ:</span> ${dados.codigo_maquina}</div>` : ''}
+                ${!isVenda ? `<div><span class="b">CÓD. MÁQ:</span> ${dados.codigo_maquina || '---'}</div>` : ''}
                 <div><span class="b">DATA:</span> ${dataArrumada}</div>
                 <div class="hr"></div>
 
                 <div class="b">DADOS DO CLIENTE</div>
-                <div><span class="b">NOME:</span> ${dados.cliente}</div>
+                <div><span class="b">NOME:</span> ${dados.cliente || 'CONSUMIDOR'}</div>
                 <div class="hr"></div>
             `;
 
@@ -1659,21 +1825,22 @@
             } else {
                 layout += `
                     <div class="b">ESPECIFICAÇÕES DO ATENDIMENTO</div>
-                    <div><span class="b">EQUIPAMENTO:</span> ${dados.equipamento}</div>
+                    <div><span class="b">EQUIPAMENTO:</span> ${dados.equipamento || dados.equipmento || '---'}</div>
                     <div style="margin-top: 3px;"><span class="b">DEFEITO RELATADO:</span></div>
                     <div style="padding-left: 5px; font-style: italic;">${dados.defeito || 'NÃO INFORMADO'}</div>
                     <div class="hr"></div>
-                    <div class="b">SERVIÇOS & PEÇAS TROCADAS</div>
                 `;
                 if (dados.servico_principal) {
+                    layout += `<div class="b">SERVIÇOS & PEÇAS TROCADAS</div>`;
                     const servicosLinhas = dados.servico_principal.split('+').map(s => `• ${s.trim()}`).join('<br>');
                     layout += `<div style="margin-top: 4px; line-height: 1.5;">${servicosLinhas}</div><div class="hr"></div>`;
                 } else {
                     layout += `
-                        <div class="c" style="color: #555; font-size: 10px; margin: 10px 0;">(DIAGNÓSTICO TÉCNICO EM ANDAMENTO)</div>
+                        <div class="c" style="color: #333; font-size: 10px; margin: 8px 0; font-weight: bold;">(DIAGNÓSTICO TÉCNICO EM ANDAMENTO)</div>
+                        <div style="font-size: 8px; text-align: center; color: #555; margin-bottom: 8px;">Guarde este protocolo para acompanhamento</div>
                         <div class="hr"></div>
-                        <div style="height: 40px; border-bottom: 1px solid black; margin-top: 20px;"></div>
-                        <div class="c b" style="font-size: 9px; margin-top: 5px;">ASSINATURA DO CLIENTE</div>
+                        <div style="height: 35px; border-bottom: 1px solid black; margin-top: 15px;"></div>
+                        <div class="c b" style="font-size: 9px; margin-top: 4px;">ASSINATURA DO CLIENTE</div>
                     `;
                 }
             }
@@ -1894,16 +2061,18 @@
         }
 
         window.gerarPDFCupom = (dados, tipo = 'OS') => {
+            if (!dados) return alert("Dados da ordem não encontrados.");
             if (!window.jspdf) return alert("Biblioteca de PDF ainda carregando, tente novamente em instantes.");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ unit: "mm", format: "a4" });
             const largura = doc.internal.pageSize.getWidth();
             const isVenda = dados.tipo_registro === 'VENDA' || dados.codigo_maquina === 'VENDA';
+            const isPendente = dados.status === 'PENDENTE' || (!dados.servico_principal && !isVenda);
             const bruto = parseFloat(dados.valor_bruto) || (parseFloat(dados.valor_servico || 0) + parseFloat(dados.desconto || 0));
             const desc = parseFloat(dados.desconto || 0);
             const total = parseFloat(dados.valor_servico || 0);
 
-            let tituloDoc = isVenda ? 'VENDA RÁPIDA' : (tipo === 'OS' ? 'ORDEM DE SERVIÇO' : 'RECIBO DE PAGAMENTO');
+            let tituloDoc = isVenda ? 'VENDA RÁPIDA' : (isPendente ? 'PROTOCOLO DE ENTRADA' : (tipo === 'OS' ? 'ORDEM DE SERVIÇO' : 'RECIBO DE PAGAMENTO'));
             let docNum = `${isVenda ? 'Venda' : 'OS'} #${dados.id}`;
             let y = pdfCabecalho(doc, tituloDoc, docNum);
 
@@ -2524,13 +2693,13 @@
                                 `<button onclick="abrirLancamento('${d.id}')" class="bg-[#0071e3]/15 text-[#0071e3] hover:bg-[#0071e3] hover:text-white transition-all rounded-xl px-4 py-2 text-xs uppercase tracking-wider font-bold active:scale-[0.97] shadow-sm">Lançar Mão de Obra</button>` :
                                 `<button onclick="prepararFinalizacao('${d.id}')" class="bg-[#34c759]/15 text-[#34c759] hover:bg-[#34c759] hover:text-white transition-all rounded-xl px-4 py-2 text-xs uppercase tracking-wider font-bold active:scale-[0.97] shadow-sm">Baixar Pagamento</button>`}
                                     <div class="flex gap-1.5">
-                                        <button onclick="window.imprimirCupom(ordensBancada['${d.id}'], 'OS')" class="btn-icon" title="Imprimir">
+                                        <button onclick="window.imprimirOrdemPorId('${d.id}', 'OS')" class="btn-icon" title="Imprimir cupom">
                                             <span class="material-symbols-outlined text-[18px]">print</span>
                                         </button>
-                                        <button onclick="window.gerarPDFCupom(ordensBancada['${d.id}'], 'OS')" class="btn-icon" title="PDF">
+                                        <button onclick="window.gerarPDFOrdemPorId('${d.id}', 'OS')" class="btn-icon" title="Gerar PDF">
                                             <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
                                         </button>
-                                        <button onclick="window.copiarParaRawBT(window.prepararTextoRecibo(ordensBancada['${d.id}'], 'OS'))" class="btn-icon" title="Copiar">
+                                        <button onclick="window.copiarOrdemPorId('${d.id}', 'OS')" class="btn-icon" title="Copiar texto">
                                             <span class="material-symbols-outlined text-[18px]">content_copy</span>
                                         </button>
                                     </div>
@@ -2546,6 +2715,9 @@
 
                 document.getElementById('valorPendenteGeral').innerText = fmtRS(totalA);
                 document.getElementById('totalPendentesCount').innerText = contagemPendentes;
+
+                // Sincronizar ordensBancada com o window
+                window.ordensBancada = ordensBancada;
 
                 // Atualizar dados do carrossel
                 listaClientesComNotas = Object.keys(mapaClientesPendentes);
@@ -2632,12 +2804,15 @@
                                 <span class="text-[9px] font-bold text-[var(--apple-text-sub)] uppercase">Valor</span>
                                 <span class="text-sm font-bold text-[#34c759] block">${fmtRS(val)}</span>
                             </div>
-                            <div class="flex gap-1.5">
-                                <button onclick="window.imprimirCupom(ordensBancada['${o.id}'], 'OS')" class="btn-icon !p-1" title="Imprimir cupom">
+                            <div class="flex gap-1.5 items-center">
+                                <button onclick="window.imprimirOrdemPorId('${o.id}', 'OS')" class="btn-icon !p-1" title="Imprimir cupom">
                                     <span class="material-symbols-outlined text-[16px]">print</span>
                                 </button>
-                                <button onclick="window.gerarPDFCupom(ordensBancada['${o.id}'], 'OS')" class="btn-icon !p-1 text-[#0071e3]" title="Gerar PDF">
+                                <button onclick="window.gerarPDFOrdemPorId('${o.id}', 'OS')" class="btn-icon !p-1 text-[#0071e3]" title="Gerar PDF">
                                     <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                                </button>
+                                <button onclick="window.copiarOrdemPorId('${o.id}', 'OS')" class="btn-icon !p-1 text-[#34c759]" title="Copiar texto">
+                                    <span class="material-symbols-outlined text-[16px]">content_copy</span>
                                 </button>
                                 ${status === 'PENDENTE' ?
                         `<button onclick="document.getElementById('modalDetalhesCliente').classList.add('hidden'); abrirLancamento('${o.id}')" class="px-2.5 py-1 rounded-lg bg-[#0071e3]/15 text-[#0071e3] text-[10px] font-bold uppercase hover:bg-[#0071e3] hover:text-white transition-colors">Lançar</button>` :
@@ -3195,14 +3370,16 @@
                 };
 
                 await setDoc(doc(db, "ordens", novoID), dados);
-                alert(`OS REGISTRADA COM SUCESSO!\n\nID: ${novoID}\nCÓDIGO: ${codF}`);
+                ordensBancada[dados.id] = dados;
+                window.ordensBancada = ordensBancada;
 
                 document.getElementById('inputCliente').value = "";
                 document.getElementById('inputEquipamento').value = "";
                 document.getElementById('defeito').value = "";
                 document.getElementById('inputManualCod').value = "";
 
-                window.mudarAba('pendentes', document.querySelectorAll('.nav-item')[1]);
+                // Abre o Modal de Protocolo de Entrada para Impressão / PDF / Cópia
+                window.abrirModalProtocolo(dados);
             } catch (err) { alert("Erro: " + err.message); }
             finally {
                 btnGravar.innerText = "Lançar Serviço na Bancada";
